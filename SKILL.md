@@ -147,6 +147,17 @@ at a page bottom, then rebuild.
 
 Only deliver after the contact sheets look clean.
 
+`--check` requires **poppler** (`pdftoppm`) in addition to the pip packages. It
+is a hard dependency, not an optional extra: if `pdftoppm` is missing, the build
+exits non-zero with an install hint instead of quietly skipping the check. A
+build that cannot be inspected is not a build that can be delivered.
+
+```bash
+winget install oschwartz10612.Poppler   # Windows
+brew install poppler                    # macOS
+apt install poppler-utils               # Linux
+```
+
 ## Structure of the finished document
 
 1. **Cover** — course, lecture number, coverage (state explicitly which pages,

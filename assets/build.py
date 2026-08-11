@@ -13,7 +13,8 @@ injects the stylesheet, and renders with WeasyPrint.
 sheets so the layout can be inspected before delivery.
 
 Dependencies:  pip install weasyprint pillow
---check also needs poppler-utils (for pdftoppm).
+--check additionally requires poppler (for pdftoppm) as a hard dependency:
+it exits non-zero if pdftoppm is missing rather than skipping the check.
 """
 
 import argparse
@@ -227,13 +228,24 @@ def visual_check(pdf_path, dpi=55, per_sheet=6):
     for stale in glob.glob(os.path.join(out_dir, "*.png")):
         os.remove(stale)
 
+    # --check is a guarantee, not a best-effort: if it cannot actually look at
+    # the pages it must fail loudly rather than exit 0 having checked nothing.
     try:
         subprocess.run(["pdftoppm", "-r", str(dpi), "-png", pdf_path,
                         os.path.join(out_dir, "pg")], check=True)
-    except (FileNotFoundError, subprocess.CalledProcessError):
-        print("  ! pdftoppm unavailable - skipping rasterisation "
-              "(install poppler-utils)")
-        return
+    except FileNotFoundError:
+        sys.exit(
+            "ERROR: --check requires pdftoppm, which was not found on PATH.\n"
+            "  The visual check is a non-negotiable step (SKILL.md Step 7);\n"
+            "  skipping it would mean delivering an uninspected PDF.\n"
+            "  Install poppler:\n"
+            "    Windows  winget install oschwartz10612.Poppler\n"
+            "    macOS    brew install poppler\n"
+            "    Linux    apt install poppler-utils\n"
+            "  (then restart the shell so PATH picks it up)")
+    except subprocess.CalledProcessError as e:
+        sys.exit("ERROR: pdftoppm failed on %s (exit %d); "
+                 "cannot verify layout." % (pdf_path, e.returncode))
 
     try:
         from PIL import Image
@@ -246,7 +258,8 @@ def visual_check(pdf_path, dpi=55, per_sheet=6):
     for start in range(0, len(pages), per_sheet):
         chunk = [Image.open(p) for p in pages[start:start + per_sheet]]
         w, h = chunk[0].size
-        cols = 3
+        # a 1- or 2-page chunk should not be padded out to a 3-wide sheet
+        cols = min(3, len(chunk))
         rows = (len(chunk) + cols - 1) // cols
         sheet = Image.new("RGB", (w * cols, h * rows), "white")
         for i, img in enumerate(chunk):

@@ -49,8 +49,19 @@ Then just upload your lecture PDF and ask for notes.
 pip install weasyprint pillow
 ```
 
-`--check` (the visual verification step) additionally needs `poppler-utils`
-for `pdftoppm`.
+On Windows, WeasyPrint also needs the GTK3 runtime
+(`winget install tschoonj.GTKForWindows`), otherwise importing it fails with
+`cannot load library 'libgobject-2.0-0'`.
+
+`--check` (the visual verification step) requires **poppler** for `pdftoppm`.
+This is a hard dependency of `--check`, not an optional extra — without it the
+build exits non-zero rather than skipping the inspection:
+
+```bash
+winget install oschwartz10612.Poppler   # Windows
+brew install poppler                    # macOS
+apt install poppler-utils               # Linux
+```
 
 ## Manual use
 
