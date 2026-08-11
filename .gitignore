@@ -1,0 +1,17 @@
+# build output
+_check/
+parts/
+*.pdf
+*.html
+
+# python
+__pycache__/
+.venv/
+venv/
+
+# editor / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini
