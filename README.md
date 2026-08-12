@@ -78,7 +78,7 @@ python assets/build.py \
 
 Code blocks are marked `<pre class="code" data-lang="python">`. Run
 `python assets/build.py --list-langs` to see the available profiles (arm, c,
-python, sql, generic). An unknown language falls back to `generic`, which still
+python, sql, verilog, generic). An unknown language falls back to `generic`, which still
 colours comments, strings and numbers. Adding a language means appending one
 entry to `PROFILES` at the top of `build.py`.
 

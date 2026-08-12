@@ -48,6 +48,10 @@ h4::before { content: "▸ "; color: #e8721c; }
 .cover .kicker { font-size: 9pt; letter-spacing: 2px; opacity: .8; text-transform: uppercase; }
 .cover .sub { font-size: 11pt; margin-top: .5em; opacity: .95; }
 .cover .meta { margin-top: 7mm; font-size: 8.2pt; opacity: .8; line-height: 1.7; }
+/* b/strong is dark navy document-wide; on the dark cover that renders
+   navy-on-navy and disappears. The cover states coverage and provenance,
+   which is exactly the text that wants emphasis. */
+.cover b, .cover strong { color: #ffe0c0; }
 
 /* ---------- code ---------- */
 pre.code, pre.asm, pre.plain {
@@ -102,6 +106,12 @@ td.mono, th.mono { font-family: "DejaVu Sans Mono",monospace; font-size: 7.6pt; 
 .ok { color: #17804a; font-weight: 700; }
 .no { color: #c0392b; font-weight: 700; }
 table.tight td, table.tight th { padding: .2em .38em; }
+/* Tables never break by default, so a long one strands the bottom of the
+   preceding page. class="flow" opts a long reference table back into normal
+   breaking; put its header row in <thead> and it repeats on each page. */
+table.flow, table.flow tbody, table.flow tr {
+  page-break-inside: auto; break-inside: auto;
+}
 
 /* ---------- misc ---------- */
 figure { margin: .5em 0 .65em; page-break-inside: avoid; text-align: center; }

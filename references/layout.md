@@ -42,6 +42,12 @@ uncommented listing is decoration.
 
 Add `class="mono"` to cells holding code, addresses, or register names.
 
+Tables are `page-break-inside: avoid`, so a table taller than the space left on
+the page jumps to the next one whole and strands what it left behind. For a long
+reference table add `class="flow"` and put the header row in `<thead>`: it then
+breaks normally and the header repeats on each page. Check the rasters — a table
+short enough to fit does not need it.
+
 Use `<span class="ok">✔</span>` / `<span class="no">✘</span>` for yes/no
 columns rather than the words.
 

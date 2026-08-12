@@ -98,6 +98,33 @@ PROFILES = {
         """.split()),
         "fold_case": False,
     },
+    "verilog": {
+        # Verilog has no '#' comment: '#' introduces a delay control (#25).
+        # The generic profile would swallow the rest of such a line.
+        "comment": r"//[^\n]*$|(?s:/\*.*?\*/)",
+        "string": r'"(?:[^"\\]|\\.)*"',
+        "directive": r"^[ \t]*`[A-Za-z_]\w*",
+        "label": None,
+        # sized/unsized based literals (4'ha, 16'h0x0z, 'd1), delays (#25),
+        # and plain numbers with underscore separators (2_000_000)
+        "number": (r"[0-9_]*'[sS]?[bBoOdDhH][0-9a-fA-FxXzZ?_]+"
+                   r"|#\d[\d_]*"
+                   r"|\b\d[\d_]*(?:\.\d[\d_]*)?(?:[eE][+-]?\d+)?"),
+        "keywords": set("""
+            module endmodule input output inout wire tri reg integer real time
+            parameter localparam defparam assign always initial begin end
+            if else case casex casez endcase default for while repeat forever
+            function endfunction task endtask posedge negedge generate
+            endgenerate genvar signed wait disable fork join
+        """.split()),
+        # built-in gate primitives get their own colour: a listing that says
+        # "and2" or "inv" is not using a primitive, and that shows up visually
+        "special": set("""
+            and nand or nor xor xnor buf not bufif0 bufif1 notif0 notif1
+            pullup pulldown
+        """.split()),
+        "fold_case": False,
+    },
     "sql": {
         "comment": r"--[^\n]*$",
         "string": r"'(?:[^'\\]|\\.)*'",

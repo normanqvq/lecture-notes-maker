@@ -128,7 +128,7 @@ Mark up code as:
 ```
 
 Run `python assets/build.py --list-langs` for the available profiles
-(currently arm, c, python, sql, generic). An unknown or omitted `data-lang`
+(currently arm, c, python, sql, verilog, generic). An unknown or omitted `data-lang`
 falls back to `generic`, which still colours comments, strings and numbers, so
 an unsupported language degrades gracefully rather than breaking.
 
