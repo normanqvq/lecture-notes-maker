@@ -9,8 +9,9 @@ Build a study-notes PDF from HTML fragments.
 Reads every *.html in --parts (sorted by filename), highlights code blocks,
 injects the stylesheet, and renders with WeasyPrint.
 
---check additionally rasterises the result and tiles the pages into contact
-sheets so the layout can be inspected before delivery.
+--check additionally rasterises the result so the layout can be inspected
+before delivery: full-size page images (pg-NN.png, at --check-dpi) plus small
+contact sheets tiled from them for the overview pass.
 
 Dependencies:  pip install weasyprint pillow
 --check additionally requires poppler (for pdftoppm) as a hard dependency:
@@ -145,7 +146,8 @@ PROFILES = {
         "string": r'"(?:[^"\\]|\\.)*"',
         "directive": None,
         "label": None,
-        "number": r"\b0[xX][0-9A-Fa-f]+\b|\b\d+\.?\d*\b",
+        # tolerate underscore digit separators (1_000_000, 0xDEAD_BEEF)
+        "number": r"\b0[xX][0-9A-Fa-f_]+\b|\b\d[\d_]*\.?[\d_]*\b",
         "keywords": set(),
         "special": set(),
         "fold_case": False,
@@ -209,8 +211,10 @@ def highlight(source, lang="generic"):
     return "".join(out)
 
 
+# class= may sit anywhere in the tag: <pre data-lang="c" class="code"> has to
+# match too, otherwise the block is silently left unhighlighted.
 _BLOCK = re.compile(
-    r'<pre class="(?P<cls>code|asm)(?P<extra>[^"]*)"(?P<attr>[^>]*)>'
+    r'<pre(?P<attr>[^>]*?\sclass="(?P<cls>code|asm)(?P<extra>[^"]*)"[^>]*)>'
     r'(?P<body>.*?)</pre>', re.S)
 
 _LANG_ATTR = re.compile(r'data-lang="([^"]+)"')
@@ -223,9 +227,8 @@ def render_code_blocks(doc):
         # class="asm" without data-lang keeps the ARM default.
         lang = found.group(1) if found else (
             "arm" if m.group("cls") == "asm" else "generic")
-        return ('<pre class="%s%s"%s>%s</pre>'
-                % (m.group("cls"), m.group("extra"), attr,
-                   highlight(m.group("body"), lang)))
+        # attr is the original attribute text, so it round-trips verbatim.
+        return '<pre%s>%s</pre>' % (attr, highlight(m.group("body"), lang))
     return _BLOCK.sub(repl, doc)
 
 
@@ -248,8 +251,18 @@ def assemble(parts_dir, css_path, footer):
             "<style>%s</style></head><body>%s</body></html>" % (css, body))
 
 
-def visual_check(pdf_path, dpi=55, per_sheet=6):
-    """Rasterise pages and tile them into contact sheets for inspection."""
+SHEET_DPI = 55          # contact-sheet thumbnails only
+
+
+def visual_check(pdf_path, dpi=120, per_sheet=6):
+    """Rasterise pages and tile them into contact sheets for inspection.
+
+    Two resolutions on purpose. The pg-NN.png rasters come out at `dpi`, high
+    enough that 7-8 pt code and SVG labels are actually legible - that is what
+    Step 7 asks you to judge, and it cannot be judged on a thumbnail. The
+    contact sheets are tiled from downscaled copies and are only the overview
+    pass: skim them, then open the individual pages that look wrong.
+    """
     out_dir = os.path.join(os.path.dirname(pdf_path) or ".", "_check")
     os.makedirs(out_dir, exist_ok=True)
     for stale in glob.glob(os.path.join(out_dir, "*.png")):
@@ -281,9 +294,17 @@ def visual_check(pdf_path, dpi=55, per_sheet=6):
               "no contact sheets")
         return
 
+    scale = float(SHEET_DPI) / dpi
     pages = sorted(glob.glob(os.path.join(out_dir, "pg-*.png")))
     for start in range(0, len(pages), per_sheet):
-        chunk = [Image.open(p) for p in pages[start:start + per_sheet]]
+        chunk = []
+        for p in pages[start:start + per_sheet]:
+            img = Image.open(p)
+            if scale < 1:
+                img = img.resize((max(1, int(img.width * scale)),
+                                  max(1, int(img.height * scale))),
+                                 Image.LANCZOS)
+            chunk.append(img)
         w, h = chunk[0].size
         # a 1- or 2-page chunk should not be padded out to a 3-wide sheet
         cols = min(3, len(chunk))
@@ -294,8 +315,9 @@ def visual_check(pdf_path, dpi=55, per_sheet=6):
         sheet.save(os.path.join(out_dir,
                                 "sheet%02d.png" % (start // per_sheet + 1)))
 
-    print("  contact sheets -> %s/  (inspect these before delivering)"
-          % out_dir)
+    print("  contact sheets -> %s/sheetNN.png  (overview pass)" % out_dir)
+    print("  page rasters   -> %s/pg-NN.png    (%d dpi - open these to judge "
+          "labels, overflow and page breaks)" % (out_dir, dpi))
 
 
 def main():
@@ -313,6 +335,9 @@ def main():
                     help="also write the assembled HTML next to the PDF")
     ap.add_argument("--check", action="store_true",
                     help="rasterise pages and build contact sheets")
+    ap.add_argument("--check-dpi", type=int, default=120, metavar="N",
+                    help="resolution of the --check page rasters "
+                         "(default: 120; below ~100 small text is unreadable)")
     ap.add_argument("--list-langs", action="store_true",
                     help="print available data-lang profiles and exit")
     args = ap.parse_args()
@@ -338,7 +363,7 @@ def main():
     print("built %s  (%d KB)" % (args.out, os.path.getsize(args.out) // 1024))
 
     if args.check:
-        visual_check(args.out)
+        visual_check(args.out, dpi=args.check_dpi)
 
 
 if __name__ == "__main__":

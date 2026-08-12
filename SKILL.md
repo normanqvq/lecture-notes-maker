@@ -44,6 +44,12 @@ Then check for **gaps**:
 - If genuinely unavailable, solve the exercise yourself and mark it clearly as
   a derived answer, not the official one.
 
+Continuous numbering is not the same as complete material. Some decks contain
+**no exercises at all** — nothing was removed, there was never anything there.
+That is a different finding from a gap, and it changes Step 4. State on the
+cover which of the two you found: pages reconstructed, or no exercises in the
+source to begin with.
+
 ### Step 2 — Separate the two layers
 
 Every section splits into:
@@ -72,6 +78,11 @@ worked examples of each.
 Discipline matters more than volume. A TRAP box that just restates the body
 text trains the reader to skip all the boxes.
 
+There is a fifth box, **KEY**, for a rule worth memorising verbatim. It is not
+a judgment category like the four above — it is emphasis, and it carries no
+claim about the source. Style details for all five are in
+`references/layout.md`.
+
 ### Step 4 — Trace every worked example
 
 Do not present only the final answer. For each example, produce a table with
@@ -81,6 +92,14 @@ flags, variables, whichever applies.
 Where the source gives an official answer, reproduce it and mark it as such.
 Then, separately, explain *why* — including which step is the one people get
 wrong.
+
+**If the source has no exercises at all** (Step 1 will have told you), do not
+drop the section and do not pad it with invented drill questions. Derive two or
+three from the source's *own* code listings and figures — trace what that code
+actually does, resolve that expression by the rules the deck just taught. Label
+every one of them `derived`, and say plainly in the section opener that the
+source contained no exercises, so the reader never mistakes them for past-paper
+questions.
 
 ### Step 5 — Choose the presentation, then draw it
 
@@ -114,11 +133,16 @@ See `references/layout.md` for figure sizing and placement conventions.
 Write the notes as HTML fragments (`parts/part1.html`, `part2.html`, …), then:
 
 ```bash
-python assets/build.py --parts parts --css assets/notes.css --out notes.pdf
+python assets/build.py --parts parts --css assets/notes.css --out notes.pdf \
+                       --footer "CG2028 · Lecture 2"
 ```
 
 `build.py` concatenates the parts, runs the code-block syntax highlighter,
 injects the stylesheet, and renders with WeasyPrint.
+
+Always pass `--footer`. It is not optional dressing: `references/layout.md`
+requires the running footer to carry the course and lecture identifier, and the
+default is a generic `Study notes`.
 
 Mark up code as:
 
@@ -132,20 +156,38 @@ Run `python assets/build.py --list-langs` for the available profiles
 falls back to `generic`, which still colours comments, strings and numbers, so
 an unsupported language degrades gracefully rather than breaking.
 
-To add a language properly, append one entry to `PROFILES` at the top of
-`build.py`. Nothing else needs changing.
+To add a language, append one entry to `PROFILES` at the top of `build.py`,
+then add its name to the two places that enumerate the profiles by hand — the
+paragraph above and the same list in `README.md` — or `--list-langs` and the
+docs drift apart.
 
 ### Step 7 — Verify visually
 
 ```bash
-python assets/build.py --parts parts --css assets/notes.css --out notes.pdf --check
+python assets/build.py --parts parts --css assets/notes.css --out notes.pdf \
+                       --footer "CG2028 · Lecture 2" --check
 ```
 
-This writes page rasters and contact sheets next to the PDF. **Look at them.**
-Fix any overlapping labels, boxes with text spilling out, or headings stranded
-at a page bottom, then rebuild.
+This writes two things into `_check/` next to the PDF, and they are for two
+different passes:
 
-Only deliver after the contact sheets look clean.
+- `sheetNN.png` — small contact sheets, six pages tiled per sheet. The
+  **overview** pass: page-break damage, a figure that blew up, a page left
+  two-thirds empty.
+- `pg-NN.png` — one image per page at `--check-dpi` (default 120). The
+  **detail** pass, and the only one that can settle the defects this step
+  actually names. Overlapping SVG labels and text spilling out of a box are
+  invisible on a thumbnail; open the page.
+
+Skim every sheet, then open every page you are not sure about. Fix overlapping
+labels, boxes with text spilling out, headings stranded at a page bottom, and
+any page left more than about a third empty, then rebuild and look again.
+
+Judging fill level from a thumbnail is unreliable — a page that reads as
+half-empty at thumbnail size is often nearly full. Confirm on `pg-NN.png`
+before you go rearranging content to fix a gap that is not there.
+
+Only deliver after both passes look clean.
 
 `--check` requires **poppler** (`pdftoppm`) in addition to the pip packages. It
 is a hard dependency, not an optional extra: if `pdftoppm` is missing, the build
@@ -165,7 +207,8 @@ apt install poppler-utils               # Linux
 2. **The Big Picture** — one page. What questions does this lecture answer?
    A map figure showing how the sections connect and where they get used later.
 3. **Body** — mirrors the source's section numbering.
-4. **Worked examples** — every exercise, fully traced.
+4. **Worked examples** — every exercise, fully traced; or, if the source has
+   none, derived ones built from its own listings and labelled as such.
 5. **Supplement** — the omissions collected: adjacent material, common build
    errors, a minimal working template if the subject involves code.
 6. **One-page reference + self-test** — a "you want to do X, write Y" table,

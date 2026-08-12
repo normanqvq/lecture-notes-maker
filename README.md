@@ -25,8 +25,9 @@ one-page cheatsheet you smuggle into the exam hall.
   - `ERRATUM` — the slides are wrong, here's what's correct
 - **Traces every worked example** step by step with full intermediate state,
   not just the final answer
-- **Self-checks the layout**: rasterises the PDF into contact sheets so
-  overlapping labels and stranded headings get caught before delivery
+- **Self-checks the layout**: rasterises the PDF into full-size page images
+  plus small contact sheets, so overlapping labels and stranded headings get
+  caught before delivery
 - Ends with a one-page quick-reference table and a self-test
 
 ## Output language
@@ -75,6 +76,11 @@ python assets/build.py \
   --footer "CG2028 · Lecture 2" \
   --check
 ```
+
+`--check` writes `_check/pg-NN.png` (one image per page, at `--check-dpi`,
+default 120) and `_check/sheetNN.png` (six pages tiled per sheet). Skim the
+sheets, then open the individual pages — small text and SVG labels cannot be
+judged at thumbnail size.
 
 Code blocks are marked `<pre class="code" data-lang="python">`. Run
 `python assets/build.py --list-langs` to see the available profiles (arm, c,

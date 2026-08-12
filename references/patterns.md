@@ -127,13 +127,20 @@ values off a plot.
 
 ---
 
-## 9. Correspondence — two representations of the same thing
+## 9. Correspondence — the same thing said two or more ways
 
 *Source and compiled output, formula and its code, notation and its meaning,
-before and after a transformation.*
+before and after a transformation, one function written in three coding styles.*
 
 **Render as** two side-by-side columns with aligned rows, so the eye can match
 line to line. Use the `.two` container.
+
+**Three or more versions do not fit that container**, and side-by-side stops
+working well before the columns get narrow. Use a matrix table instead — one
+column per version, one row per attribute being compared — and stack the full
+listings below it. The table carries the comparison; the listings carry the
+detail. Do not shrink three code blocks into a row to preserve the visual
+metaphor.
 
 State explicitly which direction the transformation goes, and who performs it
 (you, the compiler, the hardware, nature).
@@ -150,6 +157,54 @@ stick.
 
 If the source introduces terms as a numbered list (i, ii, iii…), keep that
 numbering so the reader can cross-reference.
+
+---
+
+## 11. Syntax anatomy — the parts of one construct, named
+
+*Literal and number formats, declaration syntax, function signatures, command
+lines, URL and path structure, chemical or citation notation — anything the
+source writes as `<part>'<part><part>` and then explains piece by piece.*
+
+**Render as** two aligned rows of boxes: the skeleton on top with each segment
+named, one concrete instance directly beneath with the segments filled in, so
+the eye drops straight from `<size>` to `16`. Follow it with a table:
+`Segment | What goes there | If omitted | Notes`.
+
+This resembles §3 and is not the same shape. A bit-field strip is proportional
+to bit widths and needs a stated bit ordering; a syntax skeleton has no bits,
+and its segments are sized to fit their labels. Never put bit indices on one.
+
+Rules that matter here:
+
+- Exactly one worked instance under the skeleton. Variants go in the table.
+- The "if omitted" column is what readers come back for — defaults are where
+  the surprises are.
+- Fewer than three segments: skip the figure. A sentence and a table are
+  faster.
+
+---
+
+## 12. Ranked order — a list whose sequence is the content
+
+*Operator precedence, order of operations, interrupt and arbitration priority,
+evaluation order, tie-break rules, severity levels.*
+
+**Render as** a table whose first column is the rank, with the direction spelled
+out in the header (`low → high`, `1 = evaluated first`). A plain list loses
+exactly the thing that matters: readers cannot tell whether the top is the
+strongest or the weakest.
+
+Rules that matter here:
+
+- State the direction in the heading, not only in the surrounding prose.
+- Items sharing a rank share a row. Splitting them asserts an ordering the
+  source may not claim — and merging rows the source split asserts the reverse.
+  Keep the source's grouping and note the discrepancy rather than regrouping
+  silently.
+- Teaching sources simplify precedence tables often. Check the authoritative
+  one before reproducing it, and put any difference in a SUPP box; do not
+  quietly correct the body, because the exam will use the source's version.
 
 ---
 

@@ -9,6 +9,9 @@ __pycache__/
 .venv/
 venv/
 
+# local tool config
+.claude/settings.local.json
+
 # editor / OS
 .vscode/
 .idea/
