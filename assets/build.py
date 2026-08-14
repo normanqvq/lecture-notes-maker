@@ -245,7 +245,11 @@ def assemble(parts_dir, css_path, footer):
     body = render_code_blocks(body)
 
     css = open(css_path, encoding="utf-8").read()
-    css = css.replace("__FOOTER__", html.escape(footer))
+    # __FOOTER__ sits inside a CSS content: "..." string, not in HTML, so
+    # html.escape is the wrong tool - an '&' would print literally as &amp;.
+    # A CSS string needs only backslash and the quote character escaped.
+    css = css.replace("__FOOTER__",
+                      footer.replace("\\", "\\\\").replace('"', '\\"'))
 
     return ("<!DOCTYPE html><html><head><meta charset='utf-8'>"
             "<style>%s</style></head><body>%s</body></html>" % (css, body))

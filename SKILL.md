@@ -151,6 +151,10 @@ Mark up code as:
 <pre class="plain">…</pre>          <!-- no highlighting -->
 ```
 
+`references/layout.md` writes code blocks as `<pre class="asm">`. That is the
+same mechanism, not a second one: `asm` is shorthand for
+`class="code" data-lang="arm"`, and both forms take the `sm` size modifier.
+
 Run `python assets/build.py --list-langs` for the available profiles
 (currently arm, c, python, sql, verilog, generic). An unknown or omitted `data-lang`
 falls back to `generic`, which still colours comments, strings and numbers, so

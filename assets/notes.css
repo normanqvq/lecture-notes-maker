@@ -108,10 +108,13 @@ td.mono, th.mono { font-family: "DejaVu Sans Mono",monospace; font-size: 7.6pt; 
 table.tight td, table.tight th { padding: .2em .38em; }
 /* Tables never break by default, so a long one strands the bottom of the
    preceding page. class="flow" opts a long reference table back into normal
-   breaking; put its header row in <thead> and it repeats on each page. */
-table.flow, table.flow tbody, table.flow tr {
+   breaking; put its header row in <thead> and it repeats on each page.
+   Rows themselves stay unbreakable: the break belongs between rows, else a
+   single row's cells end up scattered across two pages. */
+table.flow, table.flow tbody {
   page-break-inside: auto; break-inside: auto;
 }
+table.flow tr { page-break-inside: avoid; break-inside: avoid; }
 
 /* ---------- misc ---------- */
 figure { margin: .5em 0 .65em; page-break-inside: avoid; text-align: center; }

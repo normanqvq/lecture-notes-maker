@@ -31,6 +31,10 @@ remove any `pb` that produced more than about a third of a page of blank space.
 <pre class="plain">…</pre>   <!-- no highlighting -->
 ```
 
+`asm` is shorthand for `class="code" data-lang="arm"` — the general form in
+SKILL.md Step 6. Other languages use that form: `<pre class="code"
+data-lang="c">`, etc.
+
 Dark background, orange left rule, `page-break-inside: avoid`.
 
 Always comment the listing line by line in the target language. An
