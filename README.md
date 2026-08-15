@@ -1,10 +1,49 @@
-# lecture-notes-maker
+<a id="readme-top"></a>
 
-A Claude skill that turns lecture slides and course PDFs into a dense,
-print-ready **study-notes PDF** — the kind you read during the semester, not the
-one-page cheatsheet you smuggle into the exam hall.
+[![Contributors][contributors-shield]][contributors-url]
+[![Forks][forks-shield]][forks-url]
+[![Stargazers][stars-shield]][stars-url]
+[![Issues][issues-shield]][issues-url]
+[![MIT License][license-shield]][license-url]
 
-## What it does
+<br />
+<div align="center">
+
+# 📚 lecture-notes-maker
+
+  <p align="center">
+    A Claude skill that turns lecture slides, course PDFs, and lecture recordings into a dense, print-ready study-notes PDF — the kind you read during the semester, not the one-page cheatsheet you smuggle into the exam hall.
+    <br />
+    <a href="SKILL.md"><strong>Explore the workflow »</strong></a>
+    <br />
+    <br />
+    <a href="https://github.com/normanqvq/lecture-notes-maker/issues/new">Report Bug</a>
+    ·
+    <a href="https://github.com/normanqvq/lecture-notes-maker/issues/new">Request Feature</a>
+  </p>
+</div>
+
+<details>
+  <summary>Table of Contents</summary>
+  <ol>
+    <li><a href="#about-the-project">About The Project</a></li>
+    <li>
+      <a href="#getting-started">Getting Started</a>
+      <ul>
+        <li><a href="#prerequisites">Prerequisites</a></li>
+        <li><a href="#installation">Installation</a></li>
+      </ul>
+    </li>
+    <li><a href="#usage">Usage</a></li>
+    <li><a href="#repository-layout">Repository Layout</a></li>
+    <li><a href="#not-what-you-want">Not What You Want?</a></li>
+    <li><a href="#note-on-source-material">Note on Source Material</a></li>
+    <li><a href="#license">License</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ol>
+</details>
+
+## About The Project
 
 - **Default output**: A4 portrait PDF, single column, ~9.4 pt, dark
   syntax-highlighted code blocks, hand-authored inline SVG diagrams
@@ -34,22 +73,16 @@ one-page cheatsheet you smuggle into the exam hall.
   caught before delivery
 - Ends with a one-page quick-reference table and a self-test
 
-## Output language
+### Output language
 
 English by default. Ask for another language and it switches to bilingual mode —
 explanation in your language, technical terms kept in the original.
 
-## Install
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-```bash
-git clone https://github.com/<you>/lecture-notes-maker
-cp -r lecture-notes-maker ~/.claude/skills/
-```
+## Getting Started
 
-Then just upload your lecture PDF — or point it at a lecture recording — and
-ask for notes.
-
-## Requirements
+### Prerequisites
 
 ```bash
 pip install weasyprint pillow
@@ -80,7 +113,19 @@ curl -L -o ~/.local/share/whisper-cpp/ggml-large-v3-turbo.bin \
   https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-large-v3-turbo.bin
 ```
 
-## Manual use
+### Installation
+
+```bash
+git clone https://github.com/normanqvq/lecture-notes-maker
+cp -r lecture-notes-maker ~/.claude/skills/
+```
+
+Then just upload your lecture PDF — or point it at a lecture recording — and
+ask for notes.
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+## Usage
 
 The build script works standalone if you want to write the HTML yourself:
 
@@ -104,7 +149,18 @@ python, sql, verilog, generic). An unknown language falls back to `generic`, whi
 colours comments, strings and numbers. Adding a language means appending one
 entry to `PROFILES` at the top of `build.py`.
 
-## Layout
+Lecture recordings get flattened first — one PNG per distinct slide state,
+a timestamped transcript, and an index aligning each frame with everything
+spoken while it was on screen:
+
+```bash
+python assets/extract_video.py lecture.mp4
+python assets/extract_video.py slides.mp4 --audio-from camera.mp4   # dual-stream (Panopto)
+```
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+## Repository Layout
 
 ```
 SKILL.md                    the workflow and the non-negotiable rules
@@ -118,13 +174,15 @@ assets/
   extract_video.py          recording -> frames + transcript + alignment index
 ```
 
-## Not what you want?
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+## Not What You Want?
 
 If you need a **compressed exam cheatsheet** — formulas only, multi-column
 landscape, maximum density — that's a different artifact with different rules.
 This skill optimises for reading and understanding, and will tell you so.
 
-## Note on source material
+## Note on Source Material
 
 The skill reads your course material to produce your notes. Both the input and
 the output are your instructor's intellectual property — keep them out of public
@@ -132,4 +190,23 @@ repositories.
 
 ## License
 
-MIT
+Distributed under the MIT License. See `LICENSE` for more information.
+
+## Contact
+
+Norman — [@normanqvq](https://github.com/normanqvq)
+
+Project Link: [https://github.com/normanqvq/lecture-notes-maker](https://github.com/normanqvq/lecture-notes-maker)
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+[contributors-shield]: https://img.shields.io/github/contributors/normanqvq/lecture-notes-maker.svg?style=for-the-badge
+[contributors-url]: https://github.com/normanqvq/lecture-notes-maker/graphs/contributors
+[forks-shield]: https://img.shields.io/github/forks/normanqvq/lecture-notes-maker.svg?style=for-the-badge
+[forks-url]: https://github.com/normanqvq/lecture-notes-maker/network/members
+[stars-shield]: https://img.shields.io/github/stars/normanqvq/lecture-notes-maker.svg?style=for-the-badge
+[stars-url]: https://github.com/normanqvq/lecture-notes-maker/stargazers
+[issues-shield]: https://img.shields.io/github/issues/normanqvq/lecture-notes-maker.svg?style=for-the-badge
+[issues-url]: https://github.com/normanqvq/lecture-notes-maker/issues
+[license-shield]: https://img.shields.io/github/license/normanqvq/lecture-notes-maker.svg?style=for-the-badge
+[license-url]: https://github.com/normanqvq/lecture-notes-maker/blob/main/LICENSE
