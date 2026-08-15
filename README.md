@@ -12,6 +12,10 @@ one-page cheatsheet you smuggle into the exam hall.
   *shapes* (sequences, state traces, bit-fields, taxonomies, state machines,
   layered stacks) to the layout that serves each one — so it works the same for
   a computer-architecture deck, an organic-chemistry deck, or a finance deck
+- **Eats recordings too**: `assets/extract_video.py` flattens a lecture video
+  into timestamped slide frames + a whisper transcript, aligned so the notes
+  can cite what the lecturer *said* but never wrote — with a timestamp to jump
+  back to (needs `ffmpeg` + `whisper-cpp`, runs fully locally)
 - **Verifies before writing**: reads the actual source material and refuses to
   generate from memory — no source, no notes
 - **Finds the gaps**: detects removed answer pages (slide numbering that jumps)
@@ -42,7 +46,8 @@ git clone https://github.com/<you>/lecture-notes-maker
 cp -r lecture-notes-maker ~/.claude/skills/
 ```
 
-Then just upload your lecture PDF and ask for notes.
+Then just upload your lecture PDF — or point it at a lecture recording — and
+ask for notes.
 
 ## Requirements
 
@@ -62,6 +67,17 @@ build exits non-zero rather than skipping the inspection:
 winget install oschwartz10612.Poppler   # Windows
 brew install poppler                    # macOS
 apt install poppler-utils               # Linux
+```
+
+Video sources additionally need **ffmpeg** and **whisper-cpp** plus a ggml
+model (about 3 GB total, one-time; transcription runs locally — the recording
+never leaves your machine):
+
+```bash
+brew install ffmpeg whisper-cpp
+mkdir -p ~/.local/share/whisper-cpp
+curl -L -o ~/.local/share/whisper-cpp/ggml-large-v3-turbo.bin \
+  https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-large-v3-turbo.bin
 ```
 
 ## Manual use
@@ -99,6 +115,7 @@ references/
 assets/
   notes.css                 stylesheet
   build.py                  highlighter + WeasyPrint renderer + visual check
+  extract_video.py          recording -> frames + transcript + alignment index
 ```
 
 ## Not what you want?

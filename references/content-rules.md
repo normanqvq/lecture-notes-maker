@@ -58,6 +58,13 @@ body as bold text instead.
 line on a slide, a definition stated in unusually precise wording, or a
 distinction that an exercise turns on.
 
+When the source is a recording, the strongest signals are spoken, not written:
+"this will be on the exam" said outright, the same point repeated across
+minutes, or the lecturer parking the spotlight on one region of a slide while
+talking through it. Cite the timestamp (`▶ 37:17`) so the reader can hear the
+emphasis themselves — and quote the *slide's* wording, not the transcript's,
+whenever both exist (speech recognition mangles technical terms).
+
 Where possible, quote the phrasing the source uses, because that is the
 phrasing the marking scheme will use.
 

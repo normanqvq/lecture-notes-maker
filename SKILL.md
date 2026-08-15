@@ -1,6 +1,6 @@
 ---
 name: lecture-notes-maker
-description: Turn lecture slides, textbook chapters, or course PDFs into a dense, print-ready study-notes PDF with syntax-highlighted code, hand-authored SVG diagrams, worked-example traces, and margin tags for gaps/traps/exam-points/errata. Use when the user asks for study notes, revision notes, or a "notes PDF" from uploaded course material. Not for exam cheatsheets — see cheatsheet-style skills for that.
+description: Turn lecture slides, textbook chapters, course PDFs, or lecture recordings (video) into a dense, print-ready study-notes PDF with syntax-highlighted code, hand-authored SVG diagrams, worked-example traces, and margin tags for gaps/traps/exam-points/errata. Use when the user asks for study notes, revision notes, or a "notes PDF" from uploaded course material. Not for exam cheatsheets — see cheatsheet-style skills for that.
 ---
 
 # Lecture Notes Maker
@@ -32,6 +32,39 @@ Never translate mnemonics, API names, or code.
 
 ### Step 1 — Inventory the source
 
+**If the source is a lecture recording, flatten it first.** A video cannot be
+read directly — `assets/extract_video.py` turns it into things that can be:
+
+```bash
+python assets/extract_video.py lecture.mp4
+python assets/extract_video.py slides.mp4 --audio-from camera.mp4
+```
+
+The second form is for dual-stream recordings (Panopto and similar store the
+screen capture and the camera/audio as separate streams — the user downloads
+both, e.g. `yt-dlp --cookies-from-browser chrome <viewer URL>`; downloading and
+authentication stay on the user's side, never in this skill). It needs
+`ffmpeg` + `whisper-cpp` (`brew install ffmpeg whisper-cpp`) and a ggml model;
+the script prints the download command if the model is missing.
+
+Output directory: `frames/` (one PNG per distinct slide state, timestamped
+filenames), `sheets/` (contact sheets), `transcript.srt`, and `index.md` —
+which aligns each frame with everything spoken while it was on screen. Then:
+
+- **Triage on the contact sheets, not frame by frame.** Open individual frames
+  only where the sheet shows content worth reading closely.
+- **Expect junk frames** — desktops, lock screens, blank editors from before
+  and between the actual teaching. Skip them; do not report them as gaps.
+- **Expect several frames per slide when the lecturer uses a spotlight or
+  pointer overlay.** Read content from the least-occluded frame of the slide.
+  The spotlight's *position over time* is not noise: it marks what the
+  lecturer dwelled on, which is an EXAM-tag signal.
+- **Transcript spelling is never authoritative.** Speech recognition mangles
+  register names, mnemonics, and symbols. Every technical term that reaches
+  the notes must be verified against a frame or the slide PDF. If the user
+  also supplied the actual slide deck, the deck is the content source and the
+  video contributes only the spoken layer and the timing.
+
 Read the material end to end before writing anything. Produce (internally) a
 map of: section numbers, slide/page ranges, worked examples, and figures.
 
@@ -62,6 +95,13 @@ Every section splits into:
 Keeping these visually distinct is the single biggest quality lever. A reader
 studying for a closed-book exam needs to know which parts are examinable
 material and which are your additions.
+
+A recording adds a third layer between those two: **what the lecturer said but
+never wrote down**. It is authoritative (it came from the course, not from
+you), but the reader cannot cross-reference it against any page. Spoken-only
+claims therefore go in callout boxes like your own additions do — but cited
+with their timestamp (`▶ 37:17`) instead of a slide number, so the reader can
+jump back to the recording and hear it in context.
 
 ### Step 3 — Tag the callouts
 
