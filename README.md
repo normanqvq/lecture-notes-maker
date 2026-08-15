@@ -1,27 +1,26 @@
 <a id="readme-top"></a>
 
-[![Contributors][contributors-shield]][contributors-url]
-[![Forks][forks-shield]][forks-url]
-[![Stargazers][stars-shield]][stars-url]
-[![Issues][issues-shield]][issues-url]
-[![MIT License][license-shield]][license-url]
-
-<br />
 <div align="center">
-
-# 📚 lecture-notes-maker
-
-  <p align="center">
-    A Claude skill that turns lecture slides, course PDFs, and lecture recordings into a dense, print-ready study-notes PDF — the kind you read during the semester, not the one-page cheatsheet you smuggle into the exam hall.
-    <br />
-    <a href="SKILL.md"><strong>Explore the workflow »</strong></a>
-    <br />
-    <br />
-    <a href="https://github.com/normanqvq/lecture-notes-maker/issues/new">Report Bug</a>
-    ·
-    <a href="https://github.com/normanqvq/lecture-notes-maker/issues/new">Request Feature</a>
-  </p>
+  <img src=".github/logo.svg" alt="logo" width="100" height="100">
 </div>
+
+<h1 align="center">lecture-notes-maker</h1>
+
+<p align="center">
+  A Claude skill that turns lecture slides, course PDFs, and lecture recordings into a dense, print-ready study-notes PDF — the kind you read during the semester, not the one-page cheatsheet you smuggle into the exam hall.
+</p>
+
+<p align="center">
+  <a href="SKILL.md"><strong>Explore the workflow</strong></a>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Python-3-3776AB?logo=python&logoColor=white" alt="Python 3">
+  <img src="https://img.shields.io/badge/WeasyPrint-PDF-663399" alt="WeasyPrint">
+  <img src="https://img.shields.io/badge/FFmpeg-frames-007808?logo=ffmpeg&logoColor=white" alt="FFmpeg">
+  <img src="https://img.shields.io/badge/whisper.cpp-large--v3--turbo-4B8BBE" alt="whisper.cpp">
+  <img src="https://img.shields.io/badge/license-MIT-97CA00" alt="MIT license">
+</p>
 
 <details>
   <summary>Table of Contents</summary>
@@ -199,14 +198,3 @@ Norman — [@normanqvq](https://github.com/normanqvq)
 Project Link: [https://github.com/normanqvq/lecture-notes-maker](https://github.com/normanqvq/lecture-notes-maker)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-[contributors-shield]: https://img.shields.io/github/contributors/normanqvq/lecture-notes-maker.svg?style=for-the-badge
-[contributors-url]: https://github.com/normanqvq/lecture-notes-maker/graphs/contributors
-[forks-shield]: https://img.shields.io/github/forks/normanqvq/lecture-notes-maker.svg?style=for-the-badge
-[forks-url]: https://github.com/normanqvq/lecture-notes-maker/network/members
-[stars-shield]: https://img.shields.io/github/stars/normanqvq/lecture-notes-maker.svg?style=for-the-badge
-[stars-url]: https://github.com/normanqvq/lecture-notes-maker/stargazers
-[issues-shield]: https://img.shields.io/github/issues/normanqvq/lecture-notes-maker.svg?style=for-the-badge
-[issues-url]: https://github.com/normanqvq/lecture-notes-maker/issues
-[license-shield]: https://img.shields.io/github/license/normanqvq/lecture-notes-maker.svg?style=for-the-badge
-[license-url]: https://github.com/normanqvq/lecture-notes-maker/blob/main/LICENSE
