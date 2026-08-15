@@ -1,9 +1,5 @@
 <a id="readme-top"></a>
 
-<div align="center">
-  <img src=".github/logo.svg" alt="logo" width="100" height="100">
-</div>
-
 <h1 align="center">lecture-notes-maker</h1>
 
 <p align="center">
@@ -19,6 +15,7 @@
   <img src="https://img.shields.io/badge/WeasyPrint-PDF-663399" alt="WeasyPrint">
   <img src="https://img.shields.io/badge/FFmpeg-frames-007808?logo=ffmpeg&logoColor=white" alt="FFmpeg">
   <img src="https://img.shields.io/badge/whisper.cpp-large--v3--turbo-4B8BBE" alt="whisper.cpp">
+  <img src="https://img.shields.io/badge/Claude_Code-skill-D97757?logo=claude&logoColor=white" alt="Claude Code">
   <img src="https://img.shields.io/badge/license-MIT-97CA00" alt="MIT license">
 </p>
 
