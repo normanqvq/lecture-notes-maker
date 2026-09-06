@@ -22,6 +22,7 @@ import argparse
 import glob
 import html
 import os
+import pathlib
 import re
 import subprocess
 import sys
@@ -256,20 +257,19 @@ def assemble(parts_dir, css_path, footer):
     # subsetted embeddings render as garbage in Quartz viewers, so that case
     # is a hard error, not a warning.
     assets_dir = os.path.dirname(os.path.abspath(css_path))
-    css = css.replace("__ASSETS__", "file://" + assets_dir.replace("\\", "/"))
+    # pathlib builds a correct file:// URL on every platform (Windows needs
+    # the file:///C:/... form; a hand-built "file://" + path does not).
+    css = css.replace("__ASSETS__", pathlib.Path(assets_dir).as_uri())
     if re.search(r"[\u3040-\u30ff\u3400-\u9fff]", body):
         missing = [f for f in ("NotoSansCJKsc-Regular.otf", "NotoSansCJKsc-Bold.otf")
                    if not os.path.exists(os.path.join(assets_dir, "fonts", f))]
         if missing:
             sys.exit(
-                "ERROR: the notes contain CJK text but %s/fonts/ lacks %s.\n"
-                "  Download once (about 33 MB):\n"
-                "    mkdir -p %s/fonts\n"
-                "    curl -L -o %s/fonts/NotoSansCJKsc-Regular.otf "
-                "https://github.com/notofonts/noto-cjk/raw/main/Sans/OTF/SimplifiedChinese/NotoSansCJKsc-Regular.otf\n"
-                "    curl -L -o %s/fonts/NotoSansCJKsc-Bold.otf "
-                "https://github.com/notofonts/noto-cjk/raw/main/Sans/OTF/SimplifiedChinese/NotoSansCJKsc-Bold.otf"
-                % (assets_dir, ", ".join(missing), assets_dir, assets_dir, assets_dir))
+                "ERROR: the notes contain CJK text but %s lacks %s.\n"
+                "  Download once (about 33 MB, any OS):\n"
+                "    python %s"
+                % (os.path.join(assets_dir, "fonts"), ", ".join(missing),
+                   os.path.join(assets_dir, "get_fonts.py")))
 
     return ("<!DOCTYPE html><html><head><meta charset='utf-8'>"
             "<style>%s</style></head><body>%s</body></html>" % (css, body))

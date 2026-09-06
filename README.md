@@ -76,8 +76,11 @@ pip install weasyprint pillow
 ```
 
 Chinese (or any CJK) output needs the bundled Noto Sans CJK fonts in
-`assets/fonts/` (about 33 MB, git-ignored). `build.py` prints the two `curl`
-commands the first time it meets CJK text without them.
+`assets/fonts/` (about 33 MB, git-ignored):
+
+```bash
+python assets/get_fonts.py
+```
 
 On Windows, WeasyPrint also needs the GTK3 runtime
 (`winget install tschoonj.GTKForWindows`), otherwise importing it fails with
@@ -93,15 +96,27 @@ brew install poppler                    # macOS
 apt install poppler-utils               # Linux
 ```
 
-Video sources additionally need **ffmpeg** and **whisper-cpp** plus a ggml
+Video sources additionally need **ffmpeg** and **whisper.cpp** plus a ggml
 model (about 3 GB total, one-time; transcription runs locally — the recording
 never leaves your machine):
 
 ```bash
+# macOS
 brew install ffmpeg whisper-cpp
-mkdir -p ~/.local/share/whisper-cpp
-curl -L -o ~/.local/share/whisper-cpp/ggml-large-v3-turbo.bin \
-  https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-large-v3-turbo.bin
+# Windows (PowerShell)
+winget install Gyan.FFmpeg
+#   then download whisper-bin-x64.zip from
+#   https://github.com/ggml-org/whisper.cpp/releases, unzip it, and either add
+#   the folder to PATH or set  $env:WHISPER_CLI = "C:\\path\\whisper-cli.exe"
+```
+
+`extract_video.py` prints the model download command for your OS the first
+time it runs without one (`~/.local/share/whisper-cpp/ggml-large-v3-turbo.bin`).
+
+For the second-renderer check (`assets/render_check.py`):
+
+```bash
+pip install pypdfium2
 ```
 
 ### Installation

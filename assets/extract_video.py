@@ -12,8 +12,12 @@ sound. This script flattens both into files it can:
     index.md         the alignment: for each kept frame, what was said
                      while it was on screen
 
-Requires ffmpeg/ffprobe and whisper-cli on PATH (brew install ffmpeg
-whisper-cpp), plus a ggml model file.
+Requires ffmpeg/ffprobe and whisper-cli on PATH, plus a ggml model file.
+    macOS    brew install ffmpeg whisper-cpp
+    Windows  winget install Gyan.FFmpeg, then unzip a whisper.cpp release
+             (whisper-bin-x64.zip from github.com/ggml-org/whisper.cpp/releases)
+             and add its folder to PATH, or set WHISPER_CLI=C:\\path\\whisper-cli.exe
+    Linux    apt install ffmpeg; build whisper.cpp and put whisper-cli on PATH
 
 Usage:
     python3 extract_video.py lecture.mp4
@@ -24,6 +28,7 @@ Usage:
 """
 
 import argparse
+import os
 import re
 import shutil
 import subprocess
@@ -47,12 +52,34 @@ def die(msg):
     sys.exit(f"extract_video: {msg}")
 
 
+WIN = os.name == "nt"
+
+
+def whisper_binary():
+    """whisper-cli on PATH, or the WHISPER_CLI environment variable (handy on
+    Windows where the release zip is rarely on PATH)."""
+    env = os.environ.get("WHISPER_CLI")
+    if env and Path(env).exists():
+        return env
+    for name in ("whisper-cli", "whisper-cpp"):
+        found = shutil.which(name)
+        if found:
+            return found
+    return None
+
+
 def check_tools():
     for tool in ("ffmpeg", "ffprobe"):
         if not shutil.which(tool):
-            die(f"{tool} not found - brew install ffmpeg")
-    if not shutil.which("whisper-cli"):
-        die("whisper-cli not found - brew install whisper-cpp")
+            die(f"{tool} not found - "
+                + ("winget install Gyan.FFmpeg (then reopen the terminal)" if WIN
+                   else "brew install ffmpeg / apt install ffmpeg"))
+    if not whisper_binary():
+        die("whisper-cli not found - "
+            + ("download whisper-bin-x64.zip from "
+               "github.com/ggml-org/whisper.cpp/releases, unzip, and either add the "
+               "folder to PATH or set WHISPER_CLI to the full path of whisper-cli.exe"
+               if WIN else "brew install whisper-cpp"))
 
 
 def probe_duration(video):
@@ -76,7 +103,7 @@ def extract_audio(video, wav):
 def transcribe(wav, outdir, model, lang):
     print(f"[2/5] transcribing with whisper ({model.name}) - this is the slow part ...")
     prefix = outdir / "transcript"
-    run(["whisper-cli", "-m", str(model), "-f", str(wav),
+    run([whisper_binary(), "-m", str(model), "-f", str(wav),
          "-l", lang, "-osrt", "-of", str(prefix), "--no-prints"])
     srt = prefix.with_suffix(".srt")
     if not srt.exists() or srt.stat().st_size == 0:
@@ -153,7 +180,12 @@ def contact_sheets(framedir, sheetdir):
     sheetdir.mkdir(parents=True)
     # feed an explicit concat list so glob quirks can't reorder anything
     listfile = sheetdir / "_frames.txt"
-    listfile.write_text("".join(f"file '{p.resolve()}'\nduration 1\n" for p in frames))
+    # ffmpeg's concat demuxer wants forward slashes even on Windows, and a
+    # single quote inside a path must be escaped as '\''.
+    def q(path):
+        return path.resolve().as_posix().replace("'", "'\\''")
+    listfile.write_text("".join(f"file '{q(p)}'\nduration 1\n" for p in frames),
+                        encoding="utf-8")
     run(["ffmpeg", "-y", "-v", "error", "-f", "concat", "-safe", "0",
          "-i", str(listfile), "-vf", "scale=320:-1,tile=4x6",
          "-fps_mode", "passthrough", str(sheetdir / "sheet_%02d.png")])
@@ -164,7 +196,7 @@ def contact_sheets(framedir, sheetdir):
 def parse_srt(srt):
     """Returns [(start_seconds, text), ...]."""
     segs = []
-    for block in srt.read_text().split("\n\n"):
+    for block in srt.read_text(encoding="utf-8").split("\n\n"):
         m = re.search(r"(\d+):(\d+):(\d+)[,.](\d+)\s*-->", block)
         if not m:
             continue
@@ -209,7 +241,7 @@ def write_index(outdir, video, duration, kept, segs, n_sheets):
                   if bounds[i] <= s < bounds[i + 1]]
         lines.extend(spoken if spoken else ["- (nothing spoken)"])
         lines.append("")
-    (outdir / "index.md").write_text("\n".join(lines))
+    (outdir / "index.md").write_text("\n".join(lines), encoding="utf-8")
 
 
 def main():
@@ -229,9 +261,13 @@ def main():
     if not args.video.exists():
         die(f"no such file: {args.video}")
     if not args.model.exists():
-        die(f"whisper model not found at {args.model}\n"
-            f"  mkdir -p {args.model.parent} && curl -L -o {args.model} \\\n"
-            "  https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-large-v3-turbo.bin")
+        url = "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-large-v3-turbo.bin"
+        if WIN:
+            hint = (f"  New-Item -ItemType Directory -Force '{args.model.parent}'\n"
+                    f"  curl.exe -L -o '{args.model}' {url}")
+        else:
+            hint = f"  mkdir -p {args.model.parent} && curl -L -o {args.model} \\\n  {url}"
+        die(f"whisper model not found at {args.model}\n{hint}")
 
     audio_src = args.audio_from or args.video
     if not has_audio(audio_src):

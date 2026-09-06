@@ -65,8 +65,10 @@ The second form is for dual-stream recordings (Panopto and similar store the
 screen capture and the camera/audio as separate streams — the user downloads
 both, e.g. `yt-dlp --cookies-from-browser chrome <viewer URL>`; downloading and
 authentication stay on the user's side, never in this skill). It needs
-`ffmpeg` + `whisper-cpp` (`brew install ffmpeg whisper-cpp`) and a ggml model;
-the script prints the download command if the model is missing.
+`ffmpeg` + `whisper-cli` on PATH and a ggml model; the script prints the
+platform-specific install and download commands for whatever is missing
+(macOS: `brew install ffmpeg whisper-cpp`; Windows: `winget install
+Gyan.FFmpeg` plus a whisper.cpp release zip, or `WHISPER_CLI=…\whisper-cli.exe`).
 
 Output directory: `frames/` (one PNG per distinct slide state, timestamped
 filenames), `sheets/` (contact sheets), `transcript.srt`, and `index.md` —
@@ -203,7 +205,7 @@ injects the stylesheet, and renders with WeasyPrint. Always pass `--footer`.
 
 **CJK text:** `assets/notes.css` embeds Noto Sans CJK SC from `assets/fonts/`
 via `@font-face`. `build.py` refuses to build CJK content when those font
-files are missing and prints the download commands. Never let WeasyPrint fall
+files are missing; `python assets/get_fonts.py` fetches them once on any OS. Never let WeasyPrint fall
 back to the macOS system fonts (PingFang, Hiragino): their subsetted
 embeddings render as missing or wrong glyphs in Quartz-based viewers
 (Preview, Quick Look, the claude.ai panel), while poppler shows them fine —
@@ -233,19 +235,21 @@ overview pass: page-break damage, a figure that blew up, a page more than a
 third empty) and `_check/pg-NN.png` (one image per page — the detail pass:
 overlapping SVG labels, text spilling out of a box, a heading stranded at a
 page bottom). Fix, rebuild, look again. `--check` requires poppler
-(`brew install poppler`) and fails loudly without it.
+(`brew install poppler` / `winget install oschwartz10612.Poppler` /
+`apt install poppler-utils`) and fails loudly without it.
 
 **Second renderer, mandatory for CJK output.** poppler is not what the reader
-uses. Before delivering, render at least page 1 with a Quartz or PDFium
-renderer and confirm every glyph is present:
+uses. Before delivering, render the pages with PDFium (Chrome's engine) and
+confirm every glyph is present:
 
 ```bash
-qlmanage -t -s 1400 -o _check notes.pdf        # macOS Quartz, page 1
-pdffonts notes.pdf                             # must list no PingFang / Hiragino
+pip install pypdfium2                          # once
+python assets/render_check.py notes.pdf        # -> _check/pdfium-pg-NN.png + font list
 ```
 
-(`pypdfium2` renders all pages if it is installed; a one-page Quartz check
-plus `pdffonts` is the minimum.)
+It exits non-zero if a macOS system CJK font (PingFang, Hiragino) is embedded.
+On macOS, `qlmanage -t -s 1400 -o _check notes.pdf` adds a Quartz rendering of
+page 1; on Windows, opening the PDF in Edge is the equivalent eyeball check.
 
 **Content self-check, before delivering.** Two deletions, both must pass:
 
