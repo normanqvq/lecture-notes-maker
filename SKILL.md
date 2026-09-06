@@ -70,6 +70,17 @@ platform-specific install and download commands for whatever is missing
 (macOS: `brew install ffmpeg whisper-cpp`; Windows: `winget install
 Gyan.FFmpeg` plus a whisper.cpp release zip, or `WHISPER_CLI=…\whisper-cli.exe`).
 
+Getting the file: public YouTube lectures download directly with
+`yt-dlp -f "bv*[height<=720][ext=mp4]+ba[ext=m4a]/b" <url>`; a Panopto viewer
+URL the user pastes that carries `lti_stored_token=<jwt>` can be fetched with
+`yt-dlp --add-headers "Authorization: Bearer <jwt>" <url>` (the token is the
+user's own session; never ask for or store credentials). Several long
+recordings: launch the extractions **detached** (`nohup … &`, at most three at
+a time) and poll — a foreground command is capped at ten minutes and a
+background Bash task is killed at the same limit, taking its children with
+it. Budget roughly a third of the recording's length per video when three run
+in parallel.
+
 Output directory: `frames/` (one PNG per distinct slide state, timestamped
 filenames), `sheets/` (contact sheets), `transcript.srt`, and `index.md` —
 which aligns each frame with everything spoken while it was on screen. Then:
@@ -86,6 +97,9 @@ which aligns each frame with everything spoken while it was on screen. Then:
   pointer overlay.** Read content from the least-occluded frame. The
   spotlight's *position over time* marks what the lecturer dwelled on, which is
   an EXAM-tag signal.
+- **A transcript line repeated dozens of times** ("Let's see what is going
+  on here…") is a whisper hallucination over silence or an in-class quiz, not
+  content. Skip it; the frames for that span still count.
 - **Transcript spelling is never authoritative.** Speech recognition mangles
   register names, mnemonics, and symbols. Every technical term that reaches
   the notes must be verified against a frame or the slide PDF. If the user
@@ -95,6 +109,13 @@ which aligns each frame with everything spoken while it was on screen. Then:
 Read the material end to end before writing anything. Produce (internally) a
 map of: section numbers, slide/page ranges, worked examples, figures, and
 every sentence the slides mark as **Note**, a **question**, or **bold**.
+
+**If the user already has notes for part of the source** (an earlier PDF in
+the folder), do a coverage diff before writing: `pdftotext` the old notes,
+then for each topic in the new source grep the old text for its terms. What
+is already covered gets one line on the cover ("▶03a fully covered by
+L03_L04a notes"); only the gaps go in, collected in a short `§0 补遗` at the
+front, each item citing the timestamp. Do not re-explain covered material.
 
 Then check for **gaps**: slide numbering that jumps (e.g. 28 → 30) usually
 means the instructor removed answer pages from the student handout. Look for
@@ -191,6 +212,21 @@ in English; put any explanation in the body text.
 An ASCII waveform inside `<pre class="plain">` is acceptable for a two-line
 timing sketch and is often clearer than SVG.
 
+**Trees and array traces have generators** — do not hand-draw them:
+`assets/tree_svg.py` (`Tree`, `Tree.from_keys`, `render`, `side_by_side`:
+BST/AVL/decision trees with highlight colours, height/rank badges, dashed
+NULL slots, edge labels) and `assets/array_svg.py` (`render_array`,
+`stack_rows`: cells with pointers for partition/merge/binary-search traces).
+Write the parts from a small Python script that imports them, so every
+before/after pair in the notes is drawn from the same verified key list.
+Width rule: the A4 text column is about 700 CSS px; a tree panel is
+`slots × 40 + 20` px wide, so two 11-node trees side by side need
+`scale=0.62`, two 8-node trees `scale=0.85`, and three panels never fit —
+split a three-step rotation into two before/after figures that share the
+middle state. Rendering the figure and looking at it is still mandatory: the
+most recent defect was a height badge on the rightmost node clipped by the
+viewBox.
+
 ### Step 6 — Build
 
 Write the notes as HTML fragments (`parts/part1.html`, `part2.html`, …), then:
@@ -250,6 +286,13 @@ python assets/render_check.py notes.pdf        # -> _check/pdfium-pg-NN.png + fo
 It exits non-zero if a macOS system CJK font (PingFang, Hiragino) is embedded.
 On macOS, `qlmanage -t -s 1400 -o _check notes.pdf` adds a Quartz rendering of
 page 1; on Windows, opening the PDF in Edge is the equivalent eyeball check.
+`--check` itself falls back to PDFium when poppler is absent, so a machine
+with only `pip install pypdfium2` can still run the full check.
+
+**Detail pass is not optional after the overview looks fine.** Contact sheets
+hide clipped labels and 9 px edge text; render at least the figure-heavy
+pages at scale 1.5 (`render_check.py notes.pdf --pages 8,12 --scale 1.6`)
+before delivering.
 
 **Content self-check, before delivering.** Two deletions, both must pass:
 
@@ -276,6 +319,13 @@ or rules were left in prose. Fix before delivering.
 4. **Self-check** — 5–8 questions, each tagged with the section that answers
    it, no answers (or answers folded onto the last page). No cheat-sheet, no
    glossary, no quick-reference appendix.
+
+## Lessons log
+
+`references/lessons.md` records what went wrong on previous runs and the fix
+that was adopted, one dated entry each. Read it before starting; append to it
+when a run surfaces a new mistake, then fold the fix into the step it belongs
+to so the log stays a history, not a second rulebook.
 
 ## Calibration sample
 

@@ -24,6 +24,7 @@ import html
 import os
 import pathlib
 import re
+import shutil
 import subprocess
 import sys
 
@@ -281,35 +282,42 @@ SHEET_DPI = 55          # contact-sheet thumbnails only
 def visual_check(pdf_path, dpi=120, per_sheet=6):
     """Rasterise pages and tile them into contact sheets for inspection.
 
-    Two resolutions on purpose. The pg-NN.png rasters come out at `dpi`, high
-    enough that 7-8 pt code and SVG labels are actually legible - that is what
-    Step 7 asks you to judge, and it cannot be judged on a thumbnail. The
-    contact sheets are tiled from downscaled copies and are only the overview
-    pass: skim them, then open the individual pages that look wrong.
-    """
-    out_dir = os.path.join(os.path.dirname(pdf_path) or ".", "_check")
+    Uses poppler's pdftoppm when it is on PATH; otherwise falls back to
+    PDFium via pypdfium2 (pip-installable, so Windows users are not blocked
+    by a missing poppler). One of the two is required - the check is not
+    optional."""
+    out_dir = os.path.join(os.path.dirname(os.path.abspath(pdf_path)), "_check")
     os.makedirs(out_dir, exist_ok=True)
-    for stale in glob.glob(os.path.join(out_dir, "*.png")):
-        os.remove(stale)
+    for old in glob.glob(os.path.join(out_dir, "pg-*.png")) + \
+               glob.glob(os.path.join(out_dir, "sheet*.png")):
+        os.remove(old)
 
-    # --check is a guarantee, not a best-effort: if it cannot actually look at
-    # the pages it must fail loudly rather than exit 0 having checked nothing.
-    try:
-        subprocess.run(["pdftoppm", "-r", str(dpi), "-png", pdf_path,
-                        os.path.join(out_dir, "pg")], check=True)
-    except FileNotFoundError:
-        sys.exit(
-            "ERROR: --check requires pdftoppm, which was not found on PATH.\n"
-            "  The visual check is a non-negotiable step (SKILL.md Step 7);\n"
-            "  skipping it would mean delivering an uninspected PDF.\n"
-            "  Install poppler:\n"
-            "    Windows  winget install oschwartz10612.Poppler\n"
-            "    macOS    brew install poppler\n"
-            "    Linux    apt install poppler-utils\n"
-            "  (then restart the shell so PATH picks it up)")
-    except subprocess.CalledProcessError as e:
-        sys.exit("ERROR: pdftoppm failed on %s (exit %d); "
-                 "cannot verify layout." % (pdf_path, e.returncode))
+    if shutil.which("pdftoppm"):
+        try:
+            subprocess.run(["pdftoppm", "-r", str(dpi), "-png", pdf_path,
+                            os.path.join(out_dir, "pg")], check=True)
+        except subprocess.CalledProcessError as e:
+            sys.exit("ERROR: pdftoppm failed on %s (exit %d); "
+                     "cannot verify layout." % (pdf_path, e.returncode))
+    else:
+        try:
+            import pypdfium2 as pdfium
+        except ImportError:
+            sys.exit(
+                "ERROR: --check needs a rasteriser and found neither pdftoppm "
+                "(poppler) nor pypdfium2.\n"
+                "  The visual check is a non-negotiable step (SKILL.md Step 7);\n"
+                "  skipping it would mean delivering an uninspected PDF.\n"
+                "  Easiest on any OS:   pip install pypdfium2\n"
+                "  Or install poppler:\n"
+                "    Windows  winget install oschwartz10612.Poppler\n"
+                "    macOS    brew install poppler\n"
+                "    Linux    apt install poppler-utils")
+        doc = pdfium.PdfDocument(pdf_path)
+        for i in range(len(doc)):
+            doc[i].render(scale=dpi / 72.0).to_pil().save(
+                os.path.join(out_dir, "pg-%02d.png" % (i + 1)))
+        print("  (pdftoppm not found - rasterised with PDFium instead)")
 
     try:
         from PIL import Image

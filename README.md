@@ -48,6 +48,10 @@
   or trap that follows in a green or red box (what to memorise / avoid).
   Delete the yellow boxes and a formal revision sheet remains; delete the
   prose and the green/red boxes are a five-minute reminder card
+- **Draws data structures for you**: `assets/tree_svg.py` renders BSTs,
+  AVL rotations and decision trees from a key list (highlighted nodes,
+  height/rank badges, NULL slots, before/after panels); `assets/array_svg.py`
+  renders partition / merge / binary-search traces
 - **Worked examples as dialogues**: the source's own examples rewritten step
   by step — what is on the wire, who does it, what it means
 - **Eats recordings too**: `assets/extract_video.py` flattens a lecture video
@@ -86,9 +90,10 @@ On Windows, WeasyPrint also needs the GTK3 runtime
 (`winget install tschoonj.GTKForWindows`), otherwise importing it fails with
 `cannot load library 'libgobject-2.0-0'`.
 
-`--check` (the visual verification step) requires **poppler** for `pdftoppm`.
-This is a hard dependency of `--check`, not an optional extra — without it the
-build exits non-zero rather than skipping the inspection:
+`--check` (the visual verification step) rasterises with **poppler**'s
+`pdftoppm` when available and otherwise with **PDFium** (`pip install
+pypdfium2`). One of the two is a hard dependency — without either the build
+exits non-zero rather than skipping the inspection:
 
 ```bash
 winget install oschwartz10612.Poppler   # Windows

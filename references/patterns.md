@@ -78,6 +78,15 @@ better as a two-column table than as prose.
 
 ## 5. Hierarchy / containment — things inside other things
 
+*Binary trees, BSTs, AVL rotations, heaps, decision trees, recursion trees.*
+Draw these with `assets/tree_svg.py`: build the tree from the source's own
+key list (`Tree.from_keys([...])` for a BST, explicit `Tree(...)` nesting for
+anything else), then show **before → after** pairs for every mutation the
+source demonstrates (insert, delete, rotate) with the changed node coloured.
+Badges carry heights, balance factors, or ranks. A rotation with two steps is
+two figures that share the middle state.
+
+
 *Memory maps, class hierarchies, org structures, directory layouts,
 taxonomies, geological strata.*
 

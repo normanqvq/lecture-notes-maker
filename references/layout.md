@@ -94,6 +94,19 @@ sequence.
 
 ## Figures
 
+**Generated figures.** Trees come from `assets/tree_svg.py`, array traces
+from `assets/array_svg.py`; write the HTML parts from a Python script that
+imports them. Colour roles are built in: amber = node under discussion,
+green = result / balanced, red = violating / about to change, dashed grey =
+NULL slot or removed node. `side_by_side([...], arrow="label")` lays panels
+out on one line; use `render(..., scale=)` so two panels stay under ~700 px
+together, and never put three panels on one line.
+
+**Captions from a generator script.** Python string literals cannot nest
+double quotes; quote slide titles in captions with 「」 (`slide 「Search
+Max」`) rather than `"..."`, which also reads better in bilingual notes.
+
+
 Inline SVG inside `<figure>`, with a `<figcaption>` stating what the figure
 shows — not repeating its title.
 
