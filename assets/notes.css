@@ -1,8 +1,17 @@
+/* CJK: embedded Noto Sans CJK SC. __ASSETS__ is replaced by build.py with the
+   absolute file:// URL of the assets directory. Never rely on the macOS
+   system CJK fonts (PingFang / Hiragino): their subsetted embeddings break
+   in Quartz-based viewers. */
+@font-face { font-family: "NotoCJK"; font-weight: 400;
+             src: url("__ASSETS__/fonts/NotoSansCJKsc-Regular.otf"); }
+@font-face { font-family: "NotoCJK"; font-weight: 700;
+             src: url("__ASSETS__/fonts/NotoSansCJKsc-Bold.otf"); }
+
 @page {
   size: A4; margin: 13mm 12mm 14mm 12mm;
   @bottom-center {
     content: "__FOOTER__  —  " counter(page) " / " counter(pages);
-    font-family: "DejaVu Sans","Noto Sans CJK SC"; font-size: 7.2pt; color: #9aa3ad;
+    font-family: "Helvetica Neue","DejaVu Sans","NotoCJK","Noto Sans CJK SC"; font-size: 7.2pt; color: #9aa3ad;
   }
 }
 @page :first { @bottom-center { content: ""; } }
@@ -10,7 +19,7 @@
 * { box-sizing: border-box; }
 html { font-size: 9.4pt; }
 body {
-  font-family: "DejaVu Sans","Noto Sans CJK SC",sans-serif;
+  font-family: "Helvetica Neue","DejaVu Sans","NotoCJK","Noto Sans CJK SC",sans-serif;
   color: #1c2430; line-height: 1.5; margin: 0;
   -weasy-hyphens: none;
 }
@@ -57,7 +66,7 @@ h4::before { content: "▸ "; color: #e8721c; }
 pre.code, pre.asm, pre.plain {
   background: #10161f; color: #dfe6ef; border-radius: 5px;
   padding: .55em .75em; margin: .45em 0 .6em;
-  font-family: "DejaVu Sans Mono",monospace; font-size: 7.6pt; line-height: 1.45;
+  font-family: "Menlo","DejaVu Sans Mono","NotoCJK",monospace; font-size: 7.6pt; line-height: 1.45;
   white-space: pre; overflow-wrap: normal;
   border-left: 3px solid #e8721c;
   page-break-inside: avoid;
@@ -73,7 +82,7 @@ pre.code.sm, pre.asm.sm, pre.plain.sm { font-size: 7.0pt; }
 .c-pu { color: #ffffff; }
 .c-id { color: #dfe6ef; }
 code {
-  font-family: "DejaVu Sans Mono",monospace; font-size: .87em;
+  font-family: "Menlo","DejaVu Sans Mono","NotoCJK",monospace; font-size: .87em;
   background: #eef2f7; color: #0f3b66; padding: .05em .28em; border-radius: 3px;
 }
 
@@ -94,6 +103,8 @@ code {
 .key .tag { background: #21955c; }
 .err { background: #f4f0fb; border-left: 4px solid #7b52c9; }  /* ERRATUM */
 .err .tag { background: #7b52c9; }
+.ana { background: #fffbe6; border-left: 4px solid #f2c200; }  /* ANALOGY: yellow, no tag chip */
+.ana > b:first-child { color: #8a6d00; }
 
 /* ---------- tables ---------- */
 table { border-collapse: collapse; width: 100%; margin: .45em 0 .6em;
@@ -102,7 +113,7 @@ th { background: #123a63; color: #fff; font-weight: 700; padding: .3em .45em;
      text-align: left; border: 1px solid #123a63; }
 td { padding: .28em .45em; border: 1px solid #cfd8e3; vertical-align: top; }
 tbody tr:nth-child(even) td { background: #f5f8fc; }
-td.mono, th.mono { font-family: "DejaVu Sans Mono",monospace; font-size: 7.6pt; }
+td.mono, th.mono { font-family: "Menlo","DejaVu Sans Mono","NotoCJK",monospace; font-size: 7.6pt; }
 .ok { color: #17804a; font-weight: 700; }
 .no { color: #c0392b; font-weight: 700; }
 table.tight td, table.tight th { padding: .2em .38em; }

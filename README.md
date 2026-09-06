@@ -41,33 +41,24 @@
 
 ## About The Project
 
-- **Default output**: A4 portrait PDF, single column, ~9.4 pt, dark
-  syntax-highlighted code blocks, hand-authored inline SVG diagrams
-- **Subject-agnostic**: a catalogue of presentation patterns maps content
-  *shapes* (sequences, state traces, bit-fields, taxonomies, state machines,
-  layered stacks) to the layout that serves each one — so it works the same for
-  a computer-architecture deck, an organic-chemistry deck, or a finance deck
+- **Default output**: a short A4 revision-notes PDF — one lecture in roughly
+  5–7 pages, not a slide-by-slide transcription
+- **Three layers per key point**: a formal definition (what you write in the
+  exam), an everyday analogy in a yellow box (how to picture it), and the rule
+  or trap that follows in a green or red box (what to memorise / avoid).
+  Delete the yellow boxes and a formal revision sheet remains; delete the
+  prose and the green/red boxes are a five-minute reminder card
+- **Worked examples as dialogues**: the source's own examples rewritten step
+  by step — what is on the wire, who does it, what it means
 - **Eats recordings too**: `assets/extract_video.py` flattens a lecture video
-  into timestamped slide frames + a whisper transcript, aligned so the notes
-  can cite what the lecturer *said* but never wrote — with a timestamp to jump
-  back to (needs `ffmpeg` + `whisper-cpp`, runs fully locally)
+  into timestamped slide frames + a whisper transcript, so the notes can tag
+  what the lecturer *stressed* (EXAM / TRAP boxes carry a `▶` timestamp)
 - **Verifies before writing**: reads the actual source material and refuses to
   generate from memory — no source, no notes
-- **Finds the gaps**: detects removed answer pages (slide numbering that jumps)
-  and hunts them down in sibling decks before falling back to solving them
-- **Four margin tags**, kept visually distinct from the body so you always know
-  what came from the slides and what didn't:
-  - `SUPP` — what the slides simplified away
-  - `TRAP` — the specific way people get this wrong, with the counter-example
-    that breaks the wrong mental model
-  - `EXAM` — phrasing the marking scheme is likely to use
-  - `ERRATUM` — the slides are wrong, here's what's correct
-- **Traces every worked example** step by step with full intermediate state,
-  not just the final answer
-- **Self-checks the layout**: rasterises the PDF into full-size page images
-  plus small contact sheets, so overlapping labels and stranded headings get
-  caught before delivery
-- Ends with a one-page quick-reference table and a self-test
+- **Self-checks the layout** with poppler rasters, and asks for a second
+  renderer (Quartz / PDFium) before delivery because font-embedding bugs do
+  not show in poppler
+- Ends with a 5–8 question self-check, no cheat-sheet appendix
 
 ### Output language
 
@@ -83,6 +74,10 @@ explanation in your language, technical terms kept in the original.
 ```bash
 pip install weasyprint pillow
 ```
+
+Chinese (or any CJK) output needs the bundled Noto Sans CJK fonts in
+`assets/fonts/` (about 33 MB, git-ignored). `build.py` prints the two `curl`
+commands the first time it meets CJK text without them.
 
 On Windows, WeasyPrint also needs the GTK3 runtime
 (`winget install tschoonj.GTKForWindows`), otherwise importing it fails with

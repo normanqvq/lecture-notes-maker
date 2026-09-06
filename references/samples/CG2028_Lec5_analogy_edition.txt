@@ -1,0 +1,315 @@
+CG2028 Lecture 5 重点 + 类比版
+Classification of Protocols & I2C · 每个重点配一个生活类比 · 黄框 = 类比 · 绿框 = 要记的规则 · 红框 = 易错
+
+ 这一讲只回答一件事：STM32 怎么用两根线（PB10 / PB11）去读写另一颗芯片 HTS221 里面的寄存器。前半讲是
+ 「通信方式怎么分类」，后半讲是「I2C 线上到底在发什么」。
+
+ 总类比：打电话。STM32 是打电话的人（master），HTS221 是接电话的人（slave）。只有 STM32 能拨号和挂
+ 断；HTS221 只能接听、应声、回答。整章所有序列都可以翻译成一段电话对话。
+
+
+ 1. 六个分类维度（§2）— 每个维度只问一个问题
+维度                  定义                                   类比                            I2C
+
+Parallel / Serial   Parallel：用多根导线同时传多个 bit，             寄信：一次寄 8 张纸（8 根线）vs 一张一张寄     Serial
+                    一根线一个 bit；短距离，受 bus-skew             （1 根线）。一起寄的纸走不同的路会前后到
+                    和 cross-talk 影响。Serial：只用一根          （skew）、互相沾墨（cross-talk），所以只
+                    数据线，一次传一个 bit；适合长距离。                 能近距离
+                    芯片内部（ALU、寄存器）永远是并行
+                    的，所以串行链路两端需要
+                    parallel↔serial converter。
+
+Sync / Async        Synchronous：有一根线专门传时钟，               合唱有没有指挥打拍子。有拍子（时钟线）大家         Sync（有
+                    收发双方用同一个时钟采样。                        跟着读；没拍子就得事先约好速度（baud          SCL）
+                    Asynchronous：只传数据不传时钟，               rate）各自数秒表
+                    双方事先约定 baud rate，接收端靠
+                    start/stop 位的边沿自己恢复时序。
+
+Bus / Point-to-     Bus-based：多个设备接在同一组线                 群聊 vs 私聊。群聊里说话得先喊名字（需要地       Bus
+point               上，每个设备有唯一地址。Point-to-                址），私聊不用
+                    point：两个设备之间一条专用链路，不
+                    需要地址。
+
+Master-slave /      Master-slave：只有 master 能发起通          课堂 vs 自由讨论。课堂只有老师能点名，学生       Master-
+Peer-to-peer        信并决定哪个 slave 应答；同步协议里                被点到才说话；自由讨论谁都能开口，但要处理         slave
+                    master 还负责产生时钟。Peer-to-              抢话（arbitration）
+                    peer：任何设备都能发起，协议要处理
+                    arbitration / collision detection。
+
+Simplex / Half /    Simplex：单向链路，只有一方发。                  广播（只能听）/ 对讲机（轮流说，Over）/ 电     Half（只有
+Full duplex         Half-duplex：一条双向链路，双方轮               话（同时说）                        一根
+                    流用。Full-duplex：至少两条链路，可                                            SDA）
+                    同时收发。
+
+In-band / Out-      In-band：设备地址和数据通过同一组                 群聊里先喊「小明」再说话（地址混在话里）vs        In-band
+of-band             线发送，先发地址后发数据。Out-of-                 每个人一根专线，拉谁的线谁听（SPI 的 chip-
+addressing          band：有独立的地址线或 chip-select            select）
+                    线，经 address decoder 产生各设备的
+                    enable 信号。
+
+
+ I2C 一句话推六格：两根线（→ serial、half-duplex）、其中一根是时钟（→ sync）、多设备共用（→ bus）、没
+ 多余的线放地址（→ in-band）、只有 STM32 能开口（→ master-slave）。
+ 怎么现场判断一个协议：看它有哪几根线。有 CLK/SCL/SCK → sync；数据线一根 → serial；有两根方向相反的数
+ 据线 → full；有 chip-select → out-of-band。
+
+
+ 唯一要记的对比：SPI 和 I2C 只差两格——SPI 是 full-duplex（MOSI + MISO 两根）和 out-of-band（有 chip-
+ select 线）。
+
+
+
+                                         CG2028 · Lecture 5 重点 + 类比 · 1 / 6
+ 两个反直觉：serial 不一定比 parallel 慢（SATA、PCIe 都是 serial）；sync 不一定比 async 快（USB 是
+ async）。
+
+ 总结矩阵（open-book 可翻，但对比题常考）
+协议           Par/       Sync/   Bus/P2P                 M-S/Peer              Duplex           Addressing
+             Ser        Async
+
+I2C          Serial     Sync    Bus                     Master-slave          Half             In-band
+
+SPI          Serial     Sync    Bus（单 slave 时表现         Master-slave          Full             Out-of-band
+                                为 P2P）
+
+UART         Serial     Async   P2P                     —                     Full             —（无需地
+                                                                                               址）
+
+USB          Serial     Async   Bus                     Master-slave (host/   2.0 Half · 3.x   In-band
+                                                        device)               Full
+
+AXI          Parallel   Sync    Bus                     Master-slave          —                Out-of-band
+
+AXI-Stream   Parallel   Sync    P2P                     Master-slave          Simplex          —（无需地
+                                                                                               址）
+
+CAN /        —          —       Bus / —                 Peer-to-peer          —                —
+Ethernet
+
+ 笔记里另外几个 TRAP：
+ · SPI：讲义归 bus-based；只挂一个 slave 时 chip-select 线退化成专线，表现为 point-to-point。考试按讲义答
+ bus，题目说「单 slave」时要能说出这一点。
+ · USB：2.0 是 half-duplex，3.x 是 full-duplex，题目只写 USB 要问版本。
+ · AXI vs AXI-Stream：bus vs P2P、out-of-band vs 无地址、AXI-Stream 是 simplex——最常拿来对比的一组。
+ · 本讲的分类不看电压、信号电平这些电气特性，只看「信息怎么在线上流动」；答分类题按这个思路组织。
+
+
+2. 时钟是干什么的（§2.2 → §4.1）
+
+定义：时钟线（I2C 里是 SCL）是一根由 master 驱动的周期性信号线，每个周期对应一个 bit：发送方在时钟低电平期
+间把 bit 放到数据线上，接收方在时钟高电平期间采样。它告诉接收方「什么时候读、一共读几个」，是同步协议区别
+于异步协议的唯一标志。
+
+ 类比：读一串灯。我用一盏灯发 1111 0000：亮一会儿、灭一会儿。你看到的只是「亮了一段、灭了一段」——是
+ 4 个 1 还是 8 个 1？没法知道。加一个节拍器（SCL），每响一下你看一次灯，响 8 下就读到 8 个 bit。SDA 管「值
+ 是多少」，SCL 管「什么时候读、读几个」。
+
+ 高读低写：SCL 低的时候发送方换 SDA 的值，SCL 高的时候接收方读。所以传数据期间「SCL 高时 SDA 不能
+ 动」。
+ 正因为如此，「SCL 高时 SDA 居然动了」被留作两个特殊信号：S = SCL 高时 SDA ↓（START）；P = SCL 高时
+ SDA ↑（STOP）。
+
+SCL    ____/‾‾‾\____/‾‾‾\____/‾‾‾\____
+SDA    ‾‾‾‾‾‾‾‾‾‾\__________/‾‾‾‾‾‾‾‾‾‾          SDA 只在 SCL 低的那段跳变
+         读1         读0         读1
+
+ 「高读低写」的「写」= 发送方把下一个 bit 放到线上。跟地址字节里 R/W 位的「写」（整段传输方向）不是一回
+ 事。
+
+
+3. Open-drain 与 pull-up（§3.3）— 为什么多个芯片接一根线不打架
+定义：Open-drain（或 open-collector）输出：引脚只有两种状态——拉低（接地）或高阻 Z（放手），永远不主动
+输出高电平；讲义原话「a pin outputs Z or low, never high」。Pull-up resistor：接在线与 VDD 之间的电阻，所有
+
+
+                                   CG2028 · Lecture 5 重点 + 类比 · 2 / 6
+设备都放手时把线拉到高电平。Wired-AND：多个 open-drain 输出并联时，线的电平 = 各输出的 AND，任一设备拉
+低则整条线为低。I2C 的 SDA、SCL 都是双向 open-drain 线，各接一个上拉电阻，空闲时均为高。
+
+ 类比：一根被弹簧吊着的绳子。SDA 是绳子，上拉电阻（pull-up）是把绳子吊在上面的弹簧，默认在上面（= 高电
+ 平）。每个芯片手里都能抓住绳子往下拽（= 输出 0），但谁都不能往上推——想让它上去只能松手（= 输出 1，其
+ 实是「放手」，高阻 Z），弹簧自己把它带上去。几个人同时拽绳子也不会出事，绳子就在下面。
+
+如果允许「往上推」（Lecture 4 的 push-pull），一个推高、一个拉低，3.3V 直接接 0V，短路烧芯片。open-drain
+拆掉了「推高」，冲突时结果永远是低（wired-AND），所有芯片都被设计成接受这个结果。
+
+ 考试答「为什么 open-drain」三句：① 多设备共线，允许推高就会短路；② open-drain 只能拉低或放手，冲突
+ 结果是 low，不会损坏；③ 这个 wired-AND 让 clock stretching 和多 master 仲裁成为可能。
+ 三个推论：空闲时两根线都是高（大家都松手）· START 只能是拉低（唯一能主动做的动作）· slave 能拉住 SCL
+ 让 master 等（clock stretching）。
+ Lab 对应：OTYPER 设 1 = 选 open-drain。不用你拆任何东西，芯片两种电路都有，寄存器只是选用哪一种。
+
+ §3 另外两条要记：① 只有 master 产生 SCL，不管此刻谁在发数据。② 速度 100k / 400k（常用） / 1M / 3.4M
+ bps，总线要迁就最慢的设备；能挂多少设备受总线电容限制。
+
+
+4. 一次传输的四个零件（§4）— 一通电话的四个动作
+零件       定义                                                    电话类比
+
+S        START condition：SCL 为高时 SDA 由高变低，由                    拿起听筒。之后总线算「忙」，别人不能拨
+         master 产生，所有传输以它开始
+
+地址字节     Address byte：S 之后 master 发的第一个字节，MSB 先                拨号，并说明这通电话是「我说」还是「你说」
+         发；前 7 bit 是 slave address，第 8 bit 是 data direction
+         bit R/W（0 = write，master→slave；1 = read，
+         slave→master）
+
+A/Ā      ACK：每个 8-bit 字节后的第 9 个时钟脉冲，发送方释放                      每说一句对方「嗯」一声。Ā 不是对方说了
+         SDA，接收方把 SDA 拉低并在 SCL 高电平期间保持。                        「不」，是没人应声
+         NACK (Ā)：第 9 拍 SDA 保持高。讲义原话「Ā is in fact
+         not generated, a lack of A is Ā」
+
+P        STOP condition：SCL 为高时 SDA 由低变高，由 master              挂断，总线回到空闲
+         产生，之后总线过一段时间恢复空闲
+
+Sr       Repeated START：前面没有紧跟 P 的 START，用于在一                  不挂断，直接说「换个话题」。区别只在于它出现
+         次传输内改变方向（change of direction），master 不释               在通话中间
+         放总线；地址字节须重发并取反 R/W 位
+
+地址换算：7 bit → 8 bit
+HTS221 的 7-bit 地址 0x5F = 101 1111
+整体左移一格腾出最低位          → 1011 111_
+最低位填方向：写 0 → 1011 1110 = 0xBE        读 1 → 1011 1111 = 0xBF
+C 写法：(0x5F << 1) | 0 = 0xBE，(0x5F << 1) | 1 = 0xBF
+
+ datasheet 有的给 7-bit（0x5F），有的直接给 8-bit 读写对（0xBE/0xBF 或 0xB0/0xB1）。看到一个数先问它是 7
+ 位还是 8 位。把 0x5F 原样当第一个字节发出去，线上是 0101 1111，slave 会理解成「找 0x2F、读」，没人应。
+
+谁发 A，Ā 什么意思
+
+ 接收方发 A。地址字节是 master 发的，所以它的 A 永远由 slave 发；数据字节看方向——写时 slave 发 A，读时
+ master 发 A。
+
+情形                       第 9 拍谁拉      A                Ā
+
+
+
+
+                                    CG2028 · Lecture 5 重点 + 类比 · 3 / 6
+master 拨号（地址字节）          slave      「我在」             没人接：地址错 / 设备忙 / 坏了
+
+master 说（写数据）            slave      「收到」             无标准含义，master 软件自己决定放弃(P)或重试(Sr)
+
+master 听（读数据）            master     「再说一个」           唯一含义：够了，不用再说，紧接 P 或 Sr
+
+ p.33 的问题「master 没收好能不能回 Ā」：不能这么用。线上 master 总能收到 bit（时钟是它自己产生的），收
+ 坏只可能是软件没来得及处理 / 缓冲区溢出，那是用户软件问题不是协议问题。master 的 Ā 只有「不要了」一个
+ 意思。
+
+
+ 5. 两组角色（§5）
+定义：Master：发起和终止数据传输、产生 SCL 的设备（新版规范叫 controller）。Slave：被 master 寻址、由唯一
+7-bit 地址识别的设备（新版叫 target）。Master transmitter mode：master 向 slave 发数据，slave 对每个字节
+ACK。Master receiver mode：master 从 slave 读数据，地址字节后 master 变 receiver、slave 变 transmitter，后
+续 ACK 由 master 产生，最后一个字节前 master 发 Ā。Clock stretching：slave 把 SCL 拉低迫使 master 等待，准
+备好后释放。
+
+ 类比：「谁能拨号」和「此刻谁在说话」是两回事。老板打电话给下属（老板永远是发起方），但通话中可以是老
+ 板在说、也可以是下属在汇报。
+
+角色                          意思                                         在本模块里
+
+Master / Slave              谁控制总线：发 S、P、产生 SCL                         固定：STM32 = master，HTS221
+                                                                       = slave
+
+Transmitter / Receiver      此刻谁在往 SDA 放数据                              随 R/W 位变：写 = master
+                                                                       transmitter + slave receiver；读 =
+                                                                       master receiver + slave
+                                                                       transmitter
+
+ 读的时候数据是 slave 放的，但 SCL 还是 master 在翻。「谁发数据谁出时钟」是错的。
+
+ 三种序列
+ 写： S | addr+W | A | data | A | data | A | P
+ 读： S | addr+R | A | data | A | data | Ā | P
+                   ↑slave    ↑master    ↑master 说「够了」
+ 转向：S | addr+W | A | data | A | Sr | addr+R | A | data | Ā | P
+
+· 读模式最后一个字节 必须回 Ā：回 A 等于「再说一个」，slave 继续占着 SDA，master 发不出 P（挂不了电话）。
+· Sr 转向后 地址必须重发（同一个号码，但方向位取反）。用 Sr 不用 P+S 是为了不交出总线。
+· write → read 远比反过来常见：读寄存器前要先「写」寄存器地址告诉它读哪个。
+· Clock stretching：slave 忙时拉住 SCL，master 翻不动只能等——slave 唯一碰 SCL 的场景。类比：对方说「等
+  一下」按住了话筒。
+
+ 6. 读写 HTS221（§6）— 把电话打出去
+
+定义：I2C 协议只定义第一个字节（SA + R/W）的含义，其余字节由 slave 自行解释。通常 slave 内每个寄存器有 8-bit
+地址、装 8-bit 值；写时第二个字节被当作 register address、第三个字节当作要写入的值；读时先写 register address
+让 slave 内部指针指向它，再用 Sr 转读取回值。Autoincrement：slave 每读出一个字节内部指针自动 +1，可在一次
+读传输里连读多个寄存器（需传感器支持，可能要显式启用）。
+
+ HTS221 是另一颗芯片，它的寄存器不在 STM32 地址空间里，LDR/STR 够不着，只能走 I2C。STM32 的 I2C 外设
+ （CR1 / ISR / TXDR / RXDR，Lecture 6）自动产生 S、时钟、ACK 检测、P；你的程序只负责往 TXDR 喂字节、从
+ RXDR 取字节。
+
+
+
+
+                                  CG2028 · Lecture 5 重点 + 类比 · 4 / 6
+ 三种「地址」别混：① STM32 寄存器地址（如 I2C_TXDR）— LDR/STR 用；② slave 地址 0x5F — 拨号用；③
+ slave 内部寄存器地址 0x20 — 只有 HTS221 自己认得。
+
+ 写：把 0x85 写进 CTRL_REG1（0x20）
+ S         STM32      拿起电话
+ 0xBE      STM32      拨 0x5F，方向「我说」
+ A         HTS221     「我在」
+ 0x20      STM32      「我要动你的 0x20 号寄存器」
+ A         HTS221     「好」
+ 0x85      STM32      「把它设成 0x85」
+ A         HTS221     「设好了」
+ P         STM32      挂断
+
+I2C 协议只规定第一个字节（地址 + R/W）。「第二个字节是寄存器编号、第三个是值」是 HTS221 datasheet 的约定，换个传感器可
+能不一样。
+
+ 读：问 TEMP_OUT_L（0x2A）里是多少（假设 0x38）
+ S         STM32      拿起电话
+ 0xBE      STM32      拨 0x5F，方向「我说」
+ A         HTS221     「我在」
+ 0x2A      STM32      「我要问的是 0x2A 号」（只指位置，不给值）
+ A         HTS221     「记下了」（内部指针指向 0x2A）
+ Sr        STM32      不挂断，换方向
+ 0xBF      STM32      同一个号码，方向变「你说」
+ A         HTS221     「好，我说」
+ 0x38      HTS221     念出 0x2A 里的值（数据由 slave 放，时钟仍是 STM32 翻）
+ Ā         STM32      「够了，不用再念」
+ P         STM32      挂断
+
+前半段（到 Sr）就是一次「写」，只是少了「值」那个字节；后半段方向反过来。这就是 write → read 的标准形状。
+
+ 读 16-bit 温度：TEMP_OUT_L（0x2A）+ TEMP_OUT_H（0x2B）
+分两次问：上面的对话做两遍（第二遍问 0x2B），中间用 Autoincrement：问完 0x2A 后回 A（「再说一个」），
+Sr 连。                                           HTS221 内部指针自动 +1，接着念 0x2B，再回 Ā。
+8 bytes（4 写 + 4 读）。                             5 bytes（2 写 + 3 读）。要传感器支持并在寄存器里打
+                                                开。
+
+ S | 0xBE | A | 0x2A | A | Sr | 0xBF | A | LSB | A | MSB | Ā | P
+                                              ↑ 这里必须是 A，Ā 的话就没有 MSB 了
+
+
+ 7. 优缺点（§7）— 全是前面东西的推论
+优点                                              局限
+· 两根线（引脚少、板子小）                                   · 开销高：群聊每句话都要先喊名字 + 每句一个「嗯」
+· 加设备不影响别人（只要电容不超）                               · 慢：最高 3.4 Mbps
+· No strict baud rate：不用事先约定定时，时钟在 SCL           · 7-bit 地址最多 128 个，且会撞（两个同型号传感器地
+  上。TRAP：这不等于速度随便，上限仍由 slave 支持                     址一样就不能共线）
+  的模式和总线电容决定，standard-mode 设备接 400               · 没有 plug-and-play，地址要手动规划
+  kbps 会出错                                       · clock stretching 让整条线等，增加延迟
+· 协议简单到能用 GPIO 软件模拟（bit-bang）                    · 只能短距离（sync 的固有限制）
+
+
+
+
+                               CG2028 · Lecture 5 重点 + 类比 · 5 / 6
+8. 自查五问（答不出哪题就回去看哪节）
+  1. 为什么 I2C 要 open-drain？用绳子和弹簧解释。（§3）
+  2. S 和 P 的波形是什么？数据位什么时候允许变？（§2、§4）
+  3. 0x5F 的写地址和读地址各是多少？怎么算的？（§4）
+  4. master 读数据时最后一个字节回 A 还是 Ā？回错了会怎样？（§5）
+  5. 写出读 TEMP_OUT_L 的完整序列，标出每个 A/Ā 是谁发的。（§6）
+
+
+
+
+                       CG2028 · Lecture 5 重点 + 类比 · 6 / 6
+

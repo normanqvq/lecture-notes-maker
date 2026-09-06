@@ -6,6 +6,9 @@ A4 portrait, single column, ~13 mm margins, base font ~9.4 pt. Running footer
 carries the course and lecture identifier plus `page / total`; suppressed on the
 cover.
 
+CJK text is set in Noto Sans CJK SC embedded from `assets/fonts/` (see
+SKILL.md Step 6); Latin text falls back to Helvetica Neue / DejaVu Sans.
+
 Single column is deliberate. Multi-column looks denser but breaks wide tables
 and forces figures to postage-stamp size, and study notes are read linearly.
 
@@ -58,19 +61,36 @@ columns rather than the words.
 ## Callout boxes
 
 ```html
-<div class="box supp"><span class="tag">SUPP</span> …</div>
-<div class="box trap"><span class="tag">TRAP</span> …</div>
-<div class="box exam"><span class="tag">EXAM</span> …</div>
-<div class="box key"><span class="tag">KEY</span> …</div>
-<div class="box err"><span class="tag">ERRATUM</span> …</div>
+<div class="box ana"><b>类比：</b>…</div>                       <!-- yellow: analogy -->
+<div class="box key"><span class="tag">KEY</span> …</div>       <!-- green: rule to memorise -->
+<div class="box trap"><span class="tag">TRAP</span> …</div>     <!-- red: common mistake -->
+<div class="box exam"><span class="tag">EXAM</span> …</div>     <!-- amber: source-flagged, may carry ▶ timestamp -->
+<div class="box supp"><span class="tag">SUPP</span> …</div>     <!-- blue: rare -->
+<div class="box err"><span class="tag">ERRATUM</span> …</div>   <!-- purple: rare -->
 ```
 
-`KEY` is for a rule worth memorising verbatim — not one of the four judgment
-categories, just emphasis.
+The analogy box carries no tag chip — a bold `类比：` / `Analogy:` lead-in is
+enough, and the yellow is its identity. The three colours the reader is told
+to rely on are yellow = picture it, green = memorise it, red = do not do this;
+put that legend in one line on the cover strip.
 
 Boxes may contain tables and code blocks. They are `page-break-inside: avoid`,
 so a box longer than about a third of a page will force an awkward break —
 split it or move it into the body.
+
+## Section openers
+
+Each `h2`/`h3` is followed by one sentence stating the question the section
+answers, before any definition. The `h3` may carry the slide reference in its
+`<span class="sub">` (`§3.3 · p.23`). Definitions are plain paragraphs that
+begin with `<b>定义：</b>`; do not box them.
+
+## Dialogue tables
+
+Worked examples use a three-column `table.tight`: what is on the wire (mono),
+who, what it means (the spoken line). Bold the step people get wrong. Keep
+one such table per example; do not add a byte-by-byte trace of the same
+sequence.
 
 ## Figures
 
