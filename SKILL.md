@@ -1,6 +1,6 @@
 ---
 name: lecture-notes-maker
-description: Turn lecture slides, course PDFs, or lecture recordings (video) into a short, print-ready revision-notes PDF — one lecture in roughly 5–7 A4 pages, each key point written as definition → everyday analogy → rule/trap, worked examples as step-by-step dialogues, ending with a self-check. Use when the user asks for study notes, revision notes, 重点笔记, or a "notes PDF" from uploaded course material. Not for exhaustive transcriptions of the slides and not for one-page exam cheatsheets.
+description: Turn lecture slides, course PDFs, or lecture recordings (video) into a short, print-ready revision-notes PDF — one lecture in roughly 5–7 A4 pages, each key point written as definition → everyday analogy → rule/trap, worked examples as step-by-step dialogues, ending with a self-check. Use when the user asks for study notes, revision notes, 重点笔记, or a "notes PDF" from uploaded course material. Also turns a meeting recording into minutes (TL;DR, decisions, action items with timestamps) through the same video pipeline — use for 会议纪要, 会议总结, or "summarise this meeting video". Not for exhaustive transcriptions of the slides and not for one-page exam cheatsheets.
 ---
 
 # Lecture Notes Maker
@@ -61,7 +61,8 @@ python assets/extract_video.py lecture.mp4
 python assets/extract_video.py slides.mp4 --audio-from camera.mp4
 ```
 
-The second form is for dual-stream recordings (Panopto and similar store the
+(For a meeting recording rather than a lecture, see **Meeting mode** at the
+end of this file.) The second form is for dual-stream recordings (Panopto and similar store the
 screen capture and the camera/audio as separate streams — the user downloads
 both, e.g. `yt-dlp --cookies-from-browser chrome <viewer URL>`; downloading and
 authentication stay on the user's side, never in this skill). It needs
@@ -338,6 +339,43 @@ locally; it is git-ignored because of its size.)
 
 ## Scope
 
-This skill makes **short revision notes**. If the user wants an exhaustive,
-slide-by-slide study document, or a one-page maximum-density exam cheatsheet,
-those are different artifacts — say so and ask which they want.
+This skill makes **short revision notes** from course material and, in
+**Meeting mode** below, **minutes** from a meeting recording. If the user
+wants an exhaustive, slide-by-slide study document, or a one-page
+maximum-density exam cheatsheet, those are different artifacts — say so and
+ask which they want.
+
+## Meeting mode — recording → minutes
+
+Use this mode when the recording is a meeting (project sync, standup, client
+call, interview), or the user asks for a 会议纪要 / summary of a meeting video.
+Nobody revises for a meeting, so the three layers, analogies, self-check, and
+the 5–7 page PDF do **not** apply. The non-negotiable rules still do: never
+summarise from memory, verify against the transcript, never invent.
+
+1. **Flatten.** Camera-only recording:
+
+   ```bash
+   python assets/extract_video.py meeting.mp4 --transcript-only --lang auto
+   ```
+
+   `--transcript-only` skips the frame steps, which on a talking-heads video
+   would only produce hundreds of near-identical faces. Use `--lang zh` (or
+   `en`) when `auto` mislabels a mixed-language meeting. If the meeting was a
+   screen share with slides or a document on screen, **drop**
+   `--transcript-only` and read the frames like lecture slides. Long
+   recordings follow the same `nohup … &` / three-at-a-time rule as Step 1.
+
+2. **Read `index.md` end to end** before writing. Whisper hygiene from Step 1
+   applies (repeated lines are silence; spelling of names and terms is not
+   authoritative).
+
+3. **Write `minutes.md`** following the template and rules in
+   `references/meeting-summary.md`: TL;DR → decisions → action-items table
+   (who / what / by when / ▶timestamp) → open questions → topics in order →
+   things to double-check. Every decision and action item carries a
+   timestamp. An owner or deadline that was not said is written as
+   `not assigned` / `not said`, never guessed.
+
+4. **Deliver Markdown.** Build a PDF only if the user asks, with the Step 6/7
+   pipeline and `--footer "<meeting> · <date>"`.

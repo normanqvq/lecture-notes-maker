@@ -8,6 +8,8 @@
 
 <p align="center">
   <a href="SKILL.md"><strong>Explore the workflow</strong></a>
+  ·
+  <a href="GUIDE_zh.md"><strong>中文保姆级安装指南</strong></a>
 </p>
 
 <p align="center">
@@ -57,6 +59,11 @@
 - **Eats recordings too**: `assets/extract_video.py` flattens a lecture video
   into timestamped slide frames + a whisper transcript, so the notes can tag
   what the lecturer *stressed* (EXAM / TRAP boxes carry a `▶` timestamp)
+- **Meeting mode**: point it at a meeting recording and ask for minutes —
+  the same pipeline (`--transcript-only`, no frames) feeds a TL;DR, the
+  decisions, an action-items table and open questions, every line carrying
+  a `▶` timestamp; owners and deadlines that were not said are marked as
+  such, never guessed (`references/meeting-summary.md`)
 - **Verifies before writing**: reads the actual source material and refuses to
   generate from memory — no source, no notes
 - **Self-checks the layout** with poppler rasters, and asks for a second
@@ -127,12 +134,13 @@ pip install pypdfium2
 ### Installation
 
 ```bash
-git clone https://github.com/normanqvq/lecture-notes-maker
-cp -r lecture-notes-maker ~/.claude/skills/
+git clone https://github.com/normanqvq/lecture-notes-maker ~/.claude/skills/lecture-notes-maker
 ```
 
 Then just upload your lecture PDF — or point it at a lecture recording — and
-ask for notes.
+ask for notes. Starting from nothing (no Claude Code yet, or using it with a
+DeepSeek / Kimi / GLM key instead of a Claude account)? Follow
+[GUIDE_zh.md](GUIDE_zh.md), which walks through every step in Chinese.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -167,7 +175,12 @@ spoken while it was on screen:
 ```bash
 python assets/extract_video.py lecture.mp4
 python assets/extract_video.py slides.mp4 --audio-from camera.mp4   # dual-stream (Panopto)
+python assets/extract_video.py meeting.mp4 --transcript-only --lang auto   # meetings: no frames
 ```
+
+For a meeting, ask for minutes instead of notes and the skill switches to
+meeting mode: `minutes.md` with a TL;DR, decisions, an action-items table
+(who / what / by when / timestamp) and open questions.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -175,14 +188,20 @@ python assets/extract_video.py slides.mp4 --audio-from camera.mp4   # dual-strea
 
 ```
 SKILL.md                    the workflow and the non-negotiable rules
+GUIDE_zh.md                 step-by-step setup in Chinese: Claude Code, API keys, deps
 references/
   content-rules.md          when each tag applies, with worked examples
   patterns.md               content shape -> presentation pattern catalogue
   layout.md                 page, figure, and table conventions
+  meeting-summary.md        minutes template and rules for meeting mode
+  lessons.md                what went wrong on earlier runs and the fix
 assets/
   notes.css                 stylesheet
   build.py                  highlighter + WeasyPrint renderer + visual check
   extract_video.py          recording -> frames + transcript + alignment index
+  tree_svg.py, array_svg.py figure generators for trees and array traces
+  render_check.py           second-renderer (PDFium) check
+  get_fonts.py              downloads the Noto Sans CJK fonts
 ```
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>

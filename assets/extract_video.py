@@ -25,6 +25,9 @@ Usage:
         (Panopto often stores the screen capture and the camera/audio as
          two separate streams - download both, point --audio-from at the
          one with sound)
+    python3 extract_video.py meeting.mp4 --transcript-only --lang auto
+        (camera-only recordings such as meetings: the picture carries no
+         slides, so skip the frames and get transcript.srt + index.md only)
 """
 
 import argparse
@@ -221,11 +224,31 @@ def write_index(outdir, video, duration, kept, segs, n_sheets):
         "",
         f"- source: `{video.name}`",
         f"- duration: {fmt_t(duration)}",
-        f"- kept frames: {len(kept)} (near-duplicates in `frames/extra/`)",
-        f"- contact sheets: {n_sheets} in `sheets/` - triage there first, "
-        "then open individual frames",
+        (f"- kept frames: {len(kept)} (near-duplicates in `frames/extra/`)"
+         if kept else "- frames: none (--transcript-only)"),
+        (f"- contact sheets: {n_sheets} in `sheets/` - triage there first, "
+         "then open individual frames" if kept else "- contact sheets: none"),
         f"- transcript: `transcript.srt` ({len(segs)} segments)",
         "",
+    ]
+    if not kept:
+        # --transcript-only: no frames to align with, so group the speech
+        # into five-minute blocks instead so index.md is still readable
+        lines.append("No frames were extracted (--transcript-only). "
+                     "Transcript in five-minute blocks:")
+        lines.append("")
+        block = 300
+        for start in range(0, int(duration) + 1, block):
+            end = min(start + block, duration)
+            spoken = [f"- [{fmt_t(s)}] {text}" for s, text in segs
+                      if start <= s < end]
+            if spoken:
+                lines.append(f"## {fmt_t(start)} - {fmt_t(end)}")
+                lines.extend(spoken)
+                lines.append("")
+        (outdir / "index.md").write_text("\n".join(lines), encoding="utf-8")
+        return
+    lines += [
         "Each section below is one kept frame and everything said while it",
         "was on screen. Frame filenames carry their timestamp.",
         "",
@@ -252,7 +275,10 @@ def main():
     ap.add_argument("--outdir", type=Path, default=None,
                     help="output directory (default: <video>_extracted next to the video)")
     ap.add_argument("--model", type=Path, default=DEFAULT_MODEL)
-    ap.add_argument("--lang", default="en")
+    ap.add_argument("--lang", default="en",
+                    help="speech language for whisper (default en; zh, or auto to detect)")
+    ap.add_argument("--transcript-only", action="store_true",
+                    help="skip frame extraction - for camera-only recordings such as meetings")
     ap.add_argument("--scene", type=float, default=0.08,
                     help="ffmpeg scene-change threshold (default 0.08)")
     args = ap.parse_args()
@@ -285,17 +311,24 @@ def main():
     try:
         extract_audio(audio_src, wav)
         srt = transcribe(wav, outdir, args.model, args.lang)
-        raw = extract_raw_frames(args.video, rawdir, args.scene)
-        kept = dedup_frames(raw, outdir / "frames")
-        n_sheets = contact_sheets(outdir / "frames", outdir / "sheets")
+        if args.transcript_only:
+            print("[3/5] [4/5] skipping frames (--transcript-only)")
+            raw, kept, n_sheets = [], [], 0
+        else:
+            raw = extract_raw_frames(args.video, rawdir, args.scene)
+            kept = dedup_frames(raw, outdir / "frames")
+            n_sheets = contact_sheets(outdir / "frames", outdir / "sheets")
         write_index(outdir, args.video, duration, kept, parse_srt(srt), n_sheets)
     finally:
         wav.unlink(missing_ok=True)  # 80+ MB of pure intermediate, always drop
         shutil.rmtree(rawdir, ignore_errors=True)
 
     print(f"\ndone: {outdir}")
-    print(f"  {len(kept)} frames kept from {len(raw)} detected, "
-          f"{n_sheets} contact sheets, transcript + index.md")
+    if kept:
+        print(f"  {len(kept)} frames kept from {len(raw)} detected, "
+              f"{n_sheets} contact sheets, transcript + index.md")
+    else:
+        print("  transcript + index.md (no frames)")
 
 
 if __name__ == "__main__":
