@@ -9,7 +9,9 @@
 <p align="center">
   <a href="SKILL.md"><strong>Explore the workflow</strong></a>
   ·
-  <a href="GUIDE_zh.md"><strong>中文保姆级安装指南</strong></a>
+  <a href="Guide_en.md"><strong>Setup guide (English)</strong></a>
+  ·
+  <a href="Guide_zh.md"><strong>中文保姆级安装指南</strong></a>
 </p>
 
 <p align="center">
@@ -140,7 +142,8 @@ git clone https://github.com/normanqvq/lecture-notes-maker ~/.claude/skills/lect
 Then just upload your lecture PDF — or point it at a lecture recording — and
 ask for notes. Starting from nothing (no Claude Code yet, or using it with a
 DeepSeek / Kimi / GLM key instead of a Claude account)? Follow
-[GUIDE_zh.md](GUIDE_zh.md), which walks through every step in Chinese.
+[Guide_en.md](Guide_en.md) (or [Guide_zh.md](Guide_zh.md) in Chinese), which
+walks through every step.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -188,7 +191,7 @@ meeting mode: `minutes.md` with a TL;DR, decisions, an action-items table
 
 ```
 SKILL.md                    the workflow and the non-negotiable rules
-GUIDE_zh.md                 step-by-step setup in Chinese: Claude Code, API keys, deps
+Guide_en.md, Guide_zh.md    step-by-step setup (EN / 中文): Claude Code, API keys, deps
 references/
   content-rules.md          when each tag applies, with worked examples
   patterns.md               content shape -> presentation pattern catalogue
