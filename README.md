@@ -183,7 +183,9 @@ python assets/extract_video.py meeting.mp4 --transcript-only --lang auto   # mee
 
 For a meeting, ask for minutes instead of notes and the skill switches to
 meeting mode: `minutes.md` with a TL;DR, decisions, an action-items table
-(who / what / by when / timestamp) and open questions.
+(who / what / by when / timestamp) and open questions. A PDF, if asked for,
+is built with `assets/minutes.css`: black text, red for decisions,
+deadlines and timestamps, no coloured boxes.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -199,7 +201,8 @@ references/
   meeting-summary.md        minutes template and rules for meeting mode
   lessons.md                what went wrong on earlier runs and the fix
 assets/
-  notes.css                 stylesheet
+  notes.css                 stylesheet for revision notes
+  minutes.css               stylesheet for meeting minutes: black text, red accent only
   build.py                  highlighter + WeasyPrint renderer + visual check
   extract_video.py          recording -> frames + transcript + alignment index
   tree_svg.py, array_svg.py figure generators for trees and array traces

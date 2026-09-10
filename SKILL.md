@@ -377,5 +377,19 @@ summarise from memory, verify against the transcript, never invent.
    timestamp. An owner or deadline that was not said is written as
    `not assigned` / `not said`, never guessed.
 
-4. **Deliver Markdown.** Build a PDF only if the user asks, with the Step 6/7
-   pipeline and `--footer "<meeting> · <date>"`.
+4. **Deliver Markdown.** Build a PDF only if the user asks. Minutes use their
+   own stylesheet, not the notes one:
+
+   ```bash
+   python assets/build.py --parts parts --css assets/minutes.css \
+                          --out minutes.pdf --footer "<meeting> · <date>" --check
+   ```
+
+   `minutes.css` is black text with **one** accent colour, red. Nothing else:
+   no coloured callout boxes, no gradient headings, no highlighted code. Red
+   is reserved for what the reader scans for — decisions
+   (`<span class="red">`), deadlines, `not assigned` / `not said`, and
+   `▶` timestamps (`<span class="t">`). The `supp/trap/exam/key/ana` classes
+   are not defined in it on purpose; `references/meeting-summary.md` lists
+   the markup. Then verify with Step 7 (`--check` plus `render_check.py`
+   for CJK) exactly as for notes.

@@ -42,6 +42,27 @@ what happens next.
 - Speech recognition may have misheard: <term at ▶mm:ss>, <name>.
 ```
 
+## PDF markup (only when the user asks for a PDF)
+
+Build with `--css assets/minutes.css`. The stylesheet is black on white with
+red as the only accent, so the HTML needs very few classes:
+
+| Content | Markup |
+|---------|--------|
+| title | `<h1>` |
+| source / duration / participants line | `<p class="meta">` |
+| section headings | `<h2>` (black rule underneath; no `.sub`, no badges) |
+| a decision, a deadline, `not assigned`, `not said` | `<span class="red">…</span>` |
+| `▶` timestamp | `<span class="t">▶12:40</span>` |
+| action items | a plain `<table>` with `<thead>` |
+| a verbatim transcript line worth quoting | `<pre class="plain">` |
+| the *things to double-check* list, if boxed | `<div class="box"><span class="tag">check</span> …</div>` |
+
+Do not use `class="box supp/trap/exam/key/ana"`, `h2 .sub`, `.cover`, or
+`data-lang` code highlighting; none of them is styled in `minutes.css`, and
+the point of the plain look is that red means "this is a decision or a
+deadline" and nothing else.
+
 ## Rules
 
 1. **Every decision and action item carries a timestamp.** The reader uses
