@@ -18,7 +18,7 @@ def tree_svg():
     nodes = {41:(150,12),20:(75,40),65:(225,40),11:(37,68),29:(112,68),50:(187,68),91:(262,68),32:(135,96),72:(240,96),99:(285,96)}
     edges = [(41,20),(41,65),(20,11),(20,29),(65,50),(65,91),(29,32),(91,72),(91,99)]
     hs = {41:3,20:2,65:2,11:0,29:1,50:0,91:1,32:0,72:0,99:0}
-    s = ['<svg viewBox="0 0 330 112" width="42mm" xmlns="http://www.w3.org/2000/svg">']
+    s = ['<svg viewBox="0 0 330 112" width="40mm" xmlns="http://www.w3.org/2000/svg">']
     for a,b in edges:
         (x1,y1),(x2,y2) = nodes[a],nodes[b]
         s.append(f'<line x1="{x1}" y1="{y1}" x2="{x2}" y2="{y2}" stroke="#333" stroke-width="1"/>')
@@ -55,7 +55,7 @@ def delete_svg():
     return ''.join(s)
 
 def rec_svg():
-    s = ['<svg viewBox="0 0 250 62" width="40mm" xmlns="http://www.w3.org/2000/svg">']
+    s = ['<svg viewBox="0 0 250 62" width="36mm" xmlns="http://www.w3.org/2000/svg">']
     def box(x,y,w,t): 
         return f'<rect x="{x-w/2}" y="{y-6}" width="{w}" height="12" fill="#eef3ff" stroke="#333" stroke-width="0.7"/><text x="{x}" y="{y+3}" font-size="7" text-anchor="middle">{t}</text>'
     s.append(box(90,8,30,'cn')); 
@@ -137,7 +137,7 @@ P1.append('<p>Empty-stack pop: throw exception (postponed) or <b>modify the spec
 P1.append(code(S['stacksort']))
 
 P1.append(sec('5. Searching &amp; Divide-and-Conquer'))
-P1.append('<p><b>Linear search</b> (unsorted array / list): O(n) worst, O(1) best; global max/min of unsorted data: O(n) unavoidable. <b>Binary search</b> needs a <r>sorted array with random access</r> (not a list): after d halvings n/2&#7511; items remain; stop at 1 &rArr; d = log&#8322;n &rArr; <b>O(log n)</b>.</p>')
+P1.append('<p><b>Linear search</b> (unsorted array / list): O(n) worst, O(1) best; global max/min of unsorted data: O(n) unavoidable. <b>Binary search</b> needs a <r>sorted array with random access</r> (not a list): after d halvings n/2ᵈ items remain; stop at 1 &rArr; d = log&#8322;n &rArr; <b>O(log n)</b>.</p>')
 P1.append(code(S['bsearch']))
 P1.append(code(S['badge']))
 P1.append(code(S['peak']))
@@ -149,9 +149,9 @@ P1.append('''<ul>
 P1.append(sec('4a. Big O worked examples (rules &amp; tables: &sect;4 overleaf)'))
 P1.append('''<table><tr><th class="m">code</th><th>Steps</th></tr>
 
-<tr><td class="m">return n&lt;1 ? 1 : f(n*90.0/100.0);</td><td>Step 1: T(n)=T(0.9n)+1.<br>Step 2: after d calls size n&middot;0.9&#7511;; stops when =1.<br>Step 3: d = log&#8321;&#8320;&#8725;&#8329;n<br><b>&rArr; O(log n)</b><br><i>Note:</i> base is a constant &rArr; any f(0.9n) / f(0.7n) / f(n/3) is O(log n); never compute the base.</td></tr>
+<tr><td class="m">return n&lt;1 ? 1 : f(n*90.0/100.0);</td><td>Step 1: T(n)=T(0.9n)+1.<br>Step 2: after d calls size n&middot;0.9ᵈ; stops when =1.<br>Step 3: d = log&#8321;&#8320;&#8725;&#8329;n<br><b>&rArr; O(log n)</b><br><i>Note:</i> base is a constant &rArr; any f(0.9n) / f(0.7n) / f(n/3) is O(log n); never compute the base.</td></tr>
 <tr><td class="m">if(n&lt;=1)return 0; doSomething(n);
-return f(n/2)+f(n/2);</td><td>Step 1: T(n)=2T(n/2)+n.<br>Step 2: level d has 2&#7511; calls of size n/2&#7511; &rArr; cost n per level.<br>Step 3: log n levels<br><b>&rArr; O(n log n)</b></td></tr><tr><td class="m">for(i=0;i&lt;n;i++) O(1);
+return f(n/2)+f(n/2);</td><td>Step 1: T(n)=2T(n/2)+n.<br>Step 2: level d has 2ᵈ calls of size n/2ᵈ &rArr; cost n per level.<br>Step 3: log n levels<br><b>&rArr; O(n log n)</b></td></tr><tr><td class="m">for(i=0;i&lt;n;i++) O(1);
 return f(n/2);
 // ONE call only</td><td>Step 1: T(n)=T(n/2)+n.<br>Step 2: level d has 1 call of size n/2ᵈ &rArr; cost n/2ᵈ per level.<br>Step 3: n+n/2+n/4+&hellip; &le; 2n (geometric, r&lt;1 &rArr; &le; 2&times;first term).<br><b>&rArr; O(n)</b> (contrast: f(n/2)+f(n/2) gives n per level &rArr; O(n log n); &ldquo;叫一次不能乘&rdquo;)</td></tr>
 <tr><td class="m">if(n&lt;=1)return 0;
@@ -190,11 +190,11 @@ P2.append(sub('Recursion: write T(n), then recursion tree = (cost per level) &ti
 P2.append('''<table><tr><th>recurrence (code shape)</th><th>answer</th><th>Steps</th></tr>
 <tr><td>T(n)=T(n&minus;1)+c &nbsp;<span class="tiny">(O(1) work, f(n-1); or f(n-10))</span></td><td><b>O(n)</b></td><td>n levels &times; c</td></tr>
 <tr><td>T(n)=T(n&minus;1)+cn &nbsp;<span class="tiny">(loop n then f(n-1))</span></td><td><r>O(n&sup2;)</r></td><td>n+(n&minus;1)+&hellip;+1 = n&sup2;/2</td></tr>
-<tr><td>T(n)=T(n/2)+c &nbsp;<span class="tiny">(f(n/2), f(7n/9), f(0.9n))</span></td><td><r>O(log n)</r></td><td>n&middot;(9/10)&#7511;=1 &rArr; d = log&#8321;&#8320;&#8725;&#8329; n</td></tr>
+<tr><td>T(n)=T(n/2)+c &nbsp;<span class="tiny">(f(n/2), f(7n/9), f(0.9n))</span></td><td><r>O(log n)</r></td><td>n&middot;(9/10)ᵈ=1 &rArr; d = log&#8321;&#8320;&#8725;&#8329; n</td></tr>
 <tr><td>T(n)=T(n/2)+cn &nbsp;<span class="tiny">(loop n then ONE f(n/2))</span></td><td><b>O(n)</b></td><td>n+n/2+n/4+&hellip; &le; 2n</td></tr>
 <tr><td>T(n)=2T(n/2)+cn &nbsp;<span class="tiny">(loop n, then f(n/2)+f(n/2); merge sort)</span></td><td><r>O(n log n)</r></td><td>each level cn, log&#8322;n levels</td></tr>
 <tr><td>T(n)=T(n/10)+T(9n/10)+cn &nbsp;<span class="tiny">(quicksort 1:9)</span></td><td><r>O(n log n)</r></td><td>each level n, depth log&#8321;&#8320;&#8725;&#8329; n</td></tr>
-<tr><td>T(n)=10T(n/10)+cn &nbsp;<span class="tiny">(loop n, then 10 calls f(n/10))</span></td><td><r>O(n log n)</r></td><td>10&middot;(n/10) = n per level, log&#8321;&#8320;n levels</td></tr>
+<tr><td>T(n)=10T(n/10)+cn &nbsp;<span class="tiny">(loop n, then 10 calls f(n/10))</span></td><td><r>O(n log n)</r></td><td>10&middot;(n/10) = n per level, log&#8321;&#8320;n levels</td></tr><tr><td>T(n)=2T(n&minus;1)+c <span class="tiny">(naive Fibonacci)</span> / f(10) inside f(n) / <b>no base case</b></td><td><r>O(2ⁿ)</r> / O(1) / <r>None</r></td><td>doubles per level &times; n levels / constant-size call / never ends</td></tr>
 </table>''')
 P2.append(fig(rec_svg(), 'Recursion tree of T(n)=2T(n/2)+cn: every level costs cn, there are log&#8322;n levels &rArr; O(n log n).'))
 P2.append(sec('6. Sorting (Bubble / Selection / Insertion / Merge / Quick)'))
@@ -214,7 +214,7 @@ P2.append(code('''
 partition, pivot=22:  22 35 10 42 7 51 18  -> swap 35,18: 22 18 10 42 7 51 35
  -> swap 42,7: 22 18 10 7 42 51 35 -> hands cross, swap pivot with A[high]
  -> 7 18 10 [22] 42 51 35   "which was the pivot?" = left all <= it < right
-    e.g. 18 5 6 1 10 22 40 32 50 -> 22 or 50
+    e.g. 18 5 6 1 10 22 40 32 50 -> 22 or 50 (50: its right side is empty)
 merge trace (2022): 37 11 21 56 14 18 97 3 -> singles
  -> [11 37][21 56][14 18][3 97] -> [11 21 37 56][3 14 18 97] -> sorted''', 'pl'))
 P2.append('''<p><b>QuickSort analysis</b></p><ul>
