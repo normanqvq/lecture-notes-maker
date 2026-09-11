@@ -211,7 +211,7 @@ P2.append('''<table><tr><th>recurrence (code shape)</th><th>answer</th><th>Steps
 
 
 
-<tr><td>T(n)=T(n/10)+T(9n/10)+cn &nbsp;<span class="tiny">(quicksort 1:9)</span></td><td><r>O(n log n)</r></td><td>each level n, depth log&#8321;&#8320;&#8725;&#8329; n</td></tr>
+<tr><td>T(n)=T(n/10)+T(9n/10)+cn &nbsp;<span class="tiny">(quicksort 1:9; not covered by k calls f(n/k))</span></td><td><r>O(n log n)</r></td><td><y>unequal split, but sizes still add up to n &rArr; n per level</y>; depth = longest path log&#8321;&#8320;&#8725;&#8329; n</td></tr>
 <tr><td>T(n)=10T(n/10)+cn &nbsp;<span class="tiny">(loop n, then 10 calls f(n/10))</span></td><td><r>O(n log n)</r></td><td>10&middot;(n/10) = n per level, log&#8321;&#8320;n levels</td></tr><tr><td>T(n)=2T(n&minus;1)+c <span class="tiny">(naive Fibonacci)</span> / f(10) inside f(n) / <b>no base case</b></td><td><r>O(2ⁿ)</r> / O(1) / <r>None</r></td><td>doubles per level &times; n levels / constant-size call / never ends</td></tr>
 </table>''')
 P2.append(sec('6. Sorting (Bubble / Selection / Insertion / Merge / Quick)'))
