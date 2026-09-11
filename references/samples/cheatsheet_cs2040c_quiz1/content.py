@@ -10,15 +10,15 @@ from cheatsheet import code, sec, sub, fig, tree_svg
 from snippets import S
 
 TITLE = "CS2040C Quiz 1 Cheatsheet"
-CSS_EXTRA = ""
-LAYOUT = {}
+CSS_EXTRA = "body { line-height: 1.08; } th, td { padding: 0.35pt 1.4pt; } pre.code { line-height: 1.05; margin: 1pt 0; } p { margin-bottom: 0.9pt; } ul { margin-bottom: 0.9pt; } h1 { margin: 1.3pt 0 0.5pt; } h2 { margin: 1pt 0 0.3pt; } table { margin: 0.8pt 0 1.1pt; } .fig { margin: 0.5pt 0; }"
+LAYOUT = {"margin": "3.5mm 4mm", "page_height": "203mm", "column_gap": "2.2mm"}
 
 # ---------------- SVG figures ----------------
 def tree_svg():
     nodes = {41:(150,12),20:(75,40),65:(225,40),11:(37,68),29:(112,68),50:(187,68),91:(262,68),32:(135,96),72:(240,96),99:(285,96)}
     edges = [(41,20),(41,65),(20,11),(20,29),(65,50),(65,91),(29,32),(91,72),(91,99)]
     hs = {41:3,20:2,65:2,11:0,29:1,50:0,91:1,32:0,72:0,99:0}
-    s = ['<svg viewBox="0 0 330 112" width="40mm" xmlns="http://www.w3.org/2000/svg">']
+    s = ['<svg viewBox="0 0 330 112" width="37mm" xmlns="http://www.w3.org/2000/svg">']
     for a,b in edges:
         (x1,y1),(x2,y2) = nodes[a],nodes[b]
         s.append(f'<line x1="{x1}" y1="{y1}" x2="{x2}" y2="{y2}" stroke="#333" stroke-width="1"/>')
@@ -45,7 +45,7 @@ def delete_svg():
             out.append(f'<circle cx="{ox+x}" cy="{y}" r="8" fill="{fill}" stroke="#000" stroke-width="1"/>')
             out.append(f'<text x="{ox+x}" y="{y+3}" font-size="7.5" text-anchor="middle" font-weight="bold">{k}</text>')
         return ''.join(out)
-    s = ['<svg viewBox="0 0 270 78" width="34mm" xmlns="http://www.w3.org/2000/svg">']
+    s = ['<svg viewBox="0 0 270 78" width="28mm" xmlns="http://www.w3.org/2000/svg">']
     n1 = {65:(60,22),50:(30,46),91:(90,46),72:(72,70),99:(108,70)}
     s.append(mini(0, n1, [(65,50),(65,91),(91,72),(91,99)], 'delete(65): 2 children', 65))
     s.append('<text x="135" y="45" font-size="8" text-anchor="middle">&#8594;</text>')
@@ -169,6 +169,8 @@ return f(n-1)+f(n-1);
 </table>''')
 
 
+P1.append(fig(rec_svg(), 'Recursion tree of T(n)=2T(n/2)+cn: every level costs cn, there are log&#8322;n levels &rArr; O(n log n).'))
+
 # ---------------- PAGE 2 ----------------
 P2 = []
 P2.append(sec('4. Big O &amp; Time Complexity (Part A: 6&times;3 marks)'))
@@ -186,6 +188,18 @@ P2.append('''<table><tr><th class="m">loop header</th><th>iterations</th><th>not
 <tr><td class="m">for (...) return f(...);</td><td><r>runs once</r></td><td>return exits the loop on 1st iteration</td></tr>
 <tr><td class="m">while (rand()%n) ...</td><td>exp. O(n)</td><td>stop prob 1/n per round &rArr; E = n rounds</td></tr>
 <tr><td class="m">i=0; i&lt;n; i*=2</td><td>never ends</td><td>0*2 = 0 unless the body changes i (2024 Feb Q5)</td></tr></table>''')
+P2.append(sub('递归判断法'))
+P2.append('''<p><b>核心：每层做了多少，然后把每层加起来。一样就乘，不一样就加。</b> "loop n" 是占位符：先用 loop 规则算出一次调用的 work，再填进每层。内层 m 与 n 无关 &rArr; 提出来最后乘（固定数字如 100 &rArr; 丢掉）。树（叫 &ge;2 次）看子问题大小加起来：= n &rArr; 每层 n，乘层数；&lt; n &rArr; 每层在缩，O(首项)；&gt; n &rArr; 最后一层主导（4 次 f(n/2) &rArr; 4^(log&#8322;n) = n&sup2;）。</p>
+<table><tr><th class="m">代码</th><th>叫几次</th><th>几层</th><th>每层</th><th>答案</th></tr>
+<tr><td class="m">f(n/k)</td><td>1</td><td>log n</td><td>1, 1, 1</td><td><b>O(log n)</b></td></tr>
+<tr><td class="m">f(n&minus;k)</td><td>1</td><td>n</td><td>1, 1, 1</td><td><b>O(n)</b></td></tr>
+<tr><td class="m">loop n; f(n/k)</td><td>1</td><td>log n</td><td>n, n/k, n/k&sup2;</td><td><b>O(n)</b>（<r>不是 n log n</r>：每层在缩，不能乘）</td></tr>
+<tr><td class="m">loop n; f(n&minus;k)</td><td>1</td><td>n</td><td>n, n&minus;k, n&minus;2k</td><td><b>O(n&sup2;)</b></td></tr>
+<tr><td class="m">loop n; k 次 f(n/k)</td><td>k</td><td>log n</td><td>n, n, n</td><td><b>O(n log n)</b>（子问题加起来 = n 才成立）</td></tr>
+<tr><td class="m">f(n&minus;1)+f(n&minus;1)</td><td>2</td><td>n</td><td>1, 2, 4</td><td><b>O(2ⁿ)</b></td></tr>
+<tr><td class="m">f(n&minus;k)+f(n&minus;m)</td><td>2</td><td>n</td><td>&le; 翻倍</td><td>指数，写 <b>O(2ⁿ)</b></td></tr>
+<tr><td class="m">f(n&minus;1)+f(n&minus;2) (Fibonacci)</td><td>2</td><td>n</td><td>&le; 翻倍</td><td>精确 O(1.618ⁿ)，quiz 写 <b>O(2ⁿ)</b></td></tr></table>
+<p><b>规律：</b>减常数 + 叫 1 次 = O(n)；减常数 + 叫 &ge;2 次 = 指数；乘比例 + 叫 k 次 = n log n。<b>特例：</b><r>return 写在 loop 里 &rArr; loop 只跑一次。没有 base case &rArr; None of the above。</r></p>''')
 P2.append(sub('Recursion: write T(n), then recursion tree = (cost per level) &times; (levels)'))
 P2.append('''<table><tr><th>recurrence (code shape)</th><th>answer</th><th>Steps</th></tr>
 <tr><td>T(n)=T(n&minus;1)+c &nbsp;<span class="tiny">(O(1) work, f(n-1); or f(n-10))</span></td><td><b>O(n)</b></td><td>n levels &times; c</td></tr>
@@ -196,7 +210,6 @@ P2.append('''<table><tr><th>recurrence (code shape)</th><th>answer</th><th>Steps
 <tr><td>T(n)=T(n/10)+T(9n/10)+cn &nbsp;<span class="tiny">(quicksort 1:9)</span></td><td><r>O(n log n)</r></td><td>each level n, depth log&#8321;&#8320;&#8725;&#8329; n</td></tr>
 <tr><td>T(n)=10T(n/10)+cn &nbsp;<span class="tiny">(loop n, then 10 calls f(n/10))</span></td><td><r>O(n log n)</r></td><td>10&middot;(n/10) = n per level, log&#8321;&#8320;n levels</td></tr><tr><td>T(n)=2T(n&minus;1)+c <span class="tiny">(naive Fibonacci)</span> / f(10) inside f(n) / <b>no base case</b></td><td><r>O(2ⁿ)</r> / O(1) / <r>None</r></td><td>doubles per level &times; n levels / constant-size call / never ends</td></tr>
 </table>''')
-P2.append(fig(rec_svg(), 'Recursion tree of T(n)=2T(n/2)+cn: every level costs cn, there are log&#8322;n levels &rArr; O(n log n).'))
 P2.append(sec('6. Sorting (Bubble / Selection / Insertion / Merge / Quick)'))
 P2.append('''<table><tr><th>sort</th><th>best</th><th>avg</th><th>worst</th><th>extra mem</th><th>stable</th><th>after pass i (detective clue)</th></tr>
 <tr><td><b>Bubble</b></td><td>n (early stop, sorted input)</td><td>n&sup2;</td><td>n&sup2;</td><td>O(1) in-place</td><td><r>Yes</r></td><td>largest i at <b>right end</b> (final); rest moved by adjacent swaps only</td></tr>
