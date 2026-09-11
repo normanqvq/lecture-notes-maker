@@ -190,12 +190,13 @@ P2.append('''<table><tr><th class="m">loop header</th><th>iterations</th><th>not
 <tr><td class="m">i=0; i&lt;n; i*=2</td><td>never ends</td><td>0*2 = 0 unless the body changes i (2024 Feb Q5)</td></tr></table>''')
 P2.append(sub('递归判断法'))
 P2.append('''<p><b>核心：每层做了多少，然后把每层加起来。一样就乘，不一样就加。</b> "loop n" 是占位符：先用 loop 规则算出一次调用的 work，再填进每层。内层 m 与 n 无关 &rArr; 提出来最后乘（固定数字如 100 &rArr; 丢掉）。树（叫 &ge;2 次）看子问题大小加起来：= n &rArr; 每层 n，乘层数；&lt; n &rArr; 每层在缩，O(首项)；&gt; n &rArr; 最后一层主导（4 次 f(n/2) &rArr; 4^(log&#8322;n) = n&sup2;）。</p>
-<table><tr><th class="m">代码</th><th>叫几次</th><th>几层</th><th>每层</th><th>答案</th></tr>
+<table><colgroup><col style="width:29%"><col style="width:7%"><col style="width:8%"><col style="width:15%"><col style="width:41%"></colgroup><tr><th class="m">代码</th><th>叫几次</th><th>几层</th><th>每层</th><th>答案</th></tr>
 <tr><td class="m">f(n/k)</td><td>1</td><td>log n</td><td>1, 1, 1</td><td><b>O(log n)</b></td></tr>
 <tr><td class="m">f(n&minus;k)</td><td>1</td><td>n</td><td>1, 1, 1</td><td><b>O(n)</b></td></tr>
 <tr><td class="m">loop n; f(n/k)</td><td>1</td><td>log n</td><td>n, n/k, n/k&sup2;</td><td><b>O(n)</b>（<r>不是 n log n</r>：每层在缩，不能乘）</td></tr>
 <tr><td class="m">loop n; f(n&minus;k)</td><td>1</td><td>n</td><td>n, n&minus;k, n&minus;2k</td><td><b>O(n&sup2;)</b></td></tr>
 <tr><td class="m">loop n; k 次 f(n/k)</td><td>k</td><td>log n</td><td>n, n, n</td><td><b>O(n log n)</b>（子问题加起来 = n 才成立）</td></tr>
+<tr><td class="m">loop n²; f(n/2)+f(n/2)</td><td>2</td><td>log n</td><td>n², n²/2, n²/4</td><td><b>O(n²)</b>（大小减半 work 变 1/4，节点只翻 2 倍 &rArr; 每层减半，等比 &le; 2n²，<r>不是 n² log n</r>）</td></tr>
 <tr><td class="m">f(n&minus;1)+f(n&minus;1)</td><td>2</td><td>n</td><td>1, 2, 4</td><td><b>O(2ⁿ)</b></td></tr>
 <tr><td class="m">f(n&minus;k)+f(n&minus;m)</td><td>2</td><td>n</td><td>&le; 翻倍</td><td>指数，写 <b>O(2ⁿ)</b></td></tr>
 <tr><td class="m">f(n&minus;1)+f(n&minus;2) (Fibonacci)</td><td>2</td><td>n</td><td>&le; 翻倍</td><td>精确 O(1.618ⁿ)，quiz 写 <b>O(2ⁿ)</b></td></tr></table>
@@ -211,7 +212,7 @@ P2.append('''<table><tr><th>recurrence (code shape)</th><th>answer</th><th>Steps
 <tr><td>T(n)=10T(n/10)+cn &nbsp;<span class="tiny">(loop n, then 10 calls f(n/10))</span></td><td><r>O(n log n)</r></td><td>10&middot;(n/10) = n per level, log&#8321;&#8320;n levels</td></tr><tr><td>T(n)=2T(n&minus;1)+c <span class="tiny">(naive Fibonacci)</span> / f(10) inside f(n) / <b>no base case</b></td><td><r>O(2ⁿ)</r> / O(1) / <r>None</r></td><td>doubles per level &times; n levels / constant-size call / never ends</td></tr>
 </table>''')
 P2.append(sec('6. Sorting (Bubble / Selection / Insertion / Merge / Quick)'))
-P2.append('''<table><tr><th>sort</th><th>best</th><th>avg</th><th>worst</th><th>extra mem</th><th>stable</th><th>after pass i (detective clue)</th></tr>
+P2.append('''<table><colgroup><col style="width:8%"><col style="width:12%"><col style="width:9%"><col style="width:12%"><col style="width:11%"><col style="width:8%"><col style="width:40%"></colgroup><tr><th>sort</th><th>best</th><th>avg</th><th>worst</th><th>extra mem</th><th>stable</th><th>after pass i (detective clue)</th></tr>
 <tr><td><b>Bubble</b></td><td>n (early stop, sorted input)</td><td>n&sup2;</td><td>n&sup2;</td><td>O(1) in-place</td><td><r>Yes</r></td><td>largest i at <b>right end</b> (final); rest moved by adjacent swaps only</td></tr>
 <tr><td><b>Selection</b></td><td><r>n&sup2;</r></td><td>n&sup2;</td><td>n&sup2;</td><td>O(1)</td><td><r>No</r>*</td><td>smallest i at <b>left end</b> (final); rest in original order</td></tr>
 <tr><td><b>Insertion</b></td><td>n (already ascending)</td><td>n&sup2;</td><td>n&sup2; (descending)</td><td>O(1)</td><td>Yes</td><td>left i+1 items <b>sorted, not final</b>; right untouched</td></tr>
