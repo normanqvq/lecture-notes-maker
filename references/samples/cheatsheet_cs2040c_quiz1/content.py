@@ -18,7 +18,7 @@ def tree_svg():
     nodes = {41:(150,12),20:(75,40),65:(225,40),11:(37,68),29:(112,68),50:(187,68),91:(262,68),32:(135,96),72:(240,96),99:(285,96)}
     edges = [(41,20),(41,65),(20,11),(20,29),(65,50),(65,91),(29,32),(91,72),(91,99)]
     hs = {41:3,20:2,65:2,11:0,29:1,50:0,91:1,32:0,72:0,99:0}
-    s = ['<svg viewBox="0 0 330 112" width="37mm" xmlns="http://www.w3.org/2000/svg">']
+    s = ['<svg viewBox="0 0 330 112" width="34mm" xmlns="http://www.w3.org/2000/svg">']
     for a,b in edges:
         (x1,y1),(x2,y2) = nodes[a],nodes[b]
         s.append(f'<line x1="{x1}" y1="{y1}" x2="{x2}" y2="{y2}" stroke="#333" stroke-width="1"/>')
@@ -45,7 +45,7 @@ def delete_svg():
             out.append(f'<circle cx="{ox+x}" cy="{y}" r="8" fill="{fill}" stroke="#000" stroke-width="1"/>')
             out.append(f'<text x="{ox+x}" y="{y+3}" font-size="7.5" text-anchor="middle" font-weight="bold">{k}</text>')
         return ''.join(out)
-    s = ['<svg viewBox="0 0 270 78" width="28mm" xmlns="http://www.w3.org/2000/svg">']
+    s = ['<svg viewBox="0 0 270 78" width="26mm" xmlns="http://www.w3.org/2000/svg">']
     n1 = {65:(60,22),50:(30,46),91:(90,46),72:(72,70),99:(108,70)}
     s.append(mini(0, n1, [(65,50),(65,91),(91,72),(91,99)], 'delete(65): 2 children', 65))
     s.append('<text x="135" y="45" font-size="8" text-anchor="middle">&#8594;</text>')
@@ -178,41 +178,44 @@ P2.append('''<p><b>Def:</b> T(n) = O(f(n)) iff &exist; c, n&#8320; with T(n) &le
 P2.append('''<p><b>Rules:</b> sequential blocks add &rArr; <b>max</b>; nested loops/calls <b>multiply</b>; drop constants &amp; lower terms; if/else &rArr; costlier branch; log base irrelevant. <b>Sums:</b> 1+2+&hellip;+n = n(n+1)/2 = <r>O(n&sup2;)</r> (the loop computing it is O(n)); &Sigma;i&sup2; = O(n&sup3;); n+n/2+n/4+&hellip; &le; 2n = <r>O(n)</r>; 1+2+4+&hellip;+n &le; 2n; 1+&frac12;+&frac14;+&hellip; &le; 2; 1+&frac12;+&#8531;+&hellip;+1/n = O(log n); log(n!) = &Theta;(n log n); log(8n&sup2;+4n) = O(log n); 4n&sup2;log n + 8n = O(n&sup2;log n) (keep the log).</p>''')
 P2.append(sub('Loop patterns (iterations &times; cost of one iteration)'))
 P2.append('''<table><tr><th class="m">loop header</th><th>iterations</th><th>note</th></tr>
-<tr><td class="m">for i=0; i&lt;n (or n/4..2n, i&lt;=n)</td><td>O(n)</td><td>i+=2, i&lt;n/3, i&lt;(n&sup2;+n)/3 &rArr; n/2, n/3, n&sup2;</td></tr>
-<tr><td class="m">for i=0; i&lt;n*n; i+=n (or i+=2n)</td><td>n&sup2;/n = O(n)</td><td>i=-n..n&sup2; step n &rArr; n+1</td></tr>
-<tr><td class="m">for i=1; i&lt;n; i*=2 (or n=n/2)</td><td><r>O(log n)</r></td><td>i&lt;2n &rArr; log n + 1; i&lt;n&sup2; &rArr; 2 log n</td></tr>
-<tr><td class="m">for k=n/2,i=k+1; i&lt;n; i+=k,k/=2</td><td>O(log n)</td><td>i &rarr; n/2+n/4+&hellip; needs log n adds</td></tr>
-<tr><td class="m">for j=0; j&lt;100 (or j&lt;4; j*=2)</td><td>O(1)</td><td>bound independent of n &rArr; constant</td></tr>
-<tr><td class="m">for i&lt;n: for j&lt;n (or j&lt;n/2, j&lt;2n)</td><td>O(n&sup2;)</td><td>3 nested &rArr; O(n&sup3;) = "None"; inner j&lt;i &rArr; &Sigma;i = O(n&sup2;)</td></tr>
-<tr><td class="m">for i&lt;n: doSomething(i)  [cost O(i)]</td><td>&Sigma;i = O(n&sup2;)</td><td>doSomething(n) inside n&times;n loops &rArr; n&sup3;</td></tr>
-<tr><td class="m">for (...) return f(...);</td><td><r>runs once</r></td><td>return exits the loop on 1st iteration</td></tr>
+<tr><td class="m">for (i=0; i&lt;n; i++)  or n/4..2n, i&lt;=n</td><td>O(n)</td><td>i+=2, i&lt;n/3, i&lt;(n&sup2;+n)/3 &rArr; n/2, n/3, n&sup2;</td></tr>
+<tr><td class="m">for (i=0; i&lt;n*n; i+=n)  or i+=2n</td><td>n&sup2;/n = O(n)</td><td>i=-n..n&sup2; step n &rArr; n+1</td></tr>
+<tr><td class="m">for (i=1; i&lt;n; i*=2)  or n=n/2</td><td><r>O(log n)</r></td><td>i&lt;2n &rArr; log n + 1; i&lt;n&sup2; &rArr; 2 log n</td></tr>
+<tr><td class="m">for (k=n/2,i=k+1; i&lt;n; i+=k,k/=2)</td><td>O(log n)</td><td>i &rarr; n/2+n/4+&hellip; needs log n adds</td></tr>
+<tr><td class="m">for (j=0; j&lt;100; j++)  or j&lt;4; j*=2</td><td>O(1)</td><td>bound independent of n &rArr; constant</td></tr>
+<tr><td class="m">for (i&lt;n) for (j&lt;n)  or j&lt;n/2, j&lt;2n</td><td>O(n&sup2;)</td><td>3 nested &rArr; O(n&sup3;) = "None"; inner j&lt;i &rArr; &Sigma;i = O(n&sup2;)</td></tr>
+<tr><td class="m">for (i&lt;n) doSomething(i) [cost O(i)]</td><td>&Sigma;i = O(n&sup2;)</td><td>doSomething(n) inside n&times;n loops &rArr; n&sup3;</td></tr>
+
 <tr><td class="m">while (rand()%n) ...</td><td>exp. O(n)</td><td>stop prob 1/n per round &rArr; E = n rounds</td></tr>
-<tr><td class="m">for i=0; i&lt;n; i*=2</td><td>never ends</td><td>0*2 = 0 unless the body changes i (2024 Feb Q5)</td></tr></table>''')
-P2.append(sub('递归判断法'))
-P2.append('''<p><b>核心：每层做了多少，然后把每层加起来。一样就乘，不一样就加。</b> "loop n" 是占位符：先用 loop 规则算出一次调用的 work，再填进每层。内层 m 与 n 无关 &rArr; 提出来最后乘（固定数字如 100 &rArr; 丢掉）。树（叫 &ge;2 次）看子问题大小加起来：= n &rArr; 每层 n，乘层数；&lt; n &rArr; 每层在缩，O(首项)；&gt; n &rArr; 最后一层主导（4 次 f(n/2) &rArr; 4^(log&#8322;n) = n&sup2;）。</p>
-<table><colgroup><col style="width:29%"><col style="width:7%"><col style="width:8%"><col style="width:15%"><col style="width:41%"></colgroup><tr><th class="m">代码</th><th>叫几次</th><th>几层</th><th>每层</th><th>答案</th></tr>
+<tr><td class="m">for (i=0; i&lt;n; i*=2)</td><td>never ends</td><td>0*2 = 0 unless the body changes i (2024 Feb Q5)</td></tr></table>''')
+P2.append(sub('How to judge a recursion'))
+P2.append('''<p>Step 1: work of <b>one call</b> via the loop rules ("loop n" below = placeholder). Inner loop bounded by m independent of n &rArr; factor it out, multiply at the end (fixed number like 100 &rArr; drop).<br>
+Step 2: <b>calls</b> per level and <b>levels</b>: &divide;k &rArr; log n levels; &minus;k &rArr; n levels.<br>
+Step 3: cost of each level, then add the levels: <y>same every level &rArr; multiply by #levels; different &rArr; sum the series</y>.<br>
+Step 4 (&ge;2 calls): add the <b>subproblem sizes</b>: = n &rArr; n per level &times; levels; &lt; n &rArr; shrinking, O(first term); &gt; n &rArr; <y>last level dominates</y> (4&times; f(n/2) &rArr; 4^(log&#8322;n) = n&sup2;).</p>
+<table><colgroup><col style="width:26%"><col style="width:6%"><col style="width:8%"><col style="width:14%"><col style="width:46%"></colgroup><tr><th class="m">code</th><th>calls</th><th>levels</th><th>per level</th><th>answer</th></tr>
 <tr><td class="m">f(n/k)</td><td>1</td><td>log n</td><td>1, 1, 1</td><td><b>O(log n)</b></td></tr>
 <tr><td class="m">f(n&minus;k)</td><td>1</td><td>n</td><td>1, 1, 1</td><td><b>O(n)</b></td></tr>
-<tr><td class="m">loop n; f(n/k)</td><td>1</td><td>log n</td><td>n, n/k, n/k&sup2;</td><td><b>O(n)</b>（<r>不是 n log n</r>：每层在缩，不能乘）</td></tr>
+<tr><td class="m">loop n; f(n/k)</td><td>1</td><td>log n</td><td>n, n/k, n/k&sup2;</td><td><b>O(n)</b> (<y><r>NOT n log n</r>: levels shrink, can&#39;t multiply</y>)</td></tr>
 <tr><td class="m">loop n; f(n&minus;k)</td><td>1</td><td>n</td><td>n, n&minus;k, n&minus;2k</td><td><b>O(n&sup2;)</b></td></tr>
-<tr><td class="m">loop n; k 次 f(n/k)</td><td>k</td><td>log n</td><td>n, n, n</td><td><b>O(n log n)</b>（子问题加起来 = n 才成立）</td></tr>
-<tr><td class="m">loop n²; f(n/2)+f(n/2)</td><td>2</td><td>log n</td><td>n², n²/2, n²/4</td><td><b>O(n²)</b>（大小减半 work 变 1/4，节点只翻 2 倍 &rArr; 每层减半，等比 &le; 2n²，<r>不是 n² log n</r>）</td></tr>
+<tr><td class="m">loop n; k calls f(n/k)</td><td>k</td><td>log n</td><td>n, n, n</td><td><b>O(n log n)</b> (only if the subproblems add up to n)</td></tr>
+<tr><td class="m">loop n²; f(n/2)+f(n/2)</td><td>2</td><td>log n</td><td>n², n²/2, n²/4</td><td><b>O(n²)</b> (<y>&frac12; size &rArr; &frac14; work, only 2&times; calls &rArr; each level halves</y>; geometric &le; 2n², <r>NOT n² log n</r>)</td></tr>
 <tr><td class="m">f(n&minus;1)+f(n&minus;1)</td><td>2</td><td>n</td><td>1, 2, 4</td><td><b>O(2ⁿ)</b></td></tr>
-<tr><td class="m">f(n&minus;k)+f(n&minus;m)</td><td>2</td><td>n</td><td>&le; 翻倍</td><td>指数，写 <b>O(2ⁿ)</b></td></tr>
-<tr><td class="m">f(n&minus;1)+f(n&minus;2) (Fibonacci)</td><td>2</td><td>n</td><td>&le; 翻倍</td><td>精确 O(1.618ⁿ)，quiz 写 <b>O(2ⁿ)</b></td></tr></table>
-<p><b>规律：</b>减常数 + 叫 1 次 = O(n)；减常数 + 叫 &ge;2 次 = 指数；乘比例 + 叫 k 次 = n log n。<b>特例：</b><r>return 写在 loop 里 &rArr; loop 只跑一次。没有 base case &rArr; None of the above。</r></p>''')
-P2.append(sub('Recursion: write T(n), then recursion tree = (cost per level) &times; (levels)'))
+<tr><td class="m">f(n&minus;k)+f(n&minus;m)</td><td>2</td><td>n</td><td>&le; doubles</td><td>exponential, write <b>O(2ⁿ)</b></td></tr>
+<tr><td class="m">f(n&minus;1)+f(n&minus;2) (Fibonacci)</td><td>2</td><td>n</td><td>&le; doubles</td><td>exactly O(1.618ⁿ); in the quiz write <b>O(2ⁿ)</b></td></tr></table>
+<p><b>Rules of thumb:</b> subtract a constant + 1 call = O(n); subtract a constant + &ge;2 calls = exponential; divide by a constant + k calls = n log n. <b>Special:</b> <r>return inside the loop &rArr; loop runs once. No base case &rArr; None of the above.</r></p>''')
+P2.append(sub('Recurrences not in the table above'))
 P2.append('''<table><tr><th>recurrence (code shape)</th><th>answer</th><th>Steps</th></tr>
-<tr><td>T(n)=T(n&minus;1)+c &nbsp;<span class="tiny">(O(1) work, f(n-1); or f(n-10))</span></td><td><b>O(n)</b></td><td>n levels &times; c</td></tr>
-<tr><td>T(n)=T(n&minus;1)+cn &nbsp;<span class="tiny">(loop n then f(n-1))</span></td><td><r>O(n&sup2;)</r></td><td>n+(n&minus;1)+&hellip;+1 = n&sup2;/2</td></tr>
-<tr><td>T(n)=T(n/2)+c &nbsp;<span class="tiny">(f(n/2), f(7n/9), f(0.9n))</span></td><td><r>O(log n)</r></td><td>n&middot;(9/10)ᵈ=1 &rArr; d = log&#8321;&#8320;&#8725;&#8329; n</td></tr>
-<tr><td>T(n)=T(n/2)+cn &nbsp;<span class="tiny">(loop n then ONE f(n/2))</span></td><td><b>O(n)</b></td><td>n+n/2+n/4+&hellip; &le; 2n</td></tr>
-<tr><td>T(n)=2T(n/2)+cn &nbsp;<span class="tiny">(loop n, then f(n/2)+f(n/2); merge sort)</span></td><td><r>O(n log n)</r></td><td>each level cn, log&#8322;n levels</td></tr>
+
+
+
+
+
 <tr><td>T(n)=T(n/10)+T(9n/10)+cn &nbsp;<span class="tiny">(quicksort 1:9)</span></td><td><r>O(n log n)</r></td><td>each level n, depth log&#8321;&#8320;&#8725;&#8329; n</td></tr>
 <tr><td>T(n)=10T(n/10)+cn &nbsp;<span class="tiny">(loop n, then 10 calls f(n/10))</span></td><td><r>O(n log n)</r></td><td>10&middot;(n/10) = n per level, log&#8321;&#8320;n levels</td></tr><tr><td>T(n)=2T(n&minus;1)+c <span class="tiny">(naive Fibonacci)</span> / f(10) inside f(n) / <b>no base case</b></td><td><r>O(2ⁿ)</r> / O(1) / <r>None</r></td><td>doubles per level &times; n levels / constant-size call / never ends</td></tr>
 </table>''')
 P2.append(sec('6. Sorting (Bubble / Selection / Insertion / Merge / Quick)'))
-P2.append('''<table><colgroup><col style="width:8%"><col style="width:12%"><col style="width:9%"><col style="width:12%"><col style="width:11%"><col style="width:8%"><col style="width:40%"></colgroup><tr><th>sort</th><th>best</th><th>avg</th><th>worst</th><th>extra mem</th><th>stable</th><th>after pass i (detective clue)</th></tr>
+P2.append('''<table><colgroup><col style="width:8%"><col style="width:11%"><col style="width:9%"><col style="width:11%"><col style="width:10%"><col style="width:7%"><col style="width:44%"></colgroup><tr><th>sort</th><th>best</th><th>avg</th><th>worst</th><th>extra mem</th><th>stable</th><th>after pass i (detective clue)</th></tr>
 <tr><td><b>Bubble</b></td><td>n (early stop, sorted input)</td><td>n&sup2;</td><td>n&sup2;</td><td>O(1) in-place</td><td><r>Yes</r></td><td>largest i at <b>right end</b> (final); rest moved by adjacent swaps only</td></tr>
 <tr><td><b>Selection</b></td><td><r>n&sup2;</r></td><td>n&sup2;</td><td>n&sup2;</td><td>O(1)</td><td><r>No</r>*</td><td>smallest i at <b>left end</b> (final); rest in original order</td></tr>
 <tr><td><b>Insertion</b></td><td>n (already ascending)</td><td>n&sup2;</td><td>n&sup2; (descending)</td><td>O(1)</td><td>Yes</td><td>left i+1 items <b>sorted, not final</b>; right untouched</td></tr>
