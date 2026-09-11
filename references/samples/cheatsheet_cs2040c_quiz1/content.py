@@ -178,16 +178,16 @@ P2.append('''<p><b>Def:</b> T(n) = O(f(n)) iff &exist; c, n&#8320; with T(n) &le
 P2.append('''<p><b>Rules:</b> sequential blocks add &rArr; <b>max</b>; nested loops/calls <b>multiply</b>; drop constants &amp; lower terms; if/else &rArr; costlier branch; log base irrelevant. <b>Sums:</b> 1+2+&hellip;+n = n(n+1)/2 = <r>O(n&sup2;)</r> (the loop computing it is O(n)); &Sigma;i&sup2; = O(n&sup3;); n+n/2+n/4+&hellip; &le; 2n = <r>O(n)</r>; 1+2+4+&hellip;+n &le; 2n; 1+&frac12;+&frac14;+&hellip; &le; 2; 1+&frac12;+&#8531;+&hellip;+1/n = O(log n); log(n!) = &Theta;(n log n); log(8n&sup2;+4n) = O(log n); 4n&sup2;log n + 8n = O(n&sup2;log n) (keep the log).</p>''')
 P2.append(sub('Loop patterns (iterations &times; cost of one iteration)'))
 P2.append('''<table><tr><th class="m">loop header</th><th>iterations</th><th>note</th></tr>
-<tr><td class="m">i=0; i&lt;n (or n/4..2n, i&lt;=n)</td><td>O(n)</td><td>i+=2, i&lt;n/3, i&lt;(n&sup2;+n)/3 &rArr; n/2, n/3, n&sup2;</td></tr>
-<tr><td class="m">i=0; i&lt;n*n; i+=n  (or i+=2n)</td><td>n&sup2;/n = O(n)</td><td>i=-n..n&sup2; step n &rArr; n+1</td></tr>
-<tr><td class="m">i=1; i&lt;n; i*=2  (or n=n/2)</td><td><r>O(log n)</r></td><td>i&lt;2n &rArr; log n + 1; i&lt;n&sup2; &rArr; 2 log n</td></tr>
-<tr><td class="m">k=n/2; i=k+1; i&lt;n; i+=k, k/=2</td><td>O(log n)</td><td>i &rarr; n/2+n/4+&hellip; needs log n adds</td></tr>
-<tr><td class="m">j=0; j&lt;100 (or j&lt;4; j*=2)</td><td>O(1)</td><td>bound independent of n &rArr; constant</td></tr>
+<tr><td class="m">for i=0; i&lt;n (or n/4..2n, i&lt;=n)</td><td>O(n)</td><td>i+=2, i&lt;n/3, i&lt;(n&sup2;+n)/3 &rArr; n/2, n/3, n&sup2;</td></tr>
+<tr><td class="m">for i=0; i&lt;n*n; i+=n (or i+=2n)</td><td>n&sup2;/n = O(n)</td><td>i=-n..n&sup2; step n &rArr; n+1</td></tr>
+<tr><td class="m">for i=1; i&lt;n; i*=2 (or n=n/2)</td><td><r>O(log n)</r></td><td>i&lt;2n &rArr; log n + 1; i&lt;n&sup2; &rArr; 2 log n</td></tr>
+<tr><td class="m">for k=n/2,i=k+1; i&lt;n; i+=k,k/=2</td><td>O(log n)</td><td>i &rarr; n/2+n/4+&hellip; needs log n adds</td></tr>
+<tr><td class="m">for j=0; j&lt;100 (or j&lt;4; j*=2)</td><td>O(1)</td><td>bound independent of n &rArr; constant</td></tr>
 <tr><td class="m">for i&lt;n: for j&lt;n (or j&lt;n/2, j&lt;2n)</td><td>O(n&sup2;)</td><td>3 nested &rArr; O(n&sup3;) = "None"; inner j&lt;i &rArr; &Sigma;i = O(n&sup2;)</td></tr>
 <tr><td class="m">for i&lt;n: doSomething(i)  [cost O(i)]</td><td>&Sigma;i = O(n&sup2;)</td><td>doSomething(n) inside n&times;n loops &rArr; n&sup3;</td></tr>
 <tr><td class="m">for (...) return f(...);</td><td><r>runs once</r></td><td>return exits the loop on 1st iteration</td></tr>
 <tr><td class="m">while (rand()%n) ...</td><td>exp. O(n)</td><td>stop prob 1/n per round &rArr; E = n rounds</td></tr>
-<tr><td class="m">i=0; i&lt;n; i*=2</td><td>never ends</td><td>0*2 = 0 unless the body changes i (2024 Feb Q5)</td></tr></table>''')
+<tr><td class="m">for i=0; i&lt;n; i*=2</td><td>never ends</td><td>0*2 = 0 unless the body changes i (2024 Feb Q5)</td></tr></table>''')
 P2.append(sub('递归判断法'))
 P2.append('''<p><b>核心：每层做了多少，然后把每层加起来。一样就乘，不一样就加。</b> "loop n" 是占位符：先用 loop 规则算出一次调用的 work，再填进每层。内层 m 与 n 无关 &rArr; 提出来最后乘（固定数字如 100 &rArr; 丢掉）。树（叫 &ge;2 次）看子问题大小加起来：= n &rArr; 每层 n，乘层数；&lt; n &rArr; 每层在缩，O(首项)；&gt; n &rArr; 最后一层主导（4 次 f(n/2) &rArr; 4^(log&#8322;n) = n&sup2;）。</p>
 <table><colgroup><col style="width:29%"><col style="width:7%"><col style="width:8%"><col style="width:15%"><col style="width:41%"></colgroup><tr><th class="m">代码</th><th>叫几次</th><th>几层</th><th>每层</th><th>答案</th></tr>
