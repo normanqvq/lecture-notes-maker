@@ -100,7 +100,10 @@ which aligns each frame with everything spoken while it was on screen. Then:
   an EXAM-tag signal.
 - **A transcript line repeated dozens of times** ("Let's see what is going
   on here…") is a whisper hallucination over silence or an in-class quiz, not
-  content. Skip it; the frames for that span still count.
+  content. Skip it; the frames for that span still count. **If the repeat
+  runs to the end of the file, real speech was lost**: cut that span with
+  `ffmpeg -ss <start> -t <len>` and re-run `whisper-cli … -mc 0 -et 2.4`
+  on it (`extract_video.py` now passes `-mc 0` by default).
 - **Transcript spelling is never authoritative.** Speech recognition mangles
   register names, mnemonics, and symbols. Every technical term that reaches
   the notes must be verified against a frame or the slide PDF. If the user

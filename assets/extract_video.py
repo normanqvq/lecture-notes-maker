@@ -106,8 +106,11 @@ def extract_audio(video, wav):
 def transcribe(wav, outdir, model, lang):
     print(f"[2/5] transcribing with whisper ({model.name}) - this is the slow part ...")
     prefix = outdir / "transcript"
+    # -mc 0: decode each window without the previous text as context. With
+    # context, whisper can lock onto one sentence and repeat it for the rest
+    # of the file (2026-09-11: 14 minutes of a 27-minute lecture lost).
     run([whisper_binary(), "-m", str(model), "-f", str(wav),
-         "-l", lang, "-osrt", "-of", str(prefix), "--no-prints"])
+         "-l", lang, "-osrt", "-of", str(prefix), "--no-prints", "-mc", "0"])
     srt = prefix.with_suffix(".srt")
     if not srt.exists() or srt.stat().st_size == 0:
         die("whisper produced no transcript")

@@ -4,6 +4,27 @@ One dated entry per mistake that cost a rebuild or a wrong deliverable, with
 the fix that was adopted. Newest first. When a fix becomes a rule, it lives in
 SKILL.md or the references; this file keeps the history.
 
+## 2026-09-11 — CG2028 Lecture 6 (Panopto, three recordings)
+
+- **Whisper locked into a loop mid-file** ("the stop condition is detected
+  on the bus" × 600) from 12:25 to the end of a 27-minute recording; the
+  compact transcript silently jumped from 12:25 to 26:55. Fix: re-ran that
+  span with `-mc 0 -et 2.4` and offset the timestamps; `extract_video.py`
+  now passes `-mc 0`, and Step 1 says to check that a repeat does not run to
+  the end of the file.
+- **`python3` had no WeasyPrint** on this machine; the working recipe is
+  `DYLD_FALLBACK_LIBRARY_PATH=/opt/homebrew/lib uv run --with weasyprint
+  --with pillow --with pypdfium2 python assets/build.py …` (brew pango/glib
+  present, no venv). Not a skill rule, but it cost two false starts.
+- **A six-row reference table jumped whole to the next page** and left a
+  quarter of the page blank; `class="tight flow"` + `<thead>` fixed it. A
+  table that follows a heading near a page bottom should get `flow` on the
+  first build rather than after the raster.
+- **Scene detection kept a single frame from the 6.1 video** even at
+  `--scene 0.012`; the deck was the content source so nothing was lost, but
+  a talking-head-plus-static-slide recording gives no frame timeline —
+  timestamps then come from the transcript alone.
+
 ## 2026-09-06 — CS2040C L04b–L06a (seven YouTube lectures, 6.5 h of video)
 
 - **Background task limit killed the transcription pipeline.** A `run_in_background`
