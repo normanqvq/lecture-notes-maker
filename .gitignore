@@ -21,3 +21,7 @@ desktop.ini
 
 # bundled CJK fonts (download via the hint build.py prints)
 assets/fonts/*.otf
+
+# cheatsheet mode build output
+_measure.html
+test.cpp

@@ -4,6 +4,37 @@ One dated entry per mistake that cost a rebuild or a wrong deliverable, with
 the fix that was adopted. Newest first. When a fix becomes a rule, it lives in
 SKILL.md or the references; this file keeps the history.
 
+## 2026-09-11 — Cheatsheet mode: CS2040C Quiz 1 (two A4 sides, ~5 pt)
+
+- **Chrome print silently shrank the whole document.** Content overflowed the
+  3-column page box and "shrink-to-fit" scaled every page ~0.9×; the PDF
+  looked fine but the fonts were smaller than the CSS said. Fix: `.page {
+  overflow: hidden }` in `cheatsheet.py` — overflow is clipped and shows up in
+  `--check` instead of being hidden by scaling.
+- **A 90-line `<pre>` with `break-inside: avoid` jumped to the next column**
+  and left two thirds of a column empty. Fix: `code()` splits a snippet at
+  blank lines into one box per function (dashed separators); wrapping the
+  pieces in a `<div>` made Chrome move the group as a unit again, so they are
+  emitted as siblings.
+- **Code lines vanished at the column edge without warning** (`white-space:
+  pre` + clipping). Fix: `code_line_limit` (78 chars at 3 columns / Consolas
+  5 pt; Menlo fits only ~74) enforced by `align()` and reported by the builder
+  after every build.
+- **Cutting "by eye" never converged.** Fix: `--measure` lays every fragment
+  out in one real-width column and prints its height as a fraction of a
+  column; a side holds 3.00 minus ~0.1 for break waste.
+- **The user rejected cramped code and fact-paragraphs twice** ("代码挤在一起",
+  five facts in one paragraph). Now rules in `cheatsheet-rules.md`: Consolas
+  normal weight, italic green comments aligned in one column, one fact / T-F
+  statement / Step per line, F red, T green.
+- **Consolas is not a macOS system font**; it ships inside Microsoft Office
+  (`…/Microsoft Word.app/Contents/Resources/DFonts/consola*.ttf`).
+  `fonts_css()` embeds it as base64 when found (never commit the TTFs).
+- **Every added line must come from somewhere.** A two-line title pushed the
+  last worked example off the sheet; `<sup>` bumps line boxes (use ᵈ ⁿ ²);
+  figure width is the cheapest space lever (58 → 46 mm freed a table row).
+  After any edit look at the bottom of the last column of each side.
+
 ## 2026-09-11 — CG2028 Lecture 6 (Panopto, three recordings)
 
 - **Whisper locked into a loop mid-file** ("the stop condition is detected

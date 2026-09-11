@@ -1,6 +1,6 @@
 ---
 name: lecture-notes-maker
-description: Turn lecture slides, course PDFs, or lecture recordings (video) into a short, print-ready revision-notes PDF — one lecture in roughly 5–7 A4 pages, each key point written as definition → everyday analogy → rule/trap, worked examples as step-by-step dialogues, ending with a self-check. Use when the user asks for study notes, revision notes, 重点笔记, or a "notes PDF" from uploaded course material. Also turns a meeting recording into minutes (TL;DR, decisions, action items with timestamps) through the same video pipeline — use for 会议纪要, 会议总结, or "summarise this meeting video". Not for exhaustive transcriptions of the slides and not for one-page exam cheatsheets.
+description: Turn lecture slides, course PDFs, or lecture recordings (video) into a short, print-ready revision-notes PDF — one lecture in roughly 5–7 A4 pages, each key point written as definition → everyday analogy → rule/trap, worked examples as step-by-step dialogues, ending with a self-check. Use when the user asks for study notes, revision notes, 重点笔记, or a "notes PDF" from uploaded course material. Also turns a meeting recording into minutes (TL;DR, decisions, action items with timestamps) through the same video pipeline — use for 会议纪要, 会议总结, or "summarise this meeting video". Cheatsheet mode: when the user says "我要做 Cheatsheet", "cheatsheet 模式", "小抄", "cheat sheet", or asks for a one/two-page exam reference sheet, build a maximum-density double-sided A4 cheatsheet PDF instead (3 columns, ~5pt, complete compilable code, one-fact-per-line T/F banks, step-by-step complexity derivations, weighted by the past papers). Not for exhaustive transcriptions of the slides.
 ---
 
 # Lecture Notes Maker
@@ -342,11 +342,13 @@ locally; it is git-ignored because of its size.)
 
 ## Scope
 
-This skill makes **short revision notes** from course material and, in
-**Meeting mode** below, **minutes** from a meeting recording. If the user
-wants an exhaustive, slide-by-slide study document, or a one-page
-maximum-density exam cheatsheet, those are different artifacts — say so and
-ask which they want.
+This skill has three modes: **notes** (default) — short revision notes from
+course material; **Meeting mode** — minutes from a meeting recording;
+**Cheatsheet mode** — a maximum-density two-sided A4 exam sheet built from the
+notes plus the past papers. If the user wants an exhaustive, slide-by-slide
+study document, that is a different artifact — say so and ask which they
+want. If it is unclear whether they want notes or a cheatsheet, ask: the two
+are built by different tools and cannot be converted into each other.
 
 ## Meeting mode — recording → minutes
 
@@ -396,3 +398,72 @@ summarise from memory, verify against the transcript, never invent.
    are not defined in it on purpose; `references/meeting-summary.md` lists
    the markup. Then verify with Step 7 (`--check` plus `render_check.py`
    for CJK) exactly as for notes.
+
+## Cheatsheet mode — notes + past papers → two-sided A4 exam sheet
+
+Use this mode when the user says **"我要做 Cheatsheet"**, "cheatsheet 模式",
+"小抄", "cheat sheet", or asks for the one/two-page sheet they carry into a
+closed-book quiz. The reader has 30 seconds per question: the sheet is a
+lookup table, not a textbook. The three-layer structure, analogies,
+self-check and the 5–7 page PDF do **not** apply. The non-negotiable rules
+still do (never from memory, verify against the source, look at the raster).
+
+Format rules are in `references/cheatsheet-rules.md` — read it first. Tooling:
+`assets/cheatsheet.py` (layout CSS in `LAYOUT_DEFAULTS`, highlighter, `code()`,
+`align()`, `tf_table()`, `steps()`, `table()`, `tree_svg()`, Consolas
+embedding, Chrome rendering, `measure()`, `rasterize()`),
+`assets/build_cheatsheet.py` (CLI), `assets/cheatsheet_template.py`
+(skeleton). Needs Google Chrome (headless print) and poppler. The finished
+CS2040C Quiz 1 sheet in `references/samples/cheatsheet_cs2040c_quiz1/` is
+the calibration sample — match its density and layout.
+
+1. **Inventory by marks.** Read the scope material (notes / slides the user
+   names) and **every past paper with answers**; `pdftotext -layout`, and
+   `pdftoppm` the pages whose text layer is empty. Build a table *question
+   type → marks → topics → years*. Space on the sheet follows that table.
+   Topics the user excludes ("AVL not in scope") stay out entirely.
+
+2. **Plan two sides.** Group by section, heaviest-mark material contiguous.
+   A typical DS&A quiz: side 1 = language/OOP facts + T/F bank, the core data
+   structure with all functions, ADTs, searching, complexity worked
+   examples; side 2 = complexity rule tables + recursion tree, sorting
+   (table, detective clues, all sort code, traces, analysis bullets), trees
+   (all functions, figures, complexity, traversal facts).
+
+3. **Write `content.py` + `snippets.py`** from `assets/cheatsheet_template.py`.
+   Code: complete functions, blank line between functions, `!! ` for key
+   lines, `//!` for fatal-mistake comments, the exam point in the comment,
+   **≤ 78 chars per line**. Prose: **one fact per line** — `tf_table()` for
+   T/F (F red, T green), `table()` + `steps()` for complexity examples (one
+   `Step n:` per line, `⇒ O(…)` on its own line), bullets for analysis.
+   `<r>` red = trap / F, `<k>` inline code, `<y>` yellow. Figures: small SVG
+   (40–58 mm) only where structure matters; traces as `code(…, 'pl')`.
+
+4. **Build, measure, cut.**
+
+   ```bash
+   python assets/build_cheatsheet.py content.py --out sheet.pdf --measure --check
+   ```
+
+   `--measure` prints each side's content as a fraction of one column (a
+   side holds 3.00 − ~0.1 break waste) — plan cuts from the numbers, not by
+   eye. `--check` writes `_check/pg-N.png` and 220-dpi column crops
+   `zN-cC-rR.png`; look at the **bottom of the last column** of each side and
+   the right edge of every code box. Overflow is solved by cutting in the
+   order given in `cheatsheet-rules.md`, never by shrinking below body 5.5 pt
+   / code 5.0 pt. Iterate until the page count is right, no line is clipped
+   and every column ends within a few percent of the bottom.
+
+5. **Verify and deliver.** Assemble the snippets into a test program (shape:
+   `references/samples/cheatsheet_cs2040c_quiz1/test_snippets.py`) and run
+   it — every function on the sheet compiles and is correct, even though the
+   sheet itself carries no `main`. Deliver the PDF plus a `cheatsheet_src/`
+   folder (content, snippets, test, a README with the rebuild command) and
+   the print instruction: A4 landscape, double sided, actual size (100 %).
+
+**Iterating on feedback.** Users ask for one small change at a time ("add
+`reverse()` back", "F in red", "title on two lines"). Each change costs space:
+rebuild with `--check` after every edit and confirm nothing fell off the last
+column. When told to cut, cut what `cheatsheet-rules.md` ranks lowest and say
+exactly what was removed; when told to restore, restore verbatim and cut
+something else.

@@ -66,6 +66,14 @@
   decisions, an action-items table and open questions, every line carrying
   a `▶` timestamp; owners and deadlines that were not said are marked as
   such, never guessed (`references/meeting-summary.md`)
+- **Cheatsheet mode**: say "我要做 Cheatsheet" and point it at the notes and
+  the past papers — it builds the two-sided A4 sheet you carry into the quiz:
+  3 columns at ~5 pt, space allocated by what the past papers actually mark,
+  complete compilable code with the exam point in each comment, one-line-
+  per-statement T/F banks (F in red), `Step 1 / Step 2 / ⇒ O(…)` complexity
+  tables, small SVG figures; the builder measures every block and rasterises
+  every column so nothing falls off the sheet unnoticed
+  (`references/cheatsheet-rules.md`)
 - **Verifies before writing**: reads the actual source material and refuses to
   generate from memory — no source, no notes
 - **Self-checks the layout** with poppler rasters, and asks for a second
@@ -187,6 +195,19 @@ meeting mode: `minutes.md` with a TL;DR, decisions, an action-items table
 is built with `assets/minutes.css`: black text, red for decisions,
 deadlines and timestamps, no coloured boxes.
 
+Cheatsheet mode has its own builder (headless Google Chrome + poppler, no
+WeasyPrint):
+
+```bash
+python assets/build_cheatsheet.py content.py --out sheet.pdf --check --measure
+```
+
+`content.py` (copy `assets/cheatsheet_template.py`) lists the HTML fragments
+of each side; `--measure` reports each fragment's height as a fraction of a
+column, `--check` rasterises every column at 220 dpi and lists code lines that
+would be clipped. `references/samples/cheatsheet_cs2040c_quiz1/` is a complete
+example (content, snippets, compile test).
+
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ## Repository Layout
@@ -199,11 +220,16 @@ references/
   patterns.md               content shape -> presentation pattern catalogue
   layout.md                 page, figure, and table conventions
   meeting-summary.md        minutes template and rules for meeting mode
+  cheatsheet-rules.md       format, content selection and cutting order for cheatsheet mode
   lessons.md                what went wrong on earlier runs and the fix
+  samples/                  calibration samples (notes text; cheatsheet content + snippets)
 assets/
   notes.css                 stylesheet for revision notes
   minutes.css               stylesheet for meeting minutes: black text, red accent only
   build.py                  highlighter + WeasyPrint renderer + visual check
+  cheatsheet.py             cheatsheet mode: layout, highlighter, helpers, Chrome render, measure, raster
+  build_cheatsheet.py       cheatsheet mode CLI:  content.py --out X.pdf [--check] [--measure]
+  cheatsheet_template.py    skeleton content module for a new cheatsheet
   extract_video.py          recording -> frames + transcript + alignment index
   tree_svg.py, array_svg.py figure generators for trees and array traces
   render_check.py           second-renderer (PDFium) check
@@ -214,9 +240,10 @@ assets/
 
 ## Not What You Want?
 
-If you need a **compressed exam cheatsheet** — formulas only, multi-column
-landscape, maximum density — that's a different artifact with different rules.
-This skill optimises for reading and understanding, and will tell you so.
+If you need an **exhaustive, slide-by-slide study document**, that is a
+different artifact: the notes mode optimises for reading and understanding,
+and the cheatsheet mode for density in the exam hall — neither transcribes
+the deck.
 
 ## Note on Source Material
 
