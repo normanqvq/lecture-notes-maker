@@ -136,7 +136,7 @@ P1.append(code(S['stackq']))
 P1.append('<p>Empty-stack pop: throw exception (postponed) or <b>modify the spec</b>: add <k>empty()</k>, caller checks first. "best push O(1), pop O(n)": <r>F</r>. Stack via augmented tree keyed by insertion order: <t>T</t>.</p>')
 P1.append(code(S['stacksort']))
 
-P1.append(sec('5. Searching &amp; Divide-and-Conquer'))
+P1.append(sec('4. Searching &amp; Divide-and-Conquer'))
 P1.append('<p><b>Linear search</b> (unsorted array / list): O(n) worst, O(1) best; global max/min of unsorted data: O(n) unavoidable. <b>Binary search</b> needs a <r>sorted array with random access</r> (not a list): after d halvings n/2ᵈ items remain; stop at 1 &rArr; d = log&#8322;n &rArr; <b>O(log n)</b>.</p>')
 P1.append(code(S['bsearch']))
 P1.append(code(S['badge']))
@@ -146,7 +146,7 @@ P1.append('''<ul>
 <li><b>2D peak</b> (m cols &times; n rows): column global max + 1D peak = O(mn), correct but slow; column <i>local</i> max = wrong; <b>lazy evaluation</b> (column max computed only when visited) = <b>O(n log m)</b>.</li>
 <li><b>Max profit</b> (buy once, sell later): one pass keeping min-so-far, O(n).</li>
 <li><b>Russian dolls (2024 Oct)</b>: lowers sorted &rArr; binary search each upper, O(n log n); both unsorted &rArr; quicksort-style partition, expected O(n log n).</li></ul>''')
-P1.append(sec('4a. Big O worked examples (rules &amp; tables: &sect;4 overleaf)'))
+P1.append(sec('5a. Big O worked examples (rules &amp; tables: &sect;5 overleaf)'))
 P1.append('''<table><tr><th class="m">code</th><th>Steps</th></tr>
 
 <tr><td class="m">return n&lt;1 ? 1 : f(n*90.0/100.0);</td><td>Step 1: T(n)=T(0.9n)+1.<br>Step 2: after d calls size n&middot;0.9ᵈ; stops when =1.<br>Step 3: d = log&#8321;&#8320;&#8725;&#8329;n<br><b>&rArr; O(log n)</b><br><i>Note:</i> base is a constant &rArr; any f(0.9n) / f(0.7n) / f(n/3) is O(log n); never compute the base.</td></tr>
@@ -173,7 +173,7 @@ P1.append(fig(rec_svg(), 'Recursion tree of T(n)=2T(n/2)+cn: every level costs c
 
 # ---------------- PAGE 2 ----------------
 P2 = []
-P2.append(sec('4. Big O &amp; Time Complexity (Part A: 6&times;3 marks)'))
+P2.append(sec('5. Big O &amp; Time Complexity (Part A: 6&times;3 marks)'))
 P2.append('''<p><b>Def:</b> T(n) = O(f(n)) iff &exist; c, n&#8320; with T(n) &le; c&middot;f(n) &forall; n &ge; n&#8320; (upper bound; c absorbs constants, n&#8320; skips the transient start). <b>&Omega;</b>: T(n) &ge; c&middot;f(n). <b>&Theta;</b>: both. Count operations, not seconds. <r>Answer the tightest bound</r>: 1000n is O(n); yet "an O(n&sup2;) algorithm is also O(n&sup3;) if not tight" <r>T</r>. n&sup3; is O(n&sup3;), &Omega;(n&sup2;), not &Theta;(n&sup2;). 1 &lt; log n &lt; n &lt; n log n &lt; n&sup2; &lt; n&sup3; &lt; 2&#8319; &lt; n!.</p>''')
 P2.append('''<p><b>Rules:</b> sequential blocks add &rArr; <b>max</b>; nested loops/calls <b>multiply</b>; drop constants &amp; lower terms; if/else &rArr; costlier branch; log base irrelevant. <b>Sums:</b> 1+2+&hellip;+n = n(n+1)/2 = <r>O(n&sup2;)</r> (the loop computing it is O(n)); &Sigma;i&sup2; = O(n&sup3;); n+n/2+n/4+&hellip; &le; 2n = <r>O(n)</r>; 1+2+4+&hellip;+n &le; 2n; 1+&frac12;+&frac14;+&hellip; &le; 2; 1+&frac12;+&#8531;+&hellip;+1/n = O(log n); log(n!) = &Theta;(n log n); log(8n&sup2;+4n) = O(log n); 4n&sup2;log n + 8n = O(n&sup2;log n) (keep the log).</p>''')
 P2.append(sub('Loop patterns (iterations &times; cost of one iteration)'))
