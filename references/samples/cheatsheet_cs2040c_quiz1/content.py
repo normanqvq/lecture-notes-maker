@@ -10,7 +10,7 @@ from cheatsheet import code, sec, sub, fig, tree_svg
 from snippets import S
 
 TITLE = "CS2040C Quiz 1 Cheatsheet"
-CSS_EXTRA = "body { line-height: 1.08; } th, td { padding: 0.25pt 1.3pt; } pre.code { line-height: 1.05; margin: 1pt 0; } p { margin-bottom: 0.9pt; } ul { margin-bottom: 0.9pt; } h1 { margin: 1.3pt 0 0.5pt; } h2 { margin: 1pt 0 0.3pt; } table { margin: 0.8pt 0 1.1pt; } .fig { margin: 0.5pt 0; }"
+CSS_EXTRA = "body { line-height: 1.08; } th, td { padding: 0.15pt 1.3pt; } pre.code { line-height: 1.05; margin: 1pt 0; } p { margin-bottom: 0.9pt; } ul { margin-bottom: 0.9pt; } h1 { margin: 1.3pt 0 0.5pt; } h2 { margin: 1pt 0 0.3pt; } table { margin: 0.8pt 0 1.1pt; } .fig { margin: 0.5pt 0; }"
 LAYOUT = {"margin": "3.5mm 4mm", "page_height": "203mm", "column_gap": "2.2mm"}
 
 # ---------------- SVG figures ----------------
@@ -131,7 +131,7 @@ P1.append(sec('3. ADT, Stack, Queue'))
 P1.append('<p><b>ADT</b> = specification only: <b>interface</b> + <b>behaviour</b>; <r>no implementation details</r> (algorithm + state). "ADT is the detailed implementation": <r>F</r>; "no implementation needed to define an ADT": <t>T</t>. Same interface, many implementations (Symbol table via list / hash table / tree; "arrays only is most efficient": <r>F</r>).</p>')
 P1.append('''<table><tr><th>ADT</th><th>order</th><th>interface</th><th>linked-list impl.</th><th>array impl.</th></tr>
 <tr><td><b>Stack</b></td><td><r>LIFO</r></td><td>push(x), pop() removes+returns most recent, empty()</td><td>top = head: push/pop <b>O(1)</b></td><td>top = end: push/pop O(1) if no overflow (fixed capacity)</td></tr>
-<tr><td><b>Queue</b></td><td><r>FIFO</r></td><td>enqueue(x) at back, dequeue() removes+returns front, empty()</td><td>back = tail (needs <k>_tail</k>), front = head: both <b>O(1)</b></td><td>circular array O(1)</td></tr></table>''')
+<tr><td><b>Queue</b></td><td><r>FIFO</r></td><td>enqueue(x) at back, dequeue() removes+returns front, empty()</td><td>back = tail (needs <k>_tail</k>), front = head: both <b>O(1)</b></td><td>circular array O(1): front/back indices wrap with % capacity; full when size == capacity</td></tr></table>''')
 P1.append(code(S['stackq']))
 P1.append('<p>Empty-stack pop: throw exception (postponed) or <b>modify the spec</b>: add <k>empty()</k>, caller checks first. "best push O(1), pop O(n)": <r>F</r>. Stack via augmented tree keyed by insertion order: <t>T</t>.</p>')
 P1.append(code(S['stacksort']))
@@ -223,7 +223,7 @@ P2.append('''<table><colgroup><col style="width:8%"><col style="width:13%"><col 
 <tr><td><b>Insertion</b></td><td>n (already ascending)</td><td>n&sup2;</td><td>n&sup2; (descending)</td><td>O(1)</td><td>Yes</td><td>left i+1 items <b>sorted, not final</b>; right untouched</td></tr>
 <tr><td><b>Merge</b></td><td>n log n</td><td>n log n</td><td>n log n</td><td><r>O(n)</r> not in-place</td><td>Yes (left on tie)</td><td>sorted runs of length 2,4,8&hellip;; nothing crosses halves early</td></tr>
 <tr><td><b>Quick</b></td><td>n log n</td><td>n log n (expected)</td><td><r>n&sup2;</r> (sorted, fixed pivot)</td><td>in-place; stack O(log n)</td><td>No</td><td>pivot final; all left &le; pivot &lt; all right (grouped, not ordered)</td></tr></table>''')
-P2.append('<p class="tiny">*stable with O(n) extra space. Cocktail sort = two-way <b>Bubble</b> (not Merge), O(n&sup2;). Any <b>comparison sort</b> is &Omega;(n log n): decision tree has n! leaves &rArr; height &ge; log&#8322;(n!) = &Theta;(n log n); merge sort meets it.</p>')
+P2.append('<p class="tiny">*stable with O(n) extra space. Cocktail sort = two-way <b>Bubble</b> (not Merge), O(n&sup2;). Any <b>comparison sort</b> is &Omega;(n log n): decision tree has n! leaves &rArr; height &ge; log&#8322;(n!) = &Theta;(n log n); merge sort meets it. Non-comparison sorts (counting / radix) can beat n log n when keys are small integers ("any sort is &Omega;(n log n)": <r>F</r>). std::sort = introsort (quicksort + heapsort fallback + insertion sort for small ranges); std::stable_sort = merge sort.</p>')
 P2.append('<p><b>Detective (2022):</b> 6 3 1 4 8 7 5 2 &rarr; <k>1 2 3 4 8 7 5 6</k> Selection (left 4 final, rest untouched); <k>3 1 4 6 5 2 7 8</k> Bubble (7,8 at right); <k>1 3 6 4 8 7 5 2</k> Insertion (left 3 sorted, right untouched); <k>1 3 4 6 2 5 7 8</k> Merge (two sorted halves); <k>3 1 4 2 5 6 8 7</k> Quick (5 in place, left&lt;5&lt;right). <b>2024 Feb:</b> 14 12 40 6 8 100 7 109 &rarr; 6 8 7 12 14 40 100 109 = <b>Quick</b> (pivot 12).</p>')
 P2.append(sub('Recognising a sort from code: WHO is compared, and swap or shift'))
 P2.append('''<table><colgroup><col style="width:63%"><col style="width:37%"></colgroup><tr><th>you see</th><th>sort</th></tr>
