@@ -10,7 +10,7 @@ from cheatsheet import code, sec, sub, fig, tree_svg
 from snippets import S
 
 TITLE = "CS2040C Quiz 1 Cheatsheet"
-CSS_EXTRA = "body { line-height: 1.08; } th, td { padding: 0.35pt 1.4pt; } pre.code { line-height: 1.05; margin: 1pt 0; } p { margin-bottom: 0.9pt; } ul { margin-bottom: 0.9pt; } h1 { margin: 1.3pt 0 0.5pt; } h2 { margin: 1pt 0 0.3pt; } table { margin: 0.8pt 0 1.1pt; } .fig { margin: 0.5pt 0; }"
+CSS_EXTRA = "body { line-height: 1.08; } th, td { padding: 0.25pt 1.3pt; } pre.code { line-height: 1.05; margin: 1pt 0; } p { margin-bottom: 0.9pt; } ul { margin-bottom: 0.9pt; } h1 { margin: 1.3pt 0 0.5pt; } h2 { margin: 1pt 0 0.3pt; } table { margin: 0.8pt 0 1.1pt; } .fig { margin: 0.5pt 0; }"
 LAYOUT = {"margin": "3.5mm 4mm", "page_height": "203mm", "column_gap": "2.2mm"}
 
 # ---------------- SVG figures ----------------
@@ -18,7 +18,7 @@ def tree_svg():
     nodes = {41:(150,12),20:(75,40),65:(225,40),11:(37,68),29:(112,68),50:(187,68),91:(262,68),32:(135,96),72:(240,96),99:(285,96)}
     edges = [(41,20),(41,65),(20,11),(20,29),(65,50),(65,91),(29,32),(91,72),(91,99)]
     hs = {41:3,20:2,65:2,11:0,29:1,50:0,91:1,32:0,72:0,99:0}
-    s = ['<svg viewBox="0 0 330 112" width="34mm" xmlns="http://www.w3.org/2000/svg">']
+    s = ['<svg viewBox="0 0 330 112" width="31mm" xmlns="http://www.w3.org/2000/svg">']
     for a,b in edges:
         (x1,y1),(x2,y2) = nodes[a],nodes[b]
         s.append(f'<line x1="{x1}" y1="{y1}" x2="{x2}" y2="{y2}" stroke="#333" stroke-width="1"/>')
@@ -217,7 +217,7 @@ Step 4 (&ge;2 calls): add the <b>subproblem sizes</b>: = n &rArr; n per level &t
 <tr><td class="m">f(n&minus;1)+f(n&minus;2) (Fibonacci)</td><td>2</td><td>n</td><td>&le; doubles</td><td>exactly O(1.618ⁿ); in the quiz write <b>O(2ⁿ)</b></td></tr></table>
 <p><b>Rules of thumb:</b> subtract a constant + 1 call = O(n); subtract a constant + &ge;2 calls = exponential; divide by a constant + k calls = n log n. <b>Special:</b> <r>return inside the loop &rArr; loop runs once. No base case &rArr; None of the above.</r> A call of fixed size, f(10) inside f(n) &rArr; O(1).</p>''')
 P2.append(sec('6. Sorting (Bubble / Selection / Insertion / Merge / Quick)'))
-P2.append('''<table><colgroup><col style="width:8%"><col style="width:11%"><col style="width:9%"><col style="width:11%"><col style="width:10%"><col style="width:7%"><col style="width:44%"></colgroup><tr><th>sort</th><th>best</th><th>avg</th><th>worst</th><th>extra mem</th><th>stable</th><th>after pass i (detective clue)</th></tr>
+P2.append('''<table><colgroup><col style="width:8%"><col style="width:13%"><col style="width:8%"><col style="width:12%"><col style="width:12%"><col style="width:9%"><col style="width:38%"></colgroup><tr><th>sort</th><th>best</th><th>avg</th><th>worst</th><th>extra mem</th><th>stable</th><th>after pass i (detective clue)</th></tr>
 <tr><td><b>Bubble</b></td><td>n (early stop, sorted input)</td><td>n&sup2;</td><td>n&sup2;</td><td>O(1) in-place</td><td><r>Yes</r></td><td>largest i at <b>right end</b> (final); rest moved by adjacent swaps only</td></tr>
 <tr><td><b>Selection</b></td><td><r>n&sup2;</r></td><td>n&sup2;</td><td>n&sup2;</td><td>O(1)</td><td><r>No</r>*</td><td>smallest i at <b>left end</b> (final); rest in original order</td></tr>
 <tr><td><b>Insertion</b></td><td>n (already ascending)</td><td>n&sup2;</td><td>n&sup2; (descending)</td><td>O(1)</td><td>Yes</td><td>left i+1 items <b>sorted, not final</b>; right untouched</td></tr>
@@ -239,7 +239,7 @@ for(i<n-1) for(j=i+1;j<n) if(A[i]>A[j]) swap(A[i],A[j]);
    //! Selection (2023 Feb): swap as you go; A[i] ends as min of rest. O(n^2)
 if(n<=1)return; for(i<n-1) if(A[i]>A[n-1]) swap(A[i],A[n-1]); f(A,n-1);
    //! Selection (2023 Sep): max to end, then recurse. T(n)=T(n-1)+n = O(n^2)''', 'pl'))
-P2.append(code(S['bubble'])); P2.append(code(S['selection'])); P2.append(code(S['insertion']))
+P2.append(code(S['bubble'])); P2.append(code(S['insertion'])); P2.append(code(S['selection']))
 P2.append(code(S['merge']))
 
 P2.append(code(S['quick']))
@@ -255,7 +255,9 @@ P2.append('''<p><b>QuickSort analysis</b></p><ul>
 <li><b>Random pivot</b>: <i>good</i> = both sides &gt; n/10. P(good) = 8/10 &rArr; expected 1/p = 1.25 (&le;2) tries &rArr; <b>expected O(n log n) for every input</b>; worst case still n&sup2;.</li>
 <li>Exact median: P = 1/n &rArr; n tries &rArr; n&sup2;. "expected n log n if each side has size &ge; 10": <r>F</r> (must be a constant <i>fraction</i>).</li>
 <li>In-place: <t>T</t>. Needs O(log n) call stack: <t>T</t>. Not stable. Sorts a linked list in O(n log n): <t>T</t>.</li>
-<li>Merge sort on a linked list is still O(n log n) ("slower on lists": <r>F</r>, "O(n&sup2;)": <r>F</r>). Merge sort caches poorly ("best caching": <r>F</r>). Insertion sort is still used for small / nearly sorted input ("nobody uses it": <r>F</r>).</li></ul>''')
+<li>Merge sort on a linked list is still O(n log n) ("slower on lists": <r>F</r>, "O(n&sup2;)": <r>F</r>). Merge sort caches poorly ("best caching": <r>F</r>). Insertion sort is still used for small / nearly sorted input ("nobody uses it": <r>F</r>).</li><li>Randomized (algorithm flips coins, works for any input) &ne; average case (assumes random input).</li>
+<li>Duplicates: use &le; on one side or 3-way partition (&lt;x | =x | &gt;x), else infinite loop / n&sup2; on all-equal input.</li>
+<li>Sorting needs a transitive ordering (rock-paper-scissors is unsortable).</li></ul>''')
 P2.append(sec('7. Binary Trees &amp; BST (all functions, O(h))'))
 P2.append('<p><b>Binary tree</b>: each node &le; 2 children. <b>BST</b>: for <b>every</b> node v, all keys in left subtree &lt; v &lt; all keys in right subtree (whole subtrees, not just the 2 children). <b>Height</b>: <r>leaf = 0, empty = &minus;1</r>, node = 1 + max(child heights). Height h &rArr; &ge; h+1 nodes (chain), &le; 2^(h+1)&minus;1 ("at least 2^h&minus;1": <r>F</r>). n nodes &rArr; h from &lfloor;log&#8322;n&rfloor; to <r>n&minus;1</r> (sorted inserts; "height can be n": <r>F</r>).</p>')
 P2.append(fig(tree_svg(), 'Lecture tree. in-order: 11 20 29 32 41 50 65 72 91 99 (sorted!) &middot; pre-order: 41 20 11 29 32 65 50 91 72 99 &middot; post-order: 11 32 29 20 50 72 99 91 65 41 &middot; level-order: 41 20 65 11 29 50 91 32 72 99'))
@@ -270,13 +272,14 @@ P2.append(code(S['traverse']))
 P2.append('''<p><b>Complexity</b></p><ul>
 <li>search / insert / delete / min / max / successor / predecessor = <r>O(h)</r>: one root-to-leaf path. h = O(log n) only if balanced, O(n) worst ("all BSTs give O(log n) search": <r>F</r>).</li>
 <li>Any traversal = <r>O(n)</r> ("in-order is O(n log n)": <r>F</r>). Building by n inserts = O(n&middot;h), n&sup2; for sorted input.</li>
-</ul>
+<li>Sorted array: search O(log n), insert O(n) / list: insert O(1), search O(n) / BST: everything O(h).</li></ul>
 <p><b>Successor &amp; traversal facts</b></p><ul>
 <li><b>Successor(x)</b>: (1) x has a right subtree &rArr; its min; (2) else the lowest ancestor where the search <b>turned left</b>; none &rArr; x is max. Works if x is absent (succ(33)=41). Predecessor mirrors.</li>
 <li>In-order of an arbitrary binary tree is sorted: <r>F</r>. Pre-order is "never sorted": <r>F</r> (right chain 1&rarr;2&rarr;3). Post-order of a BST is "always not sorted": <r>F</r> (left chain 3&larr;2&larr;1 gives 1 2 3). Pre-order = reverse of post-order: <r>F</r>.</li>
 <li>Min = leftmost node, <r>not necessarily a leaf</r>.</li>
 
-<li><b>Order statistics</b> (k-th smallest, dynamic): store each node&#39;s subtree <b>size</b>, not its rank ("store the rank": <r>F</r>, one insert changes every larger rank). select(k): r = size(left)+1; k=r &rArr; me; k&lt;r &rArr; left; k&gt;r &rArr; right with k&minus;r.</li></ul>''')
+<li><b>Order statistics</b> (k-th smallest, dynamic): store each node&#39;s subtree <b>size</b>, not its rank ("store the rank": <r>F</r>, one insert changes every larger rank). select(k): r = size(left)+1; k=r &rArr; me; k&lt;r &rArr; left; k&gt;r &rArr; right with k&minus;r.</li><li>Insert always creates a <b>leaf</b>; recursive insert/delete <b>return</b> the subtree root and the caller catches it.</li>
+<li>Pre-order: copy tree / expression tree. Post-order: delete tree (children before parent). Level order = BFS with a queue.</li></ul>''')
 
 
 PAGES = [P1, P2]

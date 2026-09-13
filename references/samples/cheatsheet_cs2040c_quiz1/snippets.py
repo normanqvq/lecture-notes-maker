@@ -272,6 +272,7 @@ private:
     TreeNode<T>* _insert(TreeNode<T> *t, T x);
     TreeNode<T>* _remove(TreeNode<T> *t, T x);
     void _inOrder(TreeNode<T> *t);  int _height(TreeNode<T> *t);
+
 public:
     BinarySearchTree() { _root = NULL; _size = 0; }  // dtor: post-order
     void insert(T x) { _root = _insert(_root, x); }  // catch returned root
