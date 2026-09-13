@@ -264,6 +264,7 @@ private:  T _item;  TreeNode<T> *_left, *_right;   // ListNode + 2 nexts
 public:   TreeNode(T x) { _item = x; _left = _right = NULL; }
           friend class BinarySearchTree<T>; // the tree may touch my privates
 };
+
 template <class T>
 class BinarySearchTree {
 private:

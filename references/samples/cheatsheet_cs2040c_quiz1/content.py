@@ -98,7 +98,7 @@ P1.append('''<div class="hdr"><div class="t">CS2040C Data Structures and Algorit
 P1.append(sec('1. C++ Crash Course, Pointers &amp; OOP'))
 P1.append(sub('Pointers, new/delete, references'))
 P1.append(code(S['ptr']))
-P1.append('<p><k>*</k> in a declaration = "is a pointer"; in a statement = dereference. <k>p-&gt;x</k> &equiv; <k>(*p).x</k>. <r>Wild pointer</r> (uninitialised): writing through it segfaults <i>or</i> silently corrupts other data. <k>new</k> memory that no pointer points to = <r>orphan &rArr; memory leak</r>; after <k>delete</k> the pointer is <r>dangling</r>. <k>delete</k> only what you <k>new</k>-ed. <k>malloc/free</k> still work in C++ ("cannot use malloc": <r>F</r>) but <k>new</k> also calls the constructor.</p>')
+P1.append('<p><k>*</k> in a declaration = "is a pointer"; in a statement = dereference. <k>p-&gt;x</k> &equiv; <k>(*p).x</k>. <r>Wild pointer</r> (uninitialised): writing through it segfaults <i>or</i> silently corrupts other data. <k>new</k> memory that no pointer points to = <r>orphan &rArr; memory leak</r>; after <k>delete</k> the pointer is <r>dangling</r>. <k>delete</k> only what you <k>new</k>-ed. <k>new</k> also calls the constructor (malloc does not).</p>')
 P1.append(sub('Parameter passing &amp; overloading (slides output = 1 10 10)'))
 P1.append(code(S['pass']))
 P1.append(sub('Class syntax, constructor, destructor, access'))
@@ -107,7 +107,7 @@ P1.append('''<table><tr><th>access</th><th>own class</th><th>subclass</th><th>fr
 <tr><td><b>private</b> (default in class)</td><td>&#10004;</td><td>&#10008;</td><td>&#10004;</td><td>&#10008;</td></tr>
 <tr><td><b>protected</b></td><td>&#10004;</td><td>&#10004;</td><td>&#10004;</td><td>&#10008;</td></tr>
 <tr><td><b>public</b> (default in struct)</td><td>&#10004;</td><td>&#10004;</td><td>&#10004;</td><td>&#10004;</td></tr></table>''')
-P1.append('<p><b>friend</b> = "let that class access my private &amp; protected": <r>one-directional, not inherited, not transitive</r>. Access depends on <b>where the code is written</b>, not on the object&#39;s type. Class = blueprint; instance = its own copy of the attributes. <b>Encapsulation</b>: data hidden, used via public methods.</p>')
+P1.append('<p><b>friend</b> = "let that class access my private &amp; protected": <r>one-directional, not inherited, not transitive</r>. Access depends on <b>where the code is written</b>, not on the object&#39;s type.</p>')
 P1.append(sub('Inheritance, override, polymorphism (virtual)'))
 P1.append(code(S['inherit']))
 P1.append('''<ul>
@@ -128,7 +128,7 @@ P1.append('''<table><tr><th>SLL operation</th><th>time</th><th>why</th></tr>
 <tr><td>search / get(i) / searchMin</td><td>O(n)</td><td>only sequential access; <r>no binary search on a list</r></td></tr></table><ul><li><b>insertHead</b>: link new&rarr;old head <b>before</b> moving head. <b>removeHead</b>: temp=head &rarr; head=head-&gt;next &rarr; delete temp (PollEv order B,C,A); check empty first.</li><li><k>friend class List;</k> is written inside <k>ListNode</k>. Array: fixed size, O(1) random access. List: grows at run time, O(1) head insert, O(n) access. Doubly linked list adds <k>_prev</k> &rArr; removeTail O(1) (needed for Deque).</li></ul>''')
 
 P1.append(sec('3. ADT, Stack, Queue'))
-P1.append('<p><b>ADT</b> = specification only: <b>interface</b> + <b>behaviour</b>; <r>no implementation details</r> (algorithm + state). "ADT is the detailed implementation": <r>F</r>; "no implementation needed to define an ADT": <t>T</t>. Same interface, many implementations (Symbol table via list / hash table / tree; "arrays only is most efficient": <r>F</r>). Key = unique id for search/delete.</p>')
+P1.append('<p><b>ADT</b> = specification only: <b>interface</b> + <b>behaviour</b>; <r>no implementation details</r> (algorithm + state). "ADT is the detailed implementation": <r>F</r>; "no implementation needed to define an ADT": <t>T</t>. Same interface, many implementations (Symbol table via list / hash table / tree; "arrays only is most efficient": <r>F</r>).</p>')
 P1.append('''<table><tr><th>ADT</th><th>order</th><th>interface</th><th>linked-list impl.</th><th>array impl.</th></tr>
 <tr><td><b>Stack</b></td><td><r>LIFO</r></td><td>push(x), pop() removes+returns most recent, empty()</td><td>top = head: push/pop <b>O(1)</b></td><td>top = end: push/pop O(1) if no overflow (fixed capacity)</td></tr>
 <tr><td><b>Queue</b></td><td><r>FIFO</r></td><td>enqueue(x) at back, dequeue() removes+returns front, empty()</td><td>back = tail (needs <k>_tail</k>), front = head: both <b>O(1)</b></td><td>circular array O(1)</td></tr></table>''')
@@ -137,8 +137,19 @@ P1.append('<p>Empty-stack pop: throw exception (postponed) or <b>modify the spec
 P1.append(code(S['stacksort']))
 
 P1.append(sec('4. Searching &amp; Divide-and-Conquer'))
-P1.append('<p><b>Linear search</b> (unsorted array / list): O(n) worst, O(1) best; global max/min of unsorted data: O(n) unavoidable. <b>Binary search</b> needs a <r>sorted array with random access</r> (not a list): after d halvings n/2ᵈ items remain; stop at 1 &rArr; d = log&#8322;n &rArr; <b>O(log n)</b>.</p>')
+P1.append('<p><b>Linear search</b> (unsorted array / list): O(n) worst, O(1) best; global max/min of unsorted data: O(n) unavoidable. <b>Binary search</b> needs a <r>sorted array</r>: after d halvings n/2ᵈ items remain; stop at 1 &rArr; d = log&#8322;n &rArr; <b>O(log n)</b>.</p>')
 P1.append(code(S['bsearch']))
+P1.append(sub('Binary search variants: record + keep going'))
+P1.append('''<p>Binary search finds a <b>BOUNDARY</b>, not just a key. Pattern: when the condition holds, <y>RECORD mid and keep searching on one side</y>; return the last recorded value.</p>
+<table><colgroup><col style="width:30%"><col style="width:18%"><col style="width:30%"><col style="width:22%"></colgroup><tr><th>goal</th><th>condition</th><th>on hit</th><th>else</th></tr>
+<tr><td>first occurrence of x</td><td>A[mid] == x</td><td>ans = mid; hi = mid&minus;1 (go left)</td><td>normal</td></tr>
+<tr><td>last occurrence of x</td><td>A[mid] == x</td><td>ans = mid; lo = mid+1 (go right)</td><td>normal</td></tr>
+<tr><td>count of x</td><td colspan="3">last &minus; first + 1 (two searches, still O(log n))</td></tr>
+<tr><td>first A[i] &ge; x (lower bound)</td><td>A[mid] &ge; x</td><td>ans = mid; hi = mid&minus;1</td><td>lo = mid+1</td></tr>
+<tr><td>fixed point A[i] == i (sorted, distinct)</td><td>A[mid] vs mid</td><td colspan="2">A[mid] &lt; mid &rArr; lo = mid+1; &gt; &rArr; hi = mid&minus;1</td></tr>
+<tr><td>&lfloor;&radic;n&rfloor;</td><td>mid &le; n/mid</td><td>ans = mid; lo = mid+1</td><td>hi = mid&minus;1</td></tr>
+<tr><td>min of rotated sorted array</td><td>A[mid] &gt; A[hi]</td><td>lo = mid+1 (min on right)</td><td>ans = mid; hi = mid&minus;1</td></tr></table>
+<p>Linked list: <r>cannot binary search</r> &mdash; finding mid costs an O(n) walk (no O(1) random access), not just "hard".</p>''')
 P1.append(code(S['badge']))
 P1.append(code(S['peak']))
 P1.append('''<ul>
@@ -169,12 +180,13 @@ return f(n-1)+f(n-1);
 </table>''')
 
 
-P1.append(fig(rec_svg(), 'Recursion tree of T(n)=2T(n/2)+cn: every level costs cn, there are log&#8322;n levels &rArr; O(n log n).'))
+
+P1.append('<p><b>Recurrence not in the &sect;5 table &mdash; T(n)=T(n/10)+T(9n/10)+cn</b> (quicksort 1:9; not covered by k calls f(n/k)) &rArr; <r>O(n log n)</r>: <y>unequal split, but sizes still add up to n &rArr; n per level</y>; depth = longest path log&#8321;&#8320;&#8725;&#8329; n.</p>')
 
 # ---------------- PAGE 2 ----------------
 P2 = []
 P2.append(sec('5. Big O &amp; Time Complexity (Part A: 6&times;3 marks)'))
-P2.append('''<p><b>Def:</b> T(n) = O(f(n)) iff &exist; c, n&#8320; with T(n) &le; c&middot;f(n) &forall; n &ge; n&#8320; (upper bound; c absorbs constants, n&#8320; skips the transient start). <b>&Omega;</b>: T(n) &ge; c&middot;f(n). <b>&Theta;</b>: both. Count operations, not seconds. <r>Answer the tightest bound</r>: 1000n is O(n); yet "an O(n&sup2;) algorithm is also O(n&sup3;) if not tight" <r>T</r>. n&sup3; is O(n&sup3;), &Omega;(n&sup2;), not &Theta;(n&sup2;). 1 &lt; log n &lt; n &lt; n log n &lt; n&sup2; &lt; n&sup3; &lt; 2&#8319; &lt; n!.</p>''')
+P2.append('''<p><b>Def:</b> T(n) = O(f(n)) iff &exist; c, n&#8320; with T(n) &le; c&middot;f(n) &forall; n &ge; n&#8320; (upper bound; c absorbs constants, n&#8320; skips the transient start). <b>&Omega;</b>: T(n) &ge; c&middot;f(n). <b>&Theta;</b>: both. <r>Answer the tightest bound</r>: 1000n is O(n); yet "an O(n&sup2;) algorithm is also O(n&sup3;) if not tight" <r>T</r>. n&sup3; is O(n&sup3;), &Omega;(n&sup2;), not &Theta;(n&sup2;). 1 &lt; log n &lt; n &lt; n log n &lt; n&sup2; &lt; n&sup3; &lt; 2&#8319; &lt; n!.</p>''')
 P2.append('''<p><b>Rules:</b> sequential blocks add &rArr; <b>max</b>; nested loops/calls <b>multiply</b>; drop constants &amp; lower terms; if/else &rArr; costlier branch; log base irrelevant. <b>Sums:</b> 1+2+&hellip;+n = n(n+1)/2 = <r>O(n&sup2;)</r> (the loop computing it is O(n)); &Sigma;i&sup2; = O(n&sup3;); n+n/2+n/4+&hellip; &le; 2n = <r>O(n)</r>; 1+2+4+&hellip;+n &le; 2n; 1+&frac12;+&frac14;+&hellip; &le; 2; 1+&frac12;+&#8531;+&hellip;+1/n = O(log n); log(n!) = &Theta;(n log n); log(8n&sup2;+4n) = O(log n); 4n&sup2;log n + 8n = O(n&sup2;log n) (keep the log).</p>''')
 P2.append(sub('Loop patterns (iterations &times; cost of one iteration)'))
 P2.append('''<table><tr><th class="m">loop header</th><th>iterations</th><th>note</th></tr>
@@ -203,17 +215,7 @@ Step 4 (&ge;2 calls): add the <b>subproblem sizes</b>: = n &rArr; n per level &t
 <tr><td class="m">f(n&minus;1)+f(n&minus;1)</td><td>2</td><td>n</td><td>1, 2, 4</td><td><b>O(2ⁿ)</b></td></tr>
 <tr><td class="m">f(n&minus;k)+f(n&minus;m)</td><td>2</td><td>n</td><td>&le; doubles</td><td>exponential, write <b>O(2ⁿ)</b></td></tr>
 <tr><td class="m">f(n&minus;1)+f(n&minus;2) (Fibonacci)</td><td>2</td><td>n</td><td>&le; doubles</td><td>exactly O(1.618ⁿ); in the quiz write <b>O(2ⁿ)</b></td></tr></table>
-<p><b>Rules of thumb:</b> subtract a constant + 1 call = O(n); subtract a constant + &ge;2 calls = exponential; divide by a constant + k calls = n log n. <b>Special:</b> <r>return inside the loop &rArr; loop runs once. No base case &rArr; None of the above.</r></p>''')
-P2.append(sub('Recurrences not in the table above'))
-P2.append('''<table><tr><th>recurrence (code shape)</th><th>answer</th><th>Steps</th></tr>
-
-
-
-
-
-<tr><td>T(n)=T(n/10)+T(9n/10)+cn &nbsp;<span class="tiny">(quicksort 1:9; not covered by k calls f(n/k))</span></td><td><r>O(n log n)</r></td><td><y>unequal split, but sizes still add up to n &rArr; n per level</y>; depth = longest path log&#8321;&#8320;&#8725;&#8329; n</td></tr>
-<tr><td>T(n)=10T(n/10)+cn &nbsp;<span class="tiny">(loop n, then 10 calls f(n/10))</span></td><td><r>O(n log n)</r></td><td>10&middot;(n/10) = n per level, log&#8321;&#8320;n levels</td></tr><tr><td>T(n)=2T(n&minus;1)+c <span class="tiny">(naive Fibonacci)</span> / f(10) inside f(n) / <b>no base case</b></td><td><r>O(2ⁿ)</r> / O(1) / <r>None</r></td><td>doubles per level &times; n levels / constant-size call / never ends</td></tr>
-</table>''')
+<p><b>Rules of thumb:</b> subtract a constant + 1 call = O(n); subtract a constant + &ge;2 calls = exponential; divide by a constant + k calls = n log n. <b>Special:</b> <r>return inside the loop &rArr; loop runs once. No base case &rArr; None of the above.</r> A call of fixed size, f(10) inside f(n) &rArr; O(1).</p>''')
 P2.append(sec('6. Sorting (Bubble / Selection / Insertion / Merge / Quick)'))
 P2.append('''<table><colgroup><col style="width:8%"><col style="width:11%"><col style="width:9%"><col style="width:11%"><col style="width:10%"><col style="width:7%"><col style="width:44%"></colgroup><tr><th>sort</th><th>best</th><th>avg</th><th>worst</th><th>extra mem</th><th>stable</th><th>after pass i (detective clue)</th></tr>
 <tr><td><b>Bubble</b></td><td>n (early stop, sorted input)</td><td>n&sup2;</td><td>n&sup2;</td><td>O(1) in-place</td><td><r>Yes</r></td><td>largest i at <b>right end</b> (final); rest moved by adjacent swaps only</td></tr>
@@ -221,8 +223,22 @@ P2.append('''<table><colgroup><col style="width:8%"><col style="width:11%"><col 
 <tr><td><b>Insertion</b></td><td>n (already ascending)</td><td>n&sup2;</td><td>n&sup2; (descending)</td><td>O(1)</td><td>Yes</td><td>left i+1 items <b>sorted, not final</b>; right untouched</td></tr>
 <tr><td><b>Merge</b></td><td>n log n</td><td>n log n</td><td>n log n</td><td><r>O(n)</r> not in-place</td><td>Yes (left on tie)</td><td>sorted runs of length 2,4,8&hellip;; nothing crosses halves early</td></tr>
 <tr><td><b>Quick</b></td><td>n log n</td><td>n log n (expected)</td><td><r>n&sup2;</r> (sorted, fixed pivot)</td><td>in-place; stack O(log n)</td><td>No</td><td>pivot final; all left &le; pivot &lt; all right (grouped, not ordered)</td></tr></table>''')
-P2.append('<p class="tiny">*stable with O(n) extra space. Cocktail sort = two-way <b>Bubble</b> (not Merge), O(n&sup2;). Any <b>comparison sort</b> is &Omega;(n log n): decision tree has n! leaves &rArr; height &ge; log&#8322;(n!) = &Theta;(n log n); merge sort meets it. Needs a transitive ordering (rock-paper-scissors unsortable).</p>')
-P2.append('<p><b>Detective (2022):</b> 6 3 1 4 8 7 5 2 &rarr; <k>1 2 3 4 8 7 5 6</k> Selection (left 4 final, rest untouched); <k>3 1 4 6 5 2 7 8</k> Bubble (7,8 at right); <k>1 3 6 4 8 7 5 2</k> Insertion (left 3 sorted, right untouched); <k>1 3 4 6 2 5 7 8</k> Merge (two sorted halves); <k>3 1 4 2 5 6 8 7</k> Quick (5 in place, left&lt;5&lt;right). <b>2024 Feb:</b> 14 12 40 6 8 100 7 109 &rarr; 6 8 7 12 14 40 100 109 = <b>Quick</b> (pivot 12). <b>Code:</b> <k>for i: for j=i+1: if A[i]&gt;A[j] swap</k> = Selection; <k>if A[i]&gt;A[n-1] swap; sort(A,n-1)</k> = Selection; adjacent <k>A[j]&gt;A[j+1]</k> = Bubble; shift with <k>key</k> = Insertion.</p>')
+P2.append('<p class="tiny">*stable with O(n) extra space. Cocktail sort = two-way <b>Bubble</b> (not Merge), O(n&sup2;). Any <b>comparison sort</b> is &Omega;(n log n): decision tree has n! leaves &rArr; height &ge; log&#8322;(n!) = &Theta;(n log n); merge sort meets it.</p>')
+P2.append('<p><b>Detective (2022):</b> 6 3 1 4 8 7 5 2 &rarr; <k>1 2 3 4 8 7 5 6</k> Selection (left 4 final, rest untouched); <k>3 1 4 6 5 2 7 8</k> Bubble (7,8 at right); <k>1 3 6 4 8 7 5 2</k> Insertion (left 3 sorted, right untouched); <k>1 3 4 6 2 5 7 8</k> Merge (two sorted halves); <k>3 1 4 2 5 6 8 7</k> Quick (5 in place, left&lt;5&lt;right). <b>2024 Feb:</b> 14 12 40 6 8 100 7 109 &rarr; 6 8 7 12 14 40 100 109 = <b>Quick</b> (pivot 12).</p>')
+P2.append(sub('Recognising a sort from code: WHO is compared, and swap or shift'))
+P2.append('''<table><colgroup><col style="width:63%"><col style="width:37%"></colgroup><tr><th>you see</th><th>sort</th></tr>
+<tr><td>A[j] vs A[j+1] (adjacent), swap</td><td><b>Bubble</b></td></tr>
+<tr><td>fixed A[i] vs every A[j], j from i+1 (swap now, or record minIdx, swap once)</td><td><b>Selection</b></td></tr>
+<tr><td>key = A[j]; shift A[i+1] = A[i] leftwards (no swap); drop key</td><td><b>Insertion</b></td></tr>
+<tr><td>recursive: move max/min to one end, then f(A, n&minus;1)</td><td><b>Selection</b> (recursive), T(n)=T(n&minus;1)+n &rArr; O(n&sup2;)</td></tr>
+<tr><td>f(left); f(right); merge(&hellip;) &mdash; work AFTER recursing</td><td><b>Merge</b></td></tr>
+<tr><td>p = partition(&hellip;); f(left); f(right) &mdash; work BEFORE recursing</td><td><b>Quick</b></td></tr></table>
+<p><y>Bubble vs Selection: index j+1 &rArr; Bubble. Selection vs Insertion: swap &rArr; Selection, shift &rArr; Insertion.</y></p>''')
+P2.append(code('''
+for(i<n-1) for(j=i+1;j<n) if(A[i]>A[j]) swap(A[i],A[j]);
+   //! Selection (2023 Feb): swap as you go; A[i] ends as min of rest. O(n^2)
+if(n<=1)return; for(i<n-1) if(A[i]>A[n-1]) swap(A[i],A[n-1]); f(A,n-1);
+   //! Selection (2023 Sep): max to end, then recurse. T(n)=T(n-1)+n = O(n^2)''', 'pl'))
 P2.append(code(S['bubble'])); P2.append(code(S['selection'])); P2.append(code(S['insertion']))
 P2.append(code(S['merge']))
 
@@ -235,30 +251,31 @@ partition, pivot=22:  22 35 10 42 7 51 18  -> swap 35,18: 22 18 10 42 7 51 35
 merge trace (2022): 37 11 21 56 14 18 97 3 -> singles
  -> [11 37][21 56][14 18][3 97] -> [11 21 37 56][3 14 18 97] -> sorted''', 'pl'))
 P2.append('''<p><b>QuickSort analysis</b></p><ul>
-<li>T(n) = O(n) + T(p) + T(n&minus;1&minus;p). Middle pivot every time &rArr; 2T(n/2)+n = <b>O(n log n)</b>.</li>
 <li>Min/max pivot every time (fixed first/last pivot on <r>sorted / almost sorted input</r>) &rArr; T(n&minus;1)+n = <r>O(n&sup2;)</r>. Unsorted input can still hit n&sup2; ("never n&sup2; if not sorted": <r>F</r>).</li>
 <li><b>Random pivot</b>: <i>good</i> = both sides &gt; n/10. P(good) = 8/10 &rArr; expected 1/p = 1.25 (&le;2) tries &rArr; <b>expected O(n log n) for every input</b>; worst case still n&sup2;.</li>
-<li>Any constant split (1:9, 2:8) works: depth log&#8321;&#8320;&#8725;&#8329;n &times; n per level. Exact median: P = 1/n &rArr; n tries &rArr; n&sup2;. "expected n log n if each side has size &ge; 10": <r>F</r> (must be a constant <i>fraction</i>).</li>
-<li>Randomized (algorithm flips coins, any input) &ne; average case (input assumed random). In-place: <t>T</t>. Needs O(log n) call stack: <t>T</t>. Not stable. Sorts a linked list in O(n log n): <t>T</t>.</li>
-<li>Duplicates: use &le; on one side or 3-way partition (&lt;x | =x | &gt;x), else infinite loop.</li>
+<li>Exact median: P = 1/n &rArr; n tries &rArr; n&sup2;. "expected n log n if each side has size &ge; 10": <r>F</r> (must be a constant <i>fraction</i>).</li>
+<li>In-place: <t>T</t>. Needs O(log n) call stack: <t>T</t>. Not stable. Sorts a linked list in O(n log n): <t>T</t>.</li>
 <li>Merge sort on a linked list is still O(n log n) ("slower on lists": <r>F</r>, "O(n&sup2;)": <r>F</r>). Merge sort caches poorly ("best caching": <r>F</r>). Insertion sort is still used for small / nearly sorted input ("nobody uses it": <r>F</r>).</li></ul>''')
 P2.append(sec('7. Binary Trees &amp; BST (all functions, O(h))'))
-P2.append('<p><b>Binary tree</b>: each node &le; 2 children. <b>BST</b>: for <b>every</b> node v, all keys in left subtree &lt; v &lt; all keys in right subtree (whole subtrees, not just the 2 children; in-order strictly increasing). <b>Balanced BST</b> (AVL, not in quiz) adds a height rule. <b>Height</b>: <r>leaf = 0, empty = &minus;1</r>, node = 1 + max(child heights). Height h &rArr; &ge; h+1 nodes (chain), &le; 2^(h+1)&minus;1 ("at least 2^h&minus;1": <r>F</r>). n nodes &rArr; h from &lfloor;log&#8322;n&rfloor; to <r>n&minus;1</r> (sorted inserts; "height can be n": <r>F</r>); shape depends on insertion order.</p>')
+P2.append('<p><b>Binary tree</b>: each node &le; 2 children. <b>BST</b>: for <b>every</b> node v, all keys in left subtree &lt; v &lt; all keys in right subtree (whole subtrees, not just the 2 children). <b>Height</b>: <r>leaf = 0, empty = &minus;1</r>, node = 1 + max(child heights). Height h &rArr; &ge; h+1 nodes (chain), &le; 2^(h+1)&minus;1 ("at least 2^h&minus;1": <r>F</r>). n nodes &rArr; h from &lfloor;log&#8322;n&rfloor; to <r>n&minus;1</r> (sorted inserts; "height can be n": <r>F</r>).</p>')
 P2.append(fig(tree_svg(), 'Lecture tree. in-order: 11 20 29 32 41 50 65 72 91 99 (sorted!) &middot; pre-order: 41 20 11 29 32 65 50 91 72 99 &middot; post-order: 11 32 29 20 50 72 99 91 65 41 &middot; level-order: 41 20 65 11 29 50 91 32 72 99'))
 P2.append(code(S['tree']))
-P2.append(fig(delete_svg(), 'Successor of a 2-child node has no left child &rArr; &le;1 child &rArr; 2nd delete is case 0/1: delete is O(h), <b>not</b> O(n).'))
+P2.append(sub('Traversal rule'))
+P2.append('''<p>pre = self L R &middot; in = L self R &middot; post = L R self. <y>Every node appears AFTER all its descendants in post-order</y> (29 with right child 32 &rArr; "32 29", not "29 32").<br>
+Self-check: pre-order starts with root; post-order ENDS with root; in-order of a BST must be ascending.<br>
+Height counts <b>EDGES</b>: leaf = 0; chain of 5 nodes &rArr; height 4. size(node) = 1 + size(L) + size(R) (counts itself; leaf = 1) &mdash; used by select(k), not height.</p>''')
+P2.append('<p><b>delete(65)</b>, 2 children: copy successor 72 into 65, delete old 72 (&le;1 child, case 0/1) &rArr; delete is O(h), <r>not O(n)</r>.</p>')
 P2.append(code(S['treeops']))
 P2.append(code(S['traverse']))
 P2.append('''<p><b>Complexity</b></p><ul>
 <li>search / insert / delete / min / max / successor / predecessor = <r>O(h)</r>: one root-to-leaf path. h = O(log n) only if balanced, O(n) worst ("all BSTs give O(log n) search": <r>F</r>).</li>
 <li>Any traversal = <r>O(n)</r> ("in-order is O(n log n)": <r>F</r>). Building by n inserts = O(n&middot;h), n&sup2; for sorted input.</li>
-<li>Sorted array: search O(log n) but insert O(n). Linked list: insert O(1) but search O(n). BST: everything O(h).</li></ul>
+</ul>
 <p><b>Successor &amp; traversal facts</b></p><ul>
-<li><b>Successor(x)</b>: (1) x has a right subtree &rArr; its min; (2) else the lowest ancestor where the search <b>turned left</b>; none &rArr; x is max. Works if x is absent: succ(33)=41. succ(20)=29, succ(11)=20, succ(32)=41. Predecessor mirrors.</li>
-<li>In-order of a <b>BST</b> = ascending. In-order of an arbitrary binary tree is sorted: <r>F</r>.</li>
-<li>Pre-order is "never sorted": <r>F</r> (right chain 1&rarr;2&rarr;3). Post-order of a BST is "always not sorted": <r>F</r> (left chain 3&larr;2&larr;1 gives 1 2 3). Pre-order = reverse of post-order: <r>F</r>.</li>
-<li>Min = leftmost node, <r>not necessarily a leaf</r>. Level order = BFS with a queue. Pre-order: copy tree / expression tree; post-order: delete tree.</li>
-<li>Insert always creates a <b>leaf</b>. Recursive insert / delete <b>return</b> the subtree root and the caller catches it.</li>
+<li><b>Successor(x)</b>: (1) x has a right subtree &rArr; its min; (2) else the lowest ancestor where the search <b>turned left</b>; none &rArr; x is max. Works if x is absent (succ(33)=41). Predecessor mirrors.</li>
+<li>In-order of an arbitrary binary tree is sorted: <r>F</r>. Pre-order is "never sorted": <r>F</r> (right chain 1&rarr;2&rarr;3). Post-order of a BST is "always not sorted": <r>F</r> (left chain 3&larr;2&larr;1 gives 1 2 3). Pre-order = reverse of post-order: <r>F</r>.</li>
+<li>Min = leftmost node, <r>not necessarily a leaf</r>.</li>
+
 <li><b>Order statistics</b> (k-th smallest, dynamic): store each node&#39;s subtree <b>size</b>, not its rank ("store the rank": <r>F</r>, one insert changes every larger rank). select(k): r = size(left)+1; k=r &rArr; me; k&lt;r &rArr; left; k&gt;r &rArr; right with k&minus;r.</li></ul>''')
 
 
