@@ -10,7 +10,7 @@ from cheatsheet import code, sec, sub, fig, tree_svg
 from snippets import S
 
 TITLE = "CS2040C Quiz 1 Cheatsheet"
-CSS_EXTRA = "body { line-height: 1.08; } th, td { padding: 0.15pt 1.3pt; } pre.code { line-height: 1.05; margin: 1pt 0; } p { margin-bottom: 0.9pt; } ul { margin-bottom: 0.9pt; } h1 { margin: 1.3pt 0 0.5pt; } h2 { margin: 1pt 0 0.3pt; } table { margin: 0.8pt 0 1.1pt; } .fig { margin: 0.5pt 0; }"
+CSS_EXTRA = "body { line-height: 1.02; } th, td { padding: 0.15pt 1.3pt; } pre.code { line-height: 1.02; margin: 1pt 0; } p { margin-bottom: 0.9pt; } ul { margin-bottom: 0.9pt; } h1 { margin: 1.3pt 0 0.5pt; } h2 { margin: 1pt 0 0.3pt; } table { margin: 0.8pt 0 1.1pt; } .fig { margin: 0.5pt 0; } .page:not(.pb) { font-size: 5.3pt; } .page:not(.pb) table { font-size: 4.8pt; }"
 LAYOUT = {"margin": "3.5mm 4mm", "page_height": "203mm", "column_gap": "2.2mm"}
 
 # ---------------- SVG figures ----------------
@@ -186,7 +186,7 @@ P1.append('<p><b>Recurrence not in the &sect;5 table &mdash; T(n)=T(n/10)+T(9n/1
 # ---------------- PAGE 2 ----------------
 P2 = []
 P2.append(sec('5. Big O &amp; Time Complexity (Part A: 6&times;3 marks)'))
-P2.append('''<p><b>Def:</b> T(n) = O(f(n)) iff &exist; c, n&#8320; with T(n) &le; c&middot;f(n) &forall; n &ge; n&#8320; (upper bound; c absorbs constants, n&#8320; skips the transient start). <b>&Omega;</b>: T(n) &ge; c&middot;f(n). <b>&Theta;</b>: both. <r>Answer the tightest bound</r>: 1000n is O(n); yet "an O(n&sup2;) algorithm is also O(n&sup3;) if not tight" <r>T</r>. n&sup3; is O(n&sup3;), &Omega;(n&sup2;), not &Theta;(n&sup2;). 1 &lt; log n &lt; n &lt; n log n &lt; n&sup2; &lt; n&sup3; &lt; 2&#8319; &lt; n!.</p>''')
+P2.append('''<p><b>Def:</b> T(n) = O(f(n)) iff &exist; c, n&#8320; with T(n) &le; c&middot;f(n) &forall; n &ge; n&#8320; (upper bound; c absorbs constants, n&#8320; skips the transient start). <b>&Omega;</b>: T(n) &ge; c&middot;f(n). <b>&Theta;</b>: both. MergeSort is &Theta;(n log n): <t>T</t> (best = avg = worst). QuickSort is &Theta;(n log n): <r>F</r> (worst n&sup2;). <r>Answer the tightest bound</r>: 1000n is O(n); yet "an O(n&sup2;) algorithm is also O(n&sup3;) if not tight" <r>T</r>. n&sup3; is O(n&sup3;), &Omega;(n&sup2;), not &Theta;(n&sup2;). 1 &lt; log n &lt; n &lt; n log n &lt; n&sup2; &lt; n&sup3; &lt; 2&#8319; &lt; n!.</p>''')
 P2.append('''<p><b>Rules:</b> sequential blocks add &rArr; <b>max</b>; nested loops/calls <b>multiply</b>; drop constants &amp; lower terms; if/else &rArr; costlier branch; log base irrelevant. <b>Sums:</b> 1+2+&hellip;+n = n(n+1)/2 = <r>O(n&sup2;)</r> (the loop computing it is O(n)); &Sigma;i&sup2; = O(n&sup3;); n+n/2+n/4+&hellip; &le; 2n = <r>O(n)</r>; 1+2+4+&hellip;+n &le; 2n; 1+&frac12;+&frac14;+&hellip; &le; 2; 1+&frac12;+&#8531;+&hellip;+1/n = O(log n); log(n!) = &Theta;(n log n); log(8n&sup2;+4n) = O(log n); 4n&sup2;log n + 8n = O(n&sup2;log n) (keep the log).</p>''')
 P2.append(sub('Loop patterns (iterations &times; cost of one iteration)'))
 P2.append('''<table><tr><th class="m">loop header</th><th>iterations</th><th>note</th></tr>
@@ -215,15 +215,21 @@ Step 4 (&ge;2 calls): add the <b>subproblem sizes</b>: = n &rArr; n per level &t
 <tr><td class="m">f(n&minus;1)+f(n&minus;1)</td><td>2</td><td>n</td><td>1, 2, 4</td><td><b>O(2ⁿ)</b></td></tr>
 <tr><td class="m">f(n&minus;k)+f(n&minus;m)</td><td>2</td><td>n</td><td>&le; doubles</td><td>exponential, write <b>O(2ⁿ)</b></td></tr>
 <tr><td class="m">f(n&minus;1)+f(n&minus;2) (Fibonacci)</td><td>2</td><td>n</td><td>&le; doubles</td><td>exactly O(1.618ⁿ); in the quiz write <b>O(2ⁿ)</b></td></tr></table>
-<p><b>Rules of thumb:</b> subtract a constant + 1 call = O(n); subtract a constant + &ge;2 calls = exponential; divide by a constant + k calls = n log n. <b>Special:</b> <r>return inside the loop &rArr; loop runs once. No base case &rArr; None of the above.</r> A call of fixed size, f(10) inside f(n) &rArr; O(1).</p>''')
+<p><b>Rules of thumb:</b> subtract a constant + 1 call = O(n); subtract a constant + &ge;2 calls = exponential; divide by a constant + k calls = n log n. <r>No base case &rArr; None of the above.</r> A call of fixed size, f(10) inside f(n) &rArr; O(1).</p>''')
+P2.append(code('''
+//! Special: return INSIDE the loop -> body runs once, the loop vanishes
+for (i=0; i<n; i++) return f(n-1);      // T(n)=T(n-1)+1 => O(n)
+for (i=0; i<n; i++) return f(n/2);      // T(n)=T(n/2)+1 => O(log n)
+// Contrast: recurse OUTSIDE the loop -> the loop really runs n times
+for (i=0; i<n; i++) doOhOne(); f(n/2);  // n + n/2 + n/4 + ... => O(n)'''))
 P2.append(sec('6. Sorting (Bubble / Selection / Insertion / Merge / Quick)'))
-P2.append('''<table><colgroup><col style="width:8%"><col style="width:13%"><col style="width:8%"><col style="width:12%"><col style="width:12%"><col style="width:9%"><col style="width:38%"></colgroup><tr><th>sort</th><th>best</th><th>avg</th><th>worst</th><th>extra mem</th><th>stable</th><th>after pass i (detective clue)</th></tr>
-<tr><td><b>Bubble</b></td><td>n (early stop, sorted input)</td><td>n&sup2;</td><td>n&sup2;</td><td>O(1) in-place</td><td><r>Yes</r></td><td>largest i at <b>right end</b> (final); rest moved by adjacent swaps only</td></tr>
-<tr><td><b>Selection</b></td><td><r>n&sup2;</r></td><td>n&sup2;</td><td>n&sup2;</td><td>O(1)</td><td><r>No</r>*</td><td>smallest i at <b>left end</b> (final); rest in original order</td></tr>
-<tr><td><b>Insertion</b></td><td>n (already ascending)</td><td>n&sup2;</td><td>n&sup2; (descending)</td><td>O(1)</td><td>Yes</td><td>left i+1 items <b>sorted, not final</b>; right untouched</td></tr>
-<tr><td><b>Merge</b></td><td>n log n</td><td>n log n</td><td>n log n</td><td><r>O(n)</r> not in-place</td><td>Yes (left on tie)</td><td>sorted runs of length 2,4,8&hellip;; nothing crosses halves early</td></tr>
-<tr><td><b>Quick</b></td><td>n log n</td><td>n log n (expected)</td><td><r>n&sup2;</r> (sorted, fixed pivot)</td><td>in-place; stack O(log n)</td><td>No</td><td>pivot final; all left &le; pivot &lt; all right (grouped, not ordered)</td></tr></table>''')
-P2.append('<p class="tiny">*stable with O(n) extra space. Cocktail sort = two-way <b>Bubble</b> (not Merge), O(n&sup2;). Any <b>comparison sort</b> is &Omega;(n log n): decision tree has n! leaves &rArr; height &ge; log&#8322;(n!) = &Theta;(n log n); merge sort meets it. Non-comparison sorts (counting / radix) can beat n log n when keys are small integers ("any sort is &Omega;(n log n)": <r>F</r>). std::sort = introsort (quicksort + heapsort fallback + insertion sort for small ranges); std::stable_sort = merge sort.</p>')
+P2.append('''<table><colgroup><col style="width:8%"><col style="width:12%"><col style="width:8%"><col style="width:11%"><col style="width:14%"><col style="width:8%"><col style="width:39%"></colgroup><tr><th>sort</th><th>best</th><th>avg</th><th>worst</th><th>extra mem</th><th>stable</th><th>detective: the array after i passes</th></tr>
+<tr><td><b>Bubble</b></td><td>n (early stop, sorted input)</td><td>n&sup2;</td><td>n&sup2;</td><td>O(1) in-place</td><td><r>Yes</r></td><td>&#9312; right end: largest i, <b>FINAL</b></td></tr>
+<tr><td><b>Selection</b></td><td><r>n&sup2;</r></td><td>n&sup2;</td><td>n&sup2;</td><td>O(1)</td><td><r>No</r>*</td><td>&#9313; left end: smallest i, <b>FINAL</b>; rest in original order</td></tr>
+<tr><td><b>Insertion</b></td><td>n (already ascending)</td><td>n&sup2;</td><td>n&sup2; (descending)</td><td>O(1)</td><td>Yes</td><td>&#9314; left i+1 sorted but <b>NOT final</b>; right side untouched</td></tr>
+<tr><td><b>Merge</b></td><td>n log n</td><td>n log n</td><td>n log n</td><td><r>O(n)</r> not in-place</td><td>Yes (left on tie)</td><td>&#9315; sorted blocks of 2, 4, 8&hellip;; nothing crosses blocks</td></tr>
+<tr><td><b>Quick</b></td><td>n log n</td><td>n log n (expected)</td><td><r>n&sup2;</r> (sorted, fixed pivot)</td><td>in-place; stack O(log n)</td><td>No</td><td>&#9316; one value: all left &le; it &lt; all right (check whole sides; can be "none")</td></tr></table>''')
+P2.append('<p class="tiny"><b>Check &#9312;&rarr;&#9316; in order.</b> <y>Selection vs Insertion: left part FINAL (the true smallest) &rArr; Selection; left part only sorted &rArr; Insertion.</y> *stable with O(n) extra space. Cocktail sort = two-way <b>Bubble</b> (not Merge), O(n&sup2;). Any <b>comparison sort</b> is &Omega;(n log n): decision tree has n! leaves &rArr; height &ge; log&#8322;(n!) = &Theta;(n log n); merge sort meets it. Non-comparison sorts (counting / radix) can beat n log n when keys are small integers ("any sort is &Omega;(n log n)": <r>F</r>). std::sort = introsort (quicksort + heapsort fallback + insertion sort for small ranges); std::stable_sort = merge sort.</p>')
 P2.append('<p><b>Detective (2022):</b> 6 3 1 4 8 7 5 2 &rarr; <k>1 2 3 4 8 7 5 6</k> Selection (left 4 final, rest untouched); <k>3 1 4 6 5 2 7 8</k> Bubble (7,8 at right); <k>1 3 6 4 8 7 5 2</k> Insertion (left 3 sorted, right untouched); <k>1 3 4 6 2 5 7 8</k> Merge (two sorted halves); <k>3 1 4 2 5 6 8 7</k> Quick (5 in place, left&lt;5&lt;right). <b>2024 Feb:</b> 14 12 40 6 8 100 7 109 &rarr; 6 8 7 12 14 40 100 109 = <b>Quick</b> (pivot 12).</p>')
 P2.append(sub('Recognising a sort from code: WHO is compared, and swap or shift'))
 P2.append('''<table><colgroup><col style="width:63%"><col style="width:37%"></colgroup><tr><th>you see</th><th>sort</th></tr>
@@ -233,13 +239,19 @@ P2.append('''<table><colgroup><col style="width:63%"><col style="width:37%"></co
 <tr><td>recursive: move max/min to one end, then f(A, n&minus;1)</td><td><b>Selection</b> (recursive), T(n)=T(n&minus;1)+n &rArr; O(n&sup2;)</td></tr>
 <tr><td>f(left); f(right); merge(&hellip;) &mdash; work AFTER recursing</td><td><b>Merge</b></td></tr>
 <tr><td>p = partition(&hellip;); f(left); f(right) &mdash; work BEFORE recursing</td><td><b>Quick</b></td></tr></table>
-<p><y>Bubble vs Selection: index j+1 &rArr; Bubble. Selection vs Insertion: swap &rArr; Selection, shift &rArr; Insertion.</y></p>''')
+<p><y>Bubble vs Selection: index j+1 &rArr; Bubble. Selection vs Insertion: swap &rArr; Selection, shift &rArr; Insertion.</y></p>
+<table><colgroup><col style="width:13%"><col style="width:87%"></colgroup><tr><th>sort</th><th>Signatures under disguise</th></tr>
+<tr><td><b>Bubble</b></td><td>j and j+1 in one comparison &mdash; loop direction doesn&#39;t matter</td></tr>
+<tr><td><b>Selection</b></td><td>one index fixed through the inner loop; swap (call or 3 temp lines)</td></tr>
+<tr><td><b>Insertion</b></td><td>j-- walking left; A[j] = A[j-1] shift, no swap; key dropped at the end</td></tr>
+<tr><td><b>Merge</b></td><td>two recursive calls, THEN a helper (any name)</td></tr>
+<tr><td><b>Quick</b></td><td>helper returns an index FIRST, then two recursive calls (any name)</td></tr></table>''')
 P2.append(code('''
 for(i<n-1) for(j=i+1;j<n) if(A[i]>A[j]) swap(A[i],A[j]);
    //! Selection (2023 Feb): swap as you go; A[i] ends as min of rest. O(n^2)
 if(n<=1)return; for(i<n-1) if(A[i]>A[n-1]) swap(A[i],A[n-1]); f(A,n-1);
    //! Selection (2023 Sep): max to end, then recurse. T(n)=T(n-1)+n = O(n^2)''', 'pl'))
-P2.append(code(S['bubble'])); P2.append(code(S['insertion'])); P2.append(code(S['selection']))
+P2.append(code(S['insertion'])); P2.append(code(S['bubble'])); P2.append(code(S['selection']))
 P2.append(code(S['merge']))
 
 P2.append(code(S['quick']))
@@ -257,7 +269,8 @@ P2.append('''<p><b>QuickSort analysis</b></p><ul>
 <li>In-place: <t>T</t>. Needs O(log n) call stack: <t>T</t>. Not stable. Sorts a linked list in O(n log n): <t>T</t>.</li>
 <li>Merge sort on a linked list is still O(n log n) ("slower on lists": <r>F</r>, "O(n&sup2;)": <r>F</r>). Merge sort caches poorly ("best caching": <r>F</r>). Insertion sort is still used for small / nearly sorted input ("nobody uses it": <r>F</r>).</li><li>Randomized (algorithm flips coins, works for any input) &ne; average case (assumes random input).</li>
 <li>Duplicates: use &le; on one side or 3-way partition (&lt;x | =x | &gt;x), else infinite loop / n&sup2; on all-equal input.</li>
-<li>Sorting needs a transitive ordering (rock-paper-scissors is unsortable).</li></ul>''')
+<li>Sorting needs a transitive ordering (rock-paper-scissors is unsortable).</li>
+<li>We cannot operator-overload + &minus; * / in C++: <r>F</r>. Sorting a user-defined type needs an overloaded &gt; or &lt;.</li></ul>''')
 P2.append(sec('7. Binary Trees &amp; BST (all functions, O(h))'))
 P2.append('<p><b>Binary tree</b>: each node &le; 2 children. <b>BST</b>: for <b>every</b> node v, all keys in left subtree &lt; v &lt; all keys in right subtree (whole subtrees, not just the 2 children). <b>Height</b>: <r>leaf = 0, empty = &minus;1</r>, node = 1 + max(child heights). Height h &rArr; &ge; h+1 nodes (chain), &le; 2^(h+1)&minus;1 ("at least 2^h&minus;1": <r>F</r>). n nodes &rArr; h from &lfloor;log&#8322;n&rfloor; to <r>n&minus;1</r> (sorted inserts; "height can be n": <r>F</r>).</p>')
 P2.append(fig(tree_svg(), 'Lecture tree. in-order: 11 20 29 32 41 50 65 72 91 99 (sorted!) &middot; pre-order: 41 20 11 29 32 65 50 91 72 99 &middot; post-order: 11 32 29 20 50 72 99 91 65 41 &middot; level-order: 41 20 65 11 29 50 91 32 72 99'))
