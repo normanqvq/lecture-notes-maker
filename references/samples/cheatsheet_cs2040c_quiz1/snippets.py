@@ -76,7 +76,7 @@ public:
     bool empty() { return _size == 0; }
     int headItem() { return _head->_item; } // caller checks !empty() first
     void insertHead(int x);  void insertTail(int x);   void removeHead();
-    bool exist(int x);  int searchMin();  void reverse();  // removeTail: O(n)
+    bool exist(int x);  void reverse();  // removeTail: O(n)
 };
 
 void List::insertHead(int x) {                 // O(1) regardless of size
@@ -109,16 +109,6 @@ bool List::exist(int x) {                      // linear search O(n); NO binary 
     for (ListNode *cur = _head; cur != NULL; cur = cur->_next)
         if (cur->_item == x) return true;
     return false;
-}
-
-int List::searchMin() { // 2023 Sep Part D (list non-empty)
-    ListNode *current = _head;
-    int minimum = _head->_item;
-    while (current) {
-        if (minimum > current->_item) minimum = current->_item;
-        current = current->_next;
-    }
-    return minimum;
 }
 
 void List::reverse() {                   // O(n) time, O(1) space (PE favourite)
@@ -190,17 +180,8 @@ int peak1D(int A[], int lo, int hi) { // index of ANY local max. O(log n)
 }
 '''
 
-S['bubble'] = r'''
-void bubbleSort(int A[], int n) { // swaps NEIGHBOURS. stable, in-place
-    for (int i = 0; i < n - 1; i++) { // pass i: max of A[0..n-1-i] -> right
-        bool swapped = false;
-        for (int j = 0; j < n - 1 - i; j++)
-            if (A[j] > A[j+1]) { swap(A[j], A[j+1]); swapped = true; }
-        if (!swapped) break; // early stop: best O(n); worst still O(n^2)
-    }
-}
-'''
 S['selection'] = r'''
+// Bubble: pass i: for j<n-1-i, if A[j]>A[j+1] swap; swapped flag => early stop, best O(n)
 void selectionSort(int A[], int n) { // ALWAYS O(n^2). NOT stable
     for (int i = 0; i < n - 1; i++) {
         int minIdx = i;
@@ -406,4 +387,28 @@ std::string elem_to_string(const std::string& s) { return "\"" + s + "\""; }
 // Non-template beats template on an exact match; the template is only the
 // fallback. In a header, mark the plain one inline, or every .cpp that
 // includes it defines it again (multiple-definition error).
+'''
+
+S['profit'] = r'''
+int maxProfit(int p[], int n) {  // buy once, sell later; all pairs = O(n^2)
+    int minSoFar = p[0], best = 0;
+    for (int i = 1; i < n; i++) {
+        if (p[i] - minSoFar > best) best = p[i] - minSoFar;  // sell today
+        if (p[i] < minSoFar) minSoFar = p[i];  // cheaper buy for LATER days
+    }
+    return best;  // O(n) time, O(1) space
+}
+'''
+
+S['opover'] = r'''
+// member version: the left operand is *this
+Food Food::operator+(const Food& f2) {
+    return Food(_name + f2._name, _cal + f2._cal); }
+bool Food::operator>(const Food& f2) { return _cal > f2._cal; }
+food1 + food2;  // == food1.operator+(food2); neither operand is modified
+
+// non-member version: the left operand is the stream, so it CANNOT be a member
+ostream& operator<<(ostream& os, const Food& f) { os << f._name; return os; }
+cout << f;  // == operator<<(cout, f); must return ostream& so cout << a << b chains
+// it reads private _name => declare it a friend inside class Food
 '''

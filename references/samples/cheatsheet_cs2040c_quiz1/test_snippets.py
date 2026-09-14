@@ -6,8 +6,10 @@ parts = ['#include <iostream>\n#include <queue>\n#include <algorithm>\n#include 
 cls = clean(S['class']).replace('BankAcct b;', 'void ctorTest() { BankAcct b;').replace('p = new BankAcct(50);   // constructor runs -> destructor only on: delete p;', 'p = new BankAcct(50); delete p; }')
 parts.append('namespace A {\n' + clean(S['list']) + '\n' + clean(S['stackq']) + '\n' + cls + '\n}\n')
 parts.append('namespace B {\n' + clean(S['list']) + '\n' + clean(S['inherit']).replace('Stack *s = new BeeBooStack();','void t(){ Stack *s = new BeeBooStack();').replace('BeeBooStack b; b.empty();','BeeBooStack b; b.empty(); delete s; }').replace('Animal *a = new Dog(); a->talk();', 'void t2() { Animal *a = new Dog();  a->talk(); delete a; }') + '\n}\n')
-parts.append('namespace C {\n' + '\n'.join(clean(S[k]) for k in ['bsearch','badge','peak','bubble','selection','insertion','merge','quick','qselect','mselect']) + '\n}\n')
+parts.append('namespace C {\n' + '\n'.join(clean(S[k]) for k in ['bsearch','badge','peak','selection','insertion','merge','quick','qselect','mselect','profit']) + '\n}\n')
 parts.append('#include <string>\nnamespace F {\n' + clean(S['overload']) + '\n}\n')
+gdefs = '\n'.join(l for l in clean(S['opover']).split('\n') if not (l.startswith('food1') or l.startswith('cout <<')))
+parts.append('namespace G {\nclass Food { std::string _name; int _cal; public: Food(std::string n, int c) : _name(n), _cal(c) {} Food operator+(const Food& f2); bool operator>(const Food& f2); int cal() const { return _cal; } friend std::ostream& operator<<(std::ostream& os, const Food& f); };\n' + gdefs + '\n}\n')
 parts.append('namespace D {\n' + '\n'.join(clean(S[k]) for k in ['tree','treeops','traverse']) + '\n}\n')
 ptr = clean(S['ptr']).replace('int *a = new int[n];','int n=3; int *a = new int[n];')
 pas = clean(S['pass'])
@@ -25,7 +27,7 @@ parts.append(r'''
 int main(){
   E::run(); cout << endl;
   A::List l; l.insertHead(78); l.insertHead(551); l.insertHead(123); l.insertTail(9);
-  cout << l.searchMin() << " " << " "; l.reverse(); 
+  cout << l.exist(9) << l.exist(10) << " "; l.reverse(); 
   while(!l.empty()){ cout << l.headItem() << " "; l.removeHead(); } cout << endl;
   A::Stack st; st.push(1); st.push(2); cout << st.pop() << st.pop() << " "; cout << endl;
   A::BankAcct ba(100); cout << ba.withdraw(50) << ba.withdraw(500) << endl;
@@ -34,7 +36,7 @@ int main(){
   srand(1);
   for(int trial=0; trial<3000; trial++){ int n = rand()%30+1; int base[40]; for(int i=0;i<n;i++) base[i]=rand()%10;
     int a[5][40]; for(int s=0;s<5;s++) copy(base, base+n, a[s]);
-    C::bubbleSort(a[0],n); C::selectionSort(a[1],n); C::insertionSort(a[2],n); C::mergeSort(a[3],0,n-1); C::quickSort(a[4],0,n-1);
+    sort(a[0],a[0]+n); C::selectionSort(a[1],n); C::insertionSort(a[2],n); C::mergeSort(a[3],0,n-1); C::quickSort(a[4],0,n-1);
     sort(base, base+n); for(int s=0;s<5;s++) for(int i=0;i<n;i++) if(a[s][i]!=base[i]){ cout << "SORT FAIL " << s << endl; return 1; }
     for(int i=0;i<n;i++){ int idx=C::binarySearch(base,n,base[i]); if(base[idx]!=base[i]){cout<<"BS FAIL"<<endl; return 1;} }
     if(C::binarySearch(base,n,11)!=-1){cout<<"BS FAIL2"<<endl; return 1;}
@@ -53,6 +55,10 @@ int main(){
   }
   { int ex[]={3,4,1,2,6,7,8,5}; C::multiSelect(ex,0,7,3,6); sort(ex+2,ex+6); cout << "multiSelect ranks 3..6 = " << ex[2] << ex[3] << ex[4] << ex[5] << endl; }
   cout << "overload: " << F::elem_to_string(5) << " " << F::elem_to_string(2.5) << " " << F::elem_to_string(std::string("hi")) << endl;
+  { G::Food a("rice",100), b("egg",80); G::Food c = a + b; cout << "food: " << c << " " << c.cal() << " " << (a > b) << (b > a) << " a still " << a << a.cal() << endl; }
+  { int t1[]={7,1,5,3,6,4}, t2[]={9,1}; cout << "profit " << C::maxProfit(t1,6) << " " << C::maxProfit(t2,2) << endl;
+    for(int trial=0; trial<5000; trial++){ int n=rand()%20+1, p[20]; for(int i=0;i<n;i++) p[i]=rand()%30; int bf=0;
+      for(int i=0;i<n;i++) for(int j=i+1;j<n;j++) bf=max(bf,p[j]-p[i]); if(C::maxProfit(p,n)!=bf){ cout<<"PROFIT FAIL"<<endl; return 1; } } }
   D::BinarySearchTree<int> t; int keys[]={41,20,65,11,29,50,91,32,72,99}; for(int x: keys) t.insert(x);
   t.inOrder(); cout << "| "; t.levelOrder(); cout << "| h=" << t.height() << " min " << t.searchMin() << endl;
   cout << "succ " << t.successor(20) << t.successor(11) << " " << t.successor(32) << " " << t.successor(33) << " " << t.successor(99) << " " << t.exist(72) << t.exist(73) << endl;

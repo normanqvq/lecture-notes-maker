@@ -10,8 +10,8 @@ from cheatsheet import code, sec, sub, fig, tree_svg
 from snippets import S
 
 TITLE = "CS2040C Quiz 1 Cheatsheet"
-CSS_EXTRA = 'body { line-height: 1.02; } th, td { padding: 0.15pt 1.3pt; } pre.code { line-height: 1.02; margin: 1pt 0; } p { margin-bottom: 0.9pt; } ul { margin-bottom: 0.9pt; } h1 { margin: 1.3pt 0 0.5pt; } h2 { margin: 1pt 0 0.3pt; } table { margin: 0.8pt 0 1.1pt; } .fig { margin: 0.5pt 0; } pre.code { padding: 0.6pt 2.4pt; margin: 0.6pt 0; } pre.code.mid, pre.code.last { padding-top: 1pt; } h1 { margin: 1pt 0 0.4pt; } h2 { margin: 0.7pt 0 0.2pt; } p, ul { margin-bottom: 0.6pt; } table { margin: 0.6pt 0 0.8pt; } body { line-height: 1.0; } .hdr { padding: 0.5pt 3pt; margin-bottom: 1pt; } .fig { margin: 0; } .page.pb { font-size: 5.0pt; } .page.pb table { font-size: 4.6pt; } .page.pb .tiny { font-size: 4.7pt; } .page.pb .fig .cap { font-size: 4.8pt; } .page.pb pre.code { font-size: 4.7pt; } .page.pb td.m, .page.pb th.m { font-size: 4.6pt; } .page:not(.pb) { font-size: 5.0pt; } .page:not(.pb) table { font-size: 4.6pt; } .page:not(.pb) .tiny { font-size: 4.7pt; } .page:not(.pb) .fig .cap { font-size: 4.8pt; } .page:not(.pb) pre.code { font-size: 4.7pt; } .page:not(.pb) td.m, .page:not(.pb) th.m { font-size: 4.6pt; }'
-LAYOUT = {"margin": "3.5mm 4mm", "page_height": "203mm", "column_gap": "2.2mm"}
+CSS_EXTRA = 'body { line-height: 1.02; } th, td { padding: 0.15pt 1.3pt; } pre.code { line-height: 1.02; margin: 1pt 0; } p { margin-bottom: 0.9pt; } ul { margin-bottom: 0.9pt; } h1 { margin: 1.3pt 0 0.5pt; } h2 { margin: 1pt 0 0.3pt; } table { margin: 0.8pt 0 1.1pt; } .fig { margin: 0.5pt 0; } pre.code { padding: 0.6pt 2.4pt; margin: 0.6pt 0; } pre.code.mid, pre.code.last { padding-top: 1pt; } h1 { margin: 1pt 0 0.4pt; } h2 { margin: 0.7pt 0 0.2pt; } p, ul { margin-bottom: 0.6pt; } table { margin: 0.6pt 0 0.8pt; } body { line-height: 1.0; } .hdr { padding: 0.5pt 3pt; margin-bottom: 1pt; } .fig { margin: 0; } .page.pb { font-size: 5.0pt; } .page.pb table { font-size: 4.6pt; } .page.pb .tiny { font-size: 4.7pt; } .page.pb .fig .cap { font-size: 4.8pt; } .page.pb pre.code { font-size: 4.7pt; } .page.pb td.m, .page.pb th.m { font-size: 4.6pt; } .page:not(.pb) { font-size: 5.0pt; } .page:not(.pb) table { font-size: 4.6pt; } .page:not(.pb) .tiny { font-size: 4.7pt; } .page:not(.pb) .fig .cap { font-size: 4.8pt; } .page:not(.pb) pre.code { font-size: 4.7pt; } .page:not(.pb) td.m, .page:not(.pb) th.m { font-size: 4.6pt; } .page.pb th, .page.pb td { padding: 0.05pt 1.3pt; }'
+LAYOUT = {"margin": "3.5mm 4mm", "page_height": "203mm", "column_gap": "2.2mm", "code_line_limit": 90}
 
 # ---------------- SVG figures ----------------
 def tree_svg():
@@ -91,6 +91,25 @@ def list_svg():
     return ''.join(s)
 
 
+def profit_svg():
+    p    = [7, 1, 5, 3, 6, 4]
+    left = ['', 7, 1, 1, 1, 1]
+    diff = ['', '&minus;6', 4, 2, 5, 3]
+    x0, w, hgt, buy, sell = 60, 36, 13, 1, 4
+    s = ['<svg viewBox="0 0 280 58" width="30mm" xmlns="http://www.w3.org/2000/svg">']
+    s.append('<defs><marker id="ahp" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#c00000"/></marker></defs>')
+    s.append(f'<path d="M {x0+buy*w+w/2} 12 Q {x0+(buy+sell)/2*w+w/2} -3 {x0+sell*w+w/2} 11" fill="none" stroke="#c00000" stroke-width="0.9" marker-end="url(#ahp)"/>')
+    for r, (label, vals, y) in enumerate([('p[i]', p, 13), ('min of left', left, 29), ('p[i] &minus; min', diff, 45)]):
+        s.append(f'<text x="{x0-4}" y="{y+9}" font-size="6.5" text-anchor="end">{label}</text>')
+        for i, v in enumerate(vals):
+            x = x0 + i*w
+            fill = '#d8f0d8' if (r == 0 and i == buy) else '#ffd2d2' if (r == 0 and i == sell) else '#fff8d6'
+            s.append(f'<rect x="{x}" y="{y}" width="{w}" height="{hgt}" fill="{fill}" stroke="#000" stroke-width="0.7"/>')
+            style = ' fill="#c00000" font-weight="bold"' if (r == 2 and i == sell) else ''
+            s.append(f'<text x="{x+w/2}" y="{y+9.3}" font-size="7" text-anchor="middle"{style}>{v}</text>')
+    s.append('</svg>')
+    return ''.join(s)
+
 # ---------------- PAGE 1 ----------------
 P1 = []
 P1.append('''<div class="hdr"><div class="t">CS2040C Data Structures and Algorithms</div><div class="t2">Quiz 1 Cheatsheet</div><div class="s">AY25/26 S1 &middot; C++ &middot; Linked List &middot; ADT &middot; Big O &middot; Sorting &middot; BST &middot; <r>red = 考点/陷阱</r> &middot; <y>yellow = key lines</y></div></div>''')
@@ -103,12 +122,14 @@ P1.append(sub('Parameter passing &amp; overloading (slides output = 1 10 10)'))
 P1.append(code(S['pass']))
 P1.append(sub('Overload resolution &amp; Rule of Three (A2)'))
 P1.append(code(S['overload']))
+P1.append(code(S['opover']))
 P1.append('<p><b>Rule of Three:</b> if a class needs a user-defined destructor, it almost certainly needs a copy constructor and a copy assignment too &mdash; a linked list owns heap nodes, so the default shallow copy would leave two lists pointing at the same nodes (<r>double delete</r>).</p>')
 P1.append('''<table><colgroup><col style="width:36%"><col style="width:64%"></colgroup>
 <tr><td class="m">~List()</td><td>walk and delete every node, m_size = 0</td></tr>
 <tr><td class="m">List(const List&amp; other)</td><td>deep copy: new node per element</td></tr>
 <tr><td class="m">operator=(const List&amp; other)</td><td>self-check (this == &amp;other) FIRST, free the old nodes, then deep copy, return *this</td></tr></table>''')
 P1.append('<p>Copying head-first with push_head reverses the order &rArr; reverse() at the end (or walk with a tail pointer).</p>')
+P1.append('<p><b>Class template:</b> inside the class, refer to itself with &lt;T&gt;: <k>ListNode&lt;T&gt;* _next; friend class List&lt;T&gt;;</k><br><b>Compiling:</b> a template&#39;s definition must be visible in every translation unit &rArr; rename LinkedList.cpp to LinkedList.hpp and <k>#include</k> it from the .h. <k>#pragma once</k> so a header is pasted in only once. Command line for plain .cpp files: <k>g++ LinkedList.cpp main.cpp -o prog</k>; once the template lives in the .hpp, compile only <k>g++ main.cpp -o prog</k>.</p>')
 P1.append(sub('Class syntax, constructor, destructor, access'))
 P1.append(code(S['class']))
 P1.append('''<table><colgroup><col style="width:33%"><col style="width:14%"><col style="width:23%"><col style="width:14%"><col style="width:16%"></colgroup><tr><th>access</th><th>own class</th><th>subclass (child class)</th><th>friend</th><th>outside</th></tr>
@@ -133,7 +154,7 @@ P1.append('''<table><tr><th>SLL operation</th><th>time</th><th>why</th></tr>
 <tr><td>insertHead / removeHead</td><td><b>O(1)</b></td><td>touch only head + new node, "regardless of size"</td></tr>
 <tr><td>insertTail</td><td>O(1) with <k>_tail</k>; O(n) without</td><td>must walk to the end otherwise</td></tr>
 <tr><td>removeTail</td><td><r>O(n)</r></td><td>need 2nd-last node; no prev pointer (DLL makes it O(1))</td></tr>
-<tr><td>search / get(i) / searchMin</td><td>O(n)</td><td>only sequential access; <r>no binary search on a list</r></td></tr></table><ul><li><b>insertHead</b>: link new&rarr;old head <b>before</b> moving head. <b>removeHead</b>: temp=head &rarr; head=head-&gt;next &rarr; delete temp (PollEv order B,C,A); check empty first.</li><li><k>friend class List;</k> is written inside <k>ListNode</k>. Array: fixed size, O(1) random access. List: grows at run time, O(1) head insert, O(n) access. Doubly linked list adds <k>_prev</k> &rArr; removeTail O(1) (needed for Deque).</li></ul>''')
+<tr><td>search / get(i) / searchMin (2023 Sep Part D)</td><td>O(n)</td><td>only sequential access; <r>no binary search on a list</r></td></tr></table><ul><li><b>insertHead</b>: link new&rarr;old head <b>before</b> moving head. <b>removeHead</b>: temp=head &rarr; head=head-&gt;next &rarr; delete temp (PollEv order B,C,A); check empty first.</li><li><k>friend class List;</k> is written inside <k>ListNode</k>. Array: fixed size, O(1) random access. List: grows at run time, O(1) head insert, O(n) access. Doubly linked list adds <k>_prev</k> &rArr; removeTail O(1) (needed for Deque).</li></ul>''')
 
 P1.append(sec('3. ADT, Stack, Queue'))
 P1.append('<p><b>ADT</b> = specification only: <b>interface</b> + <b>behaviour</b>; <r>no implementation details</r> (algorithm + state). "ADT is the detailed implementation": <r>F</r>; "no implementation needed to define an ADT": <t>T</t>. Same interface, many implementations (Symbol table via list / hash table / tree; "arrays only is most efficient": <r>F</r>).</p>')
@@ -172,8 +193,9 @@ P1.append(code(S['peak']))
 P1.append('''<ul>
 <li><b>Peak finding</b> (local max; ends = &minus;&infin;): recurse into the <b>bigger</b> side, it must contain a peak (values can&#39;t rise forever); the smaller side may have none. Finding <i>all</i> peaks: &Omega;(n).</li>
 <li><b>2D peak</b> (m cols &times; n rows): column global max + 1D peak = O(mn), correct but slow; column <i>local</i> max = wrong; <b>lazy evaluation</b> (column max computed only when visited) = <b>O(n log m)</b>.</li>
-<li><b>Max profit</b> (buy once, sell later): one pass keeping min-so-far, O(n).</li>
 </ul>''')
+P1.append(code(S['profit']))
+P1.append(fig(profit_svg(), 'Green = buy (cheapest day on the LEFT), red = sell: best = 6 &minus; 1 = 5. <r>Trap: global max &minus; global min is WRONG: [9, 1] gives 8, but 9 comes first &rArr; answer 0.</r>'))
 P1.append('<p><b>Russian dolls / nuts &amp; bolts</b> (2024 Oct; Week 6 "QuickShoes" is the same problem with children &amp; shoes). n uppers + n lowers, uppers shuffled. You may ONLY compare one upper against one lower (match / upper bigger / lower bigger) &mdash; <r>same-side comparison is forbidden, so neither side can be sorted first</r>.</p>')
 P1.append(code('''
 matchAll(U[1..n], L[1..n]):
@@ -188,23 +210,11 @@ P1.append('''<p><b>Def:</b> T(n) = O(f(n)) iff &exist; c, n&#8320; with T(n) &le
 P1.append(sec('5a. Big O worked examples (rules &amp; tables: &sect;5 overleaf)'))
 P1.append('''<table><tr><th class="m">code</th><th>Steps</th></tr>
 
-<tr><td class="m">return n&lt;1 ? 1 : f(n*90.0/100.0);</td><td>Step 1: T(n)=T(0.9n)+1.<br>Step 2: after d calls size n&middot;0.9ᵈ; stops when =1.<br>Step 3: d = log&#8321;&#8320;&#8725;&#8329;n<br><b>&rArr; O(log n)</b><br><i>Note:</i> base is a constant &rArr; any f(0.9n) / f(0.7n) / f(n/3) is O(log n); never compute the base.</td></tr>
-<tr><td class="m">if(n&lt;=1)return 0; doSomething(n);
-return f(n/2)+f(n/2);</td><td>Step 1: T(n)=2T(n/2)+n.<br>Step 2: level d has 2ᵈ calls of size n/2ᵈ &rArr; cost n per level.<br>Step 3: log n levels<br><b>&rArr; O(n log n)</b></td></tr><tr><td class="m">for(i=0;i&lt;n;i++) O(1);
-return f(n/2);
-// ONE call only</td><td>Step 1: T(n)=T(n/2)+n.<br>Step 2: level d has 1 call of size n/2ᵈ &rArr; cost n/2ᵈ per level.<br>Step 3: n+n/2+n/4+&hellip; &le; 2n (geometric, r&lt;1 &rArr; &le; 2&times;first term).<br><b>&rArr; O(n)</b> (contrast: f(n/2)+f(n/2) gives n per level &rArr; O(n log n); &ldquo;叫一次不能乘&rdquo;)</td></tr>
-<tr><td class="m">if(n&lt;=1)return 0;
-return f(n-1)+f(n-1);
-// no loop</td><td>Step 1: T(n)=2T(n&minus;1)+1.<br>Step 2: level d has 2ᵈ calls, each O(1) &rArr; cost 2ᵈ per level.<br>Step 3: n levels (size shrinks by 1) &rArr; 1+2+4+&hellip;+2ⁿ &le; 2&middot;2ⁿ.<br><b>&rArr; O(2ⁿ)</b> (naive Fibonacci shape)</td></tr>
-
-
-
-
-
-
 <tr><td class="m">for(i=1;i&lt;n;i*=2)
  for(j=0;j&lt;n;j+=i)
   for(k=0;k&lt;j;k++) count++;</td><td>Step 1: i = 1,2,4,&hellip;,n (log n values).<br>Step 2: for fixed i, j = 0,i,2i,&hellip; (n/i values), inner cost j.<br>Step 3: &Sigma;j = i(0+1+&hellip;+n/i) &asymp; n&sup2;/(2i).<br>Step 4: &Sigma; over i of n&sup2;/i = n&sup2;(1+&frac12;+&frac14;+&hellip;) &le; 2n&sup2;<br><b>&rArr; O(n&sup2;)</b> (2025 Sep Q5)</td></tr>
+<tr><td class="m">int fib(int n)
+// 4 versions</td><td>naive fib(n-1)+fib(n-2) &rArr; <b>O(2ⁿ)</b> time (the same subproblems are recomputed)<br>top-down + memo[] &rArr; O(n) time, O(n) space + O(n) stack<br>bottom-up for-loop filling memo[] &rArr; O(n)/O(n), no stack<br>keep only twoBefore/oneBefore &rArr; <b>O(n) time, O(1) space</b></td></tr>
 </table>''')
 
 
@@ -221,6 +231,7 @@ P2.append('''<table><tr><th class="m">loop header</th><th>iterations</th><th>not
 <tr><td class="m">for (i=1; i&lt;n; i*=2)  or n=n/2</td><td><r>O(log n)</r></td><td>i&lt;2n &rArr; log n + 1; i&lt;n&sup2; &rArr; 2 log n</td></tr>
 <tr><td class="m">for (k=n/2,i=k+1; i&lt;n; i+=k,k/=2)</td><td>O(log n)</td><td>i &rarr; n/2+n/4+&hellip; needs log n adds</td></tr>
 <tr><td class="m">for (j=0; j&lt;100; j++)  or j&lt;4; j*=2</td><td>O(1)</td><td>bound independent of n &rArr; constant</td></tr>
+<tr><td class="m">for (i=1; i&lt;n; i += (n/10 + 1))</td><td>~10 iterations</td><td>step proportional to n &rArr; constant count &rArr; O(1) (2025 Sep Q2: this loop followed by an i*=2 loop &rArr; O(log n))</td></tr>
 <tr><td class="m">for (i&lt;n) for (j&lt;n)  or j&lt;n/2, j&lt;2n</td><td>O(n&sup2;)</td><td>3 nested &rArr; O(n&sup3;) = "None"; inner j&lt;i &rArr; &Sigma;i = O(n&sup2;)</td></tr>
 <tr><td class="m">for (i&lt;n) doSomething(i) [cost O(i)]</td><td>&Sigma;i = O(n&sup2;)</td><td>doSomething(n) inside n&times;n loops &rArr; n&sup3;</td></tr>
 
@@ -234,6 +245,8 @@ Step 4 (&ge;2 calls): add the <b>subproblem sizes</b>: = n &rArr; n per level &t
 <table><colgroup><col style="width:26%"><col style="width:6%"><col style="width:8%"><col style="width:14%"><col style="width:46%"></colgroup><tr><th class="m">code</th><th>calls</th><th>levels</th><th>per level</th><th>answer</th></tr>
 <tr><td class="m">f(n/k)</td><td>1</td><td>log n</td><td>1, 1, 1</td><td><b>O(log n)</b></td></tr>
 <tr><td class="m">f(n&minus;k)</td><td>1</td><td>n</td><td>1, 1, 1</td><td><b>O(n)</b></td></tr>
+<tr><td class="m">if (n&lt;100) return;
+f(10); f(n-10);</td><td>1+1</td><td>n/10</td><td>1, 1, 1</td><td><b>O(n)</b> (1 shrinking + 1 fixed-size call; 2025 Sep Q3: f(10) is O(1) and does not recurse further)</td></tr>
 <tr><td class="m">loop n; f(n/k)</td><td>1</td><td>log n</td><td>n, n/k, n/k&sup2;</td><td><b>O(n)</b> (<y><r>NOT n log n</r>: levels shrink, can&#39;t multiply</y>)</td></tr>
 <tr><td class="m">loop n; f(n&minus;k)</td><td>1</td><td>n</td><td>n, n&minus;k, n&minus;2k</td><td><b>O(n&sup2;)</b></td></tr>
 <tr><td class="m">loop n; k calls f(n/k)</td><td>k</td><td>log n</td><td>n, n, n</td><td><b>O(n log n)</b> (only if the subproblems add up to n)</td></tr>
@@ -256,6 +269,7 @@ P2.append('''<table><colgroup><col style="width:8%"><col style="width:11%"><col 
 <tr><td><b>Merge</b></td><td>n log n</td><td>n log n</td><td>n log n</td><td><r>O(n)</r> not in-place</td><td>Yes (left on tie)</td><td>&#9315; sorted blocks of 2, 4, 8&hellip;; nothing crosses blocks</td></tr>
 <tr><td><b>Quick</b></td><td>n log n</td><td>n log n (expected)</td><td><r>n&sup2;</r> (sorted, fixed pivot)</td><td>in-place; stack O(log n) avg, O(n) worst (same trigger as time n&sup2;: sorted input + fixed pivot &rArr; every pivot is min/max &rArr; depth n)</td><td>No</td><td>&#9316; one value: all left &le; it &lt; all right (check whole sides; can be "none")</td></tr></table>''')
 P2.append('<p class="tiny"><b>Check &#9312;&rarr;&#9316; in order.</b> <y>Selection vs Insertion: left part FINAL (the true smallest) &rArr; Selection; left part only sorted &rArr; Insertion.</y> *stable with O(n) extra space. Cocktail sort = two-way <b>Bubble</b> (not Merge), O(n&sup2;). Any <b>comparison sort</b> is &Omega;(n log n): decision tree has n! leaves &rArr; height &ge; log&#8322;(n!) = &Theta;(n log n); merge sort meets it. Non-comparison sorts (counting / radix) can beat n log n when keys are small integers ("any sort is &Omega;(n log n)": <r>F</r>). std::sort = introsort (quicksort + heapsort fallback + insertion sort for small ranges); std::stable_sort = merge sort.</p>')
+P2.append('<p><b>On a LINKED LIST</b> (Week 6 lab): all five sorts keep the SAME time complexity as on an array. Only MergeSort&#39;s space changes: auxiliary O(n) &rArr; O(1) (merge only relinks pointers), function stack O(log n) unchanged.<br>What DOES break on a list is <r>BINARY SEARCH</r>: finding the middle needs a slow/fast pointer walk, so O(n log n) if every step walks from the head, and still n/2+n/4+&hellip; = O(n) if it walks only the shrinking range &mdash; never better than a plain O(n) scan. <b>Rule:</b> sequential access is fine, random access is not.</p>')
 P2.append('<p><b>Detective (2022):</b> 6 3 1 4 8 7 5 2 &rarr; <k>1 2 3 4 8 7 5 6</k> Selection (left 4 final, rest untouched); <k>3 1 4 6 5 2 7 8</k> Bubble (7,8 at right); <k>1 3 6 4 8 7 5 2</k> Insertion (left 3 sorted, right untouched); <k>1 3 4 6 2 5 7 8</k> Merge (two sorted halves); <k>3 1 4 2 5 6 8 7</k> Quick (5 in place, left&lt;5&lt;right). <b>2024 Feb:</b> 14 12 40 6 8 100 7 109 &rarr; 6 8 7 12 14 40 100 109 = <b>Quick</b> (pivot 12).</p>')
 P2.append(sub('Recognising a sort from code: WHO is compared, and swap or shift'))
 P2.append('''<table><colgroup><col style="width:63%"><col style="width:37%"></colgroup><tr><th>you see</th><th>sort</th></tr>
@@ -277,7 +291,7 @@ for(i<n-1) for(j=i+1;j<n) if(A[i]>A[j]) swap(A[i],A[j]);
    //! Selection (2023 Feb): swap as you go; A[i] ends as min of rest. O(n^2)
 if(n<=1)return; for(i<n-1) if(A[i]>A[n-1]) swap(A[i],A[n-1]); f(A,n-1);
    //! Selection (2023 Sep): max to end, then recurse. T(n)=T(n-1)+n = O(n^2)''', 'pl'))
-P2.append(code(S['insertion'])); P2.append(code(S['bubble'])); P2.append(code(S['selection']))
+P2.append(code(S['insertion'])); P2.append(code(S['selection']))
 P2.append(code(S['merge']))
 
 P2.append(code(S['quick']))
