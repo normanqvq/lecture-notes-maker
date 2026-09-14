@@ -6,7 +6,8 @@ parts = ['#include <iostream>\n#include <queue>\n#include <algorithm>\n#include 
 cls = clean(S['class']).replace('BankAcct b;', 'void ctorTest() { BankAcct b;').replace('p = new BankAcct(50);   // constructor runs -> destructor only on: delete p;', 'p = new BankAcct(50); delete p; }')
 parts.append('namespace A {\n' + clean(S['list']) + '\n' + clean(S['stackq']) + '\n' + cls + '\n}\n')
 parts.append('namespace B {\n' + clean(S['list']) + '\n' + clean(S['inherit']).replace('Stack *s = new BeeBooStack();','void t(){ Stack *s = new BeeBooStack();').replace('BeeBooStack b; b.empty();','BeeBooStack b; b.empty(); delete s; }').replace('Animal *a = new Dog(); a->talk();', 'void t2() { Animal *a = new Dog();  a->talk(); delete a; }') + '\n}\n')
-parts.append('namespace C {\n' + '\n'.join(clean(S[k]) for k in ['bsearch','badge','peak','bubble','selection','insertion','merge','quick']) + '\n}\n')
+parts.append('namespace C {\n' + '\n'.join(clean(S[k]) for k in ['bsearch','badge','peak','bubble','selection','insertion','merge','quick','qselect','mselect']) + '\n}\n')
+parts.append('#include <string>\nnamespace F {\n' + clean(S['overload']) + '\n}\n')
 parts.append('namespace D {\n' + '\n'.join(clean(S[k]) for k in ['tree','treeops','traverse']) + '\n}\n')
 ptr = clean(S['ptr']).replace('int *a = new int[n];','int n=3; int *a = new int[n];')
 pas = clean(S['pass'])
@@ -42,6 +43,16 @@ int main(){
     // peak
     int p = C::peak1D(base,0,n-1); if((p>0 && base[p-1]>base[p])||(p<n-1&&base[p+1]>base[p])){cout<<"PEAK FAIL"<<endl; return 1;}
   }
+  for(int trial=0; trial<4000; trial++){ int n = rand()%30+1; int base[40], s[40], b[40];
+    for(int i=0;i<n;i++) base[i]=rand()%10; copy(base,base+n,s); sort(s,s+n);
+    int k = rand()%n+1; copy(base,base+n,b); if(C::quickSelect(b,0,n-1,k)!=s[k-1]){ cout<<"QSELECT FAIL"<<endl; return 1; }
+    int ra = rand()%n+1, rb = ra + rand()%(n-ra+1); copy(base,base+n,b); C::multiSelect(b,0,n-1,ra,rb);
+    int seg[40]; int len = rb-ra+1; copy(b+ra-1, b+rb, seg); sort(seg, seg+len);
+    for(int i=0;i<len;i++) if(seg[i]!=s[ra-1+i]){ cout<<"MSELECT FAIL"<<endl; return 1; }
+    sort(b,b+n); for(int i=0;i<n;i++) if(b[i]!=s[i]){ cout<<"MSELECT PERM FAIL"<<endl; return 1; }
+  }
+  { int ex[]={3,4,1,2,6,7,8,5}; C::multiSelect(ex,0,7,3,6); sort(ex+2,ex+6); cout << "multiSelect ranks 3..6 = " << ex[2] << ex[3] << ex[4] << ex[5] << endl; }
+  cout << "overload: " << F::elem_to_string(5) << " " << F::elem_to_string(2.5) << " " << F::elem_to_string(std::string("hi")) << endl;
   D::BinarySearchTree<int> t; int keys[]={41,20,65,11,29,50,91,32,72,99}; for(int x: keys) t.insert(x);
   t.inOrder(); cout << "| "; t.levelOrder(); cout << "| h=" << t.height() << " min " << t.searchMin() << endl;
   cout << "succ " << t.successor(20) << t.successor(11) << " " << t.successor(32) << " " << t.successor(33) << " " << t.successor(99) << " " << t.exist(72) << t.exist(73) << endl;

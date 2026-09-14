@@ -370,3 +370,40 @@ int BinarySearchTree<T>::_height(TreeNode<T> *t) { // leaf = 0, empty = -1
     return max(_height(t->_left), _height(t->_right)) + 1;
 }
 '''
+
+S['qselect'] = r'''
+int quickSelect(int A[], int lo, int hi, int k) {  // k is 1-based
+    if (lo == hi) return A[lo];
+    swap(A[lo], A[lo + rand() % (hi - lo + 1)]);
+    int p = partition(A, lo, hi), r = p - lo + 1;  // pivot ranks r-th here
+    if (k == r) return A[p];
+    return (k < r) ? quickSelect(A, lo, p - 1, k)  // left, k unchanged
+                : quickSelect(A, p + 1, hi, k - r);  // right, drop r ranks
+}
+'''
+
+S['mselect'] = r'''
+// MultiSelect: leave ranks a..b (1-based) of A[lo..hi] in place,
+//              ignore the rest
+void multiSelect(int A[], int lo, int hi, int a, int b) {
+    if (lo >= hi || a > b) return;
+    swap(A[lo], A[lo + rand() % (hi - lo + 1)]);
+    int p = partition(A, lo, hi), r = p - lo + 1;  // pivot ranks r-th here
+    if (b < r)      multiSelect(A, lo, p - 1, a, b);  // range entirely left
+    else if (a > r) multiSelect(A, p + 1, hi, a - r, b - r);  // entirely right
+    else { multiSelect(A, lo, p - 1, a, r - 1);  // straddles the pivot
+           multiSelect(A, p + 1, hi, 1, b - r); }
+}
+'''
+
+S['overload'] = r'''
+// 1. a template catches everything, a plain overload wins for an exact match
+template <typename U>
+std::string elem_to_string(const U& x) { return std::to_string(x); }
+std::string elem_to_string(const std::string& s) { return "\"" + s + "\""; }
+// int/double -> template (to_string); std::string -> the plain one (to_string
+// has no string overload, so the template alone would not compile).
+// Non-template beats template on an exact match; the template is only the
+// fallback. In a header, mark the plain one inline, or every .cpp that
+// includes it defines it again (multiple-definition error).
+'''

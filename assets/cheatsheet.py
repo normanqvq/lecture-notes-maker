@@ -128,12 +128,13 @@ def align(block, limit=None, max_col=46):
         if len(c) + 2 <= target and target + 3 + len(m) <= limit:
             out.append(pre + c.ljust(target) + '// ' + m)
         else:
-            out.append(pre + c + '  // ' + m)
+            sep = '  // ' if len(c) + 5 + len(m) <= limit else ' // '   # 1 space only when 2 would clip
+            out.append(pre + c + sep + m)
     return '\n'.join(out)
 
-def _one_block(src, cls, limit):
+def _one_block(src, cls, limit, max_col=46):
     lines = []
-    for ln in align(src.strip('\n'), limit).split('\n'):
+    for ln in align(src.strip('\n'), limit, max_col).split('\n'):
         if ln.startswith('!! '):
             lines.append(f'<span class="hl">{hl_line(ln[3:])}</span>')
         elif ln.startswith('!R '):
@@ -142,18 +143,18 @@ def _one_block(src, cls, limit):
             lines.append(hl_line(ln))
     return f'<pre class="code {cls}">' + '\n'.join(lines) + '</pre>'
 
-def code(src, cls="", limit=None):
+def code(src, cls="", limit=None, max_col=46):
     """Render a code snippet. Blank lines split it into separately-breakable boxes
     (one function per box). Line prefixes: '!! ' = yellow key line, '!R ' = red line.
     Comment prefix '//!' = red comment. cls='pl' = plain text (traces, ascii art)."""
     limit = limit or LINE_LIMIT
     blocks = [b for b in src.strip('\n').split('\n\n') if b.strip()]
     if len(blocks) == 1:
-        return _one_block(blocks[0], cls, limit)
+        return _one_block(blocks[0], cls, limit, max_col)
     out = []
     for i, b in enumerate(blocks):
         c = cls + (' first' if i == 0 else ' mid' if i < len(blocks) - 1 else ' last')
-        out.append(_one_block(b, c, limit))
+        out.append(_one_block(b, c, limit, max_col))
     return ''.join(out)
 
 def long_lines(src, limit=None):

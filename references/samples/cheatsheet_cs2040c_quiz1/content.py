@@ -10,7 +10,7 @@ from cheatsheet import code, sec, sub, fig, tree_svg
 from snippets import S
 
 TITLE = "CS2040C Quiz 1 Cheatsheet"
-CSS_EXTRA = "body { line-height: 1.02; } th, td { padding: 0.15pt 1.3pt; } pre.code { line-height: 1.02; margin: 1pt 0; } p { margin-bottom: 0.9pt; } ul { margin-bottom: 0.9pt; } h1 { margin: 1.3pt 0 0.5pt; } h2 { margin: 1pt 0 0.3pt; } table { margin: 0.8pt 0 1.1pt; } .fig { margin: 0.5pt 0; } .page:not(.pb) { font-size: 5.3pt; } .page:not(.pb) table { font-size: 4.8pt; }"
+CSS_EXTRA = 'body { line-height: 1.02; } th, td { padding: 0.15pt 1.3pt; } pre.code { line-height: 1.02; margin: 1pt 0; } p { margin-bottom: 0.9pt; } ul { margin-bottom: 0.9pt; } h1 { margin: 1.3pt 0 0.5pt; } h2 { margin: 1pt 0 0.3pt; } table { margin: 0.8pt 0 1.1pt; } .fig { margin: 0.5pt 0; } pre.code { padding: 0.6pt 2.4pt; margin: 0.6pt 0; } pre.code.mid, pre.code.last { padding-top: 1pt; } h1 { margin: 1pt 0 0.4pt; } h2 { margin: 0.7pt 0 0.2pt; } p, ul { margin-bottom: 0.6pt; } table { margin: 0.6pt 0 0.8pt; } body { line-height: 1.0; } .hdr { padding: 0.5pt 3pt; margin-bottom: 1pt; } .fig { margin: 0; } .page.pb { font-size: 5.0pt; } .page.pb table { font-size: 4.6pt; } .page.pb .tiny { font-size: 4.7pt; } .page.pb .fig .cap { font-size: 4.8pt; } .page.pb pre.code { font-size: 4.7pt; } .page.pb td.m, .page.pb th.m { font-size: 4.6pt; } .page:not(.pb) { font-size: 5.0pt; } .page:not(.pb) table { font-size: 4.6pt; } .page:not(.pb) .tiny { font-size: 4.7pt; } .page:not(.pb) .fig .cap { font-size: 4.8pt; } .page:not(.pb) pre.code { font-size: 4.7pt; } .page:not(.pb) td.m, .page:not(.pb) th.m { font-size: 4.6pt; }'
 LAYOUT = {"margin": "3.5mm 4mm", "page_height": "203mm", "column_gap": "2.2mm"}
 
 # ---------------- SVG figures ----------------
@@ -18,7 +18,7 @@ def tree_svg():
     nodes = {41:(150,12),20:(75,40),65:(225,40),11:(37,68),29:(112,68),50:(187,68),91:(262,68),32:(135,96),72:(240,96),99:(285,96)}
     edges = [(41,20),(41,65),(20,11),(20,29),(65,50),(65,91),(29,32),(91,72),(91,99)]
     hs = {41:3,20:2,65:2,11:0,29:1,50:0,91:1,32:0,72:0,99:0}
-    s = ['<svg viewBox="0 0 330 112" width="31mm" xmlns="http://www.w3.org/2000/svg">']
+    s = ['<svg viewBox="0 0 330 112" width="28mm" xmlns="http://www.w3.org/2000/svg">']
     for a,b in edges:
         (x1,y1),(x2,y2) = nodes[a],nodes[b]
         s.append(f'<line x1="{x1}" y1="{y1}" x2="{x2}" y2="{y2}" stroke="#333" stroke-width="1"/>')
@@ -71,7 +71,7 @@ def rec_svg():
     return ''.join(s)
 
 def list_svg():
-    s = ['<svg viewBox="0 0 300 42" width="50mm" xmlns="http://www.w3.org/2000/svg">']
+    s = ['<svg viewBox="0 0 300 42" width="44mm" xmlns="http://www.w3.org/2000/svg">']
     s.append('<rect x="2" y="6" width="52" height="28" fill="#e8ecf3" stroke="#000" stroke-width="0.8"/>')
     s.append('<text x="28" y="16" font-size="7" text-anchor="middle" font-weight="bold">List (engine)</text>')
     s.append('<text x="28" y="24" font-size="6.5" text-anchor="middle">_size = 3</text>')
@@ -101,9 +101,17 @@ P1.append(code(S['ptr']))
 P1.append('<p><k>*</k> in a declaration = "is a pointer"; in a statement = dereference. <k>p-&gt;x</k> &equiv; <k>(*p).x</k>. <r>Wild pointer</r> (uninitialised): writing through it segfaults <i>or</i> silently corrupts other data. <k>new</k> memory that no pointer points to = <r>orphan &rArr; memory leak</r>; after <k>delete</k> the pointer is <r>dangling</r>. <k>delete</k> only what you <k>new</k>-ed. <k>new</k> also calls the constructor (malloc does not).</p>')
 P1.append(sub('Parameter passing &amp; overloading (slides output = 1 10 10)'))
 P1.append(code(S['pass']))
+P1.append(sub('Overload resolution &amp; Rule of Three (A2)'))
+P1.append(code(S['overload']))
+P1.append('<p><b>Rule of Three:</b> if a class needs a user-defined destructor, it almost certainly needs a copy constructor and a copy assignment too &mdash; a linked list owns heap nodes, so the default shallow copy would leave two lists pointing at the same nodes (<r>double delete</r>).</p>')
+P1.append('''<table><colgroup><col style="width:36%"><col style="width:64%"></colgroup>
+<tr><td class="m">~List()</td><td>walk and delete every node, m_size = 0</td></tr>
+<tr><td class="m">List(const List&amp; other)</td><td>deep copy: new node per element</td></tr>
+<tr><td class="m">operator=(const List&amp; other)</td><td>self-check (this == &amp;other) FIRST, free the old nodes, then deep copy, return *this</td></tr></table>''')
+P1.append('<p>Copying head-first with push_head reverses the order &rArr; reverse() at the end (or walk with a tail pointer).</p>')
 P1.append(sub('Class syntax, constructor, destructor, access'))
 P1.append(code(S['class']))
-P1.append('''<table><tr><th>access</th><th>own class</th><th>subclass</th><th>friend</th><th>outside</th></tr>
+P1.append('''<table><colgroup><col style="width:33%"><col style="width:14%"><col style="width:23%"><col style="width:14%"><col style="width:16%"></colgroup><tr><th>access</th><th>own class</th><th>subclass (child class)</th><th>friend</th><th>outside</th></tr>
 <tr><td><b>private</b> (default in class)</td><td>&#10004;</td><td>&#10008;</td><td>&#10004;</td><td>&#10008;</td></tr>
 <tr><td><b>protected</b></td><td>&#10004;</td><td>&#10004;</td><td>&#10004;</td><td>&#10008;</td></tr>
 <tr><td><b>public</b> (default in struct)</td><td>&#10004;</td><td>&#10004;</td><td>&#10004;</td><td>&#10004;</td></tr></table>''')
@@ -134,6 +142,15 @@ P1.append('''<table><tr><th>ADT</th><th>order</th><th>interface</th><th>linked-l
 <tr><td><b>Queue</b></td><td><r>FIFO</r></td><td>enqueue(x) at back, dequeue() removes+returns front, empty()</td><td>back = tail (needs <k>_tail</k>), front = head: both <b>O(1)</b></td><td>circular array O(1): front/back indices wrap with % capacity; full when size == capacity</td></tr></table>''')
 P1.append(code(S['stackq']))
 P1.append('<p>Empty-stack pop: throw exception (postponed) or <b>modify the spec</b>: add <k>empty()</k>, caller checks first. "best push O(1), pop O(n)": <r>F</r>. Stack via augmented tree keyed by insertion order: <t>T</t>.</p>')
+P1.append(sub('Set ADT: which data structure? (Week 6 Ex 3)'))
+P1.append('<p>Operations: add(T), remove(T), exist(T), isSubsetOf(Y), isEqualTo(Y), setUnion(Y), intersect(Y), minus(Y). Let |this| = a, |Y| = b.</p>')
+P1.append('''<table><colgroup><col style="width:15%"><col style="width:21%"><col style="width:8%"><col style="width:9%"><col style="width:47%"></colgroup>
+<tr style="break-after: avoid"><th>backing store</th><th>add</th><th>remove</th><th>exist</th><th>set ops (subset / union / intersect / minus)</th></tr>
+<tr><td>unsorted array / list</td><td>O(n) (must check for duplicate first)</td><td>O(n)</td><td>O(n)</td><td>O(a&middot;b) &mdash; every element against every element</td></tr>
+<tr><td>sorted array</td><td>O(n)</td><td>O(n)</td><td>O(log n)</td><td>O(a+b) &mdash; walk both with two pointers, like merge</td></tr>
+<tr><td>BST</td><td>O(h)</td><td>O(h)</td><td>O(h)</td><td>O(a+b) via in-order (in-order of a BST is ascending)</td></tr>
+<tr><td>hash table</td><td>O(1) avg</td><td>O(1) avg</td><td>O(1) avg</td><td>O(a) lookups, but the result is unordered</td></tr></table>''')
+P1.append('<p><b>Key point:</b> the set operations are pairwise comparisons, so <b>ORDER</b> is what makes them cheap &mdash; a sorted array or a BST&#39;s in-order gives two ascending sequences that merge in O(a+b). A hash table wins on single-element ops but not on ordered output.</p>')
 P1.append(code(S['stacksort']))
 
 P1.append(sec('4. Searching &amp; Divide-and-Conquer'))
@@ -156,7 +173,18 @@ P1.append('''<ul>
 <li><b>Peak finding</b> (local max; ends = &minus;&infin;): recurse into the <b>bigger</b> side, it must contain a peak (values can&#39;t rise forever); the smaller side may have none. Finding <i>all</i> peaks: &Omega;(n).</li>
 <li><b>2D peak</b> (m cols &times; n rows): column global max + 1D peak = O(mn), correct but slow; column <i>local</i> max = wrong; <b>lazy evaluation</b> (column max computed only when visited) = <b>O(n log m)</b>.</li>
 <li><b>Max profit</b> (buy once, sell later): one pass keeping min-so-far, O(n).</li>
-<li><b>Russian dolls (2024 Oct)</b>: lowers sorted &rArr; binary search each upper, O(n log n); both unsorted &rArr; quicksort-style partition, expected O(n log n).</li></ul>''')
+</ul>''')
+P1.append('<p><b>Russian dolls / nuts &amp; bolts</b> (2024 Oct; Week 6 "QuickShoes" is the same problem with children &amp; shoes). n uppers + n lowers, uppers shuffled. You may ONLY compare one upper against one lower (match / upper bigger / lower bigger) &mdash; <r>same-side comparison is forbidden, so neither side can be sorted first</r>.</p>')
+P1.append(code('''
+matchAll(U[1..n], L[1..n]):
+    if n <= 1: return
+    pivotL = L[random(1, n)]
+    p = partitionU(U, pivotL)        // splits U, and U[p] is pivotL's match
+    q = partitionL(L, U[p])          // splits L at the same boundary; q == p
+    matchAll(U[1..p-1], L[1..q-1]); matchAll(U[p+1..n], L[q+1..n])''', 'pl'))
+P1.append('<p>Two O(n) partitions per level; subproblem sizes add up to n &rArr; O(n) per level; random pivot &rArr; expected log n levels &rArr; <b>expected O(n log n)</b>, worst O(n&sup2;). If the question states one side is already sorted &rArr; binary search each item of the other side, also O(n log n).</p>')
+P1.append(sec('5. Big O &amp; Time Complexity (Part A: 6&times;3 marks)'))
+P1.append('''<p><b>Def:</b> T(n) = O(f(n)) iff &exist; c, n&#8320; with T(n) &le; c&middot;f(n) &forall; n &ge; n&#8320; (upper bound; c absorbs constants, n&#8320; skips the transient start). <b>&Omega;</b>: T(n) &ge; c&middot;f(n). <b>&Theta;</b>: both. MergeSort is &Theta;(n log n): <t>T</t> (best = avg = worst). QuickSort is &Theta;(n log n): <r>F</r> (worst n&sup2;). <r>Answer the tightest bound</r>: 1000n is O(n); yet "an O(n&sup2;) algorithm is also O(n&sup3;) if not tight" <r>T</r>. n&sup3; is O(n&sup3;), &Omega;(n&sup2;), not &Theta;(n&sup2;). 1 &lt; log n &lt; n &lt; n log n &lt; n&sup2; &lt; n&sup3; &lt; 2&#8319; &lt; n!.</p>''')
 P1.append(sec('5a. Big O worked examples (rules &amp; tables: &sect;5 overleaf)'))
 P1.append('''<table><tr><th class="m">code</th><th>Steps</th></tr>
 
@@ -185,9 +213,7 @@ P1.append('<p><b>Recurrence not in the &sect;5 table &mdash; T(n)=T(n/10)+T(9n/1
 
 # ---------------- PAGE 2 ----------------
 P2 = []
-P2.append(sec('5. Big O &amp; Time Complexity (Part A: 6&times;3 marks)'))
-P2.append('''<p><b>Def:</b> T(n) = O(f(n)) iff &exist; c, n&#8320; with T(n) &le; c&middot;f(n) &forall; n &ge; n&#8320; (upper bound; c absorbs constants, n&#8320; skips the transient start). <b>&Omega;</b>: T(n) &ge; c&middot;f(n). <b>&Theta;</b>: both. MergeSort is &Theta;(n log n): <t>T</t> (best = avg = worst). QuickSort is &Theta;(n log n): <r>F</r> (worst n&sup2;). <r>Answer the tightest bound</r>: 1000n is O(n); yet "an O(n&sup2;) algorithm is also O(n&sup3;) if not tight" <r>T</r>. n&sup3; is O(n&sup3;), &Omega;(n&sup2;), not &Theta;(n&sup2;). 1 &lt; log n &lt; n &lt; n log n &lt; n&sup2; &lt; n&sup3; &lt; 2&#8319; &lt; n!.</p>''')
-P2.append('''<p><b>Rules:</b> sequential blocks add &rArr; <b>max</b>; nested loops/calls <b>multiply</b>; drop constants &amp; lower terms; if/else &rArr; costlier branch; log base irrelevant. <b>Sums:</b> 1+2+&hellip;+n = n(n+1)/2 = <r>O(n&sup2;)</r> (the loop computing it is O(n)); &Sigma;i&sup2; = O(n&sup3;); n+n/2+n/4+&hellip; &le; 2n = <r>O(n)</r>; 1+2+4+&hellip;+n &le; 2n; 1+&frac12;+&frac14;+&hellip; &le; 2; 1+&frac12;+&#8531;+&hellip;+1/n = O(log n); log(n!) = &Theta;(n log n); log(8n&sup2;+4n) = O(log n); 4n&sup2;log n + 8n = O(n&sup2;log n) (keep the log).</p>''')
+P2.append('''<p><b>&sect;5 (cont.) Rules:</b> sequential blocks add &rArr; <b>max</b>; nested loops/calls <b>multiply</b>; drop constants &amp; lower terms; if/else &rArr; costlier branch; log base irrelevant. <b>Sums:</b> 1+2+&hellip;+n = n(n+1)/2 = <r>O(n&sup2;)</r> (the loop computing it is O(n)); &Sigma;i&sup2; = O(n&sup3;); n+n/2+n/4+&hellip; &le; 2n = <r>O(n)</r>; 1+2+4+&hellip;+n &le; 2n; 1+&frac12;+&frac14;+&hellip; &le; 2; 1+&frac12;+&#8531;+&hellip;+1/n = O(log n); log(n!) = &Theta;(n log n); log(8n&sup2;+4n) = O(log n); 4n&sup2;log n + 8n = O(n&sup2;log n) (keep the log).</p>''')
 P2.append(sub('Loop patterns (iterations &times; cost of one iteration)'))
 P2.append('''<table><tr><th class="m">loop header</th><th>iterations</th><th>note</th></tr>
 <tr><td class="m">for (i=0; i&lt;n; i++)  or n/4..2n, i&lt;=n</td><td>O(n)</td><td>i+=2, i&lt;n/3, i&lt;(n&sup2;+n)/3 &rArr; n/2, n/3, n&sup2;</td></tr>
@@ -223,12 +249,12 @@ for (i=0; i<n; i++) return f(n/2);      // T(n)=T(n/2)+1 => O(log n)
 // Contrast: recurse OUTSIDE the loop -> the loop really runs n times
 for (i=0; i<n; i++) doOhOne(); f(n/2);  // n + n/2 + n/4 + ... => O(n)'''))
 P2.append(sec('6. Sorting (Bubble / Selection / Insertion / Merge / Quick)'))
-P2.append('''<table><colgroup><col style="width:8%"><col style="width:12%"><col style="width:8%"><col style="width:11%"><col style="width:14%"><col style="width:8%"><col style="width:39%"></colgroup><tr><th>sort</th><th>best</th><th>avg</th><th>worst</th><th>extra mem</th><th>stable</th><th>detective: the array after i passes</th></tr>
+P2.append('''<table><colgroup><col style="width:8%"><col style="width:11%"><col style="width:8%"><col style="width:10%"><col style="width:23%"><col style="width:8%"><col style="width:32%"></colgroup><tr><th>sort</th><th>best</th><th>avg</th><th>worst</th><th>extra mem</th><th>stable</th><th>detective: the array after i passes</th></tr>
 <tr><td><b>Bubble</b></td><td>n (early stop, sorted input)</td><td>n&sup2;</td><td>n&sup2;</td><td>O(1) in-place</td><td><r>Yes</r></td><td>&#9312; right end: largest i, <b>FINAL</b></td></tr>
 <tr><td><b>Selection</b></td><td><r>n&sup2;</r></td><td>n&sup2;</td><td>n&sup2;</td><td>O(1)</td><td><r>No</r>*</td><td>&#9313; left end: smallest i, <b>FINAL</b>; rest in original order</td></tr>
 <tr><td><b>Insertion</b></td><td>n (already ascending)</td><td>n&sup2;</td><td>n&sup2; (descending)</td><td>O(1)</td><td>Yes</td><td>&#9314; left i+1 sorted but <b>NOT final</b>; right side untouched</td></tr>
 <tr><td><b>Merge</b></td><td>n log n</td><td>n log n</td><td>n log n</td><td><r>O(n)</r> not in-place</td><td>Yes (left on tie)</td><td>&#9315; sorted blocks of 2, 4, 8&hellip;; nothing crosses blocks</td></tr>
-<tr><td><b>Quick</b></td><td>n log n</td><td>n log n (expected)</td><td><r>n&sup2;</r> (sorted, fixed pivot)</td><td>in-place; stack O(log n)</td><td>No</td><td>&#9316; one value: all left &le; it &lt; all right (check whole sides; can be "none")</td></tr></table>''')
+<tr><td><b>Quick</b></td><td>n log n</td><td>n log n (expected)</td><td><r>n&sup2;</r> (sorted, fixed pivot)</td><td>in-place; stack O(log n) avg, O(n) worst (same trigger as time n&sup2;: sorted input + fixed pivot &rArr; every pivot is min/max &rArr; depth n)</td><td>No</td><td>&#9316; one value: all left &le; it &lt; all right (check whole sides; can be "none")</td></tr></table>''')
 P2.append('<p class="tiny"><b>Check &#9312;&rarr;&#9316; in order.</b> <y>Selection vs Insertion: left part FINAL (the true smallest) &rArr; Selection; left part only sorted &rArr; Insertion.</y> *stable with O(n) extra space. Cocktail sort = two-way <b>Bubble</b> (not Merge), O(n&sup2;). Any <b>comparison sort</b> is &Omega;(n log n): decision tree has n! leaves &rArr; height &ge; log&#8322;(n!) = &Theta;(n log n); merge sort meets it. Non-comparison sorts (counting / radix) can beat n log n when keys are small integers ("any sort is &Omega;(n log n)": <r>F</r>). std::sort = introsort (quicksort + heapsort fallback + insertion sort for small ranges); std::stable_sort = merge sort.</p>')
 P2.append('<p><b>Detective (2022):</b> 6 3 1 4 8 7 5 2 &rarr; <k>1 2 3 4 8 7 5 6</k> Selection (left 4 final, rest untouched); <k>3 1 4 6 5 2 7 8</k> Bubble (7,8 at right); <k>1 3 6 4 8 7 5 2</k> Insertion (left 3 sorted, right untouched); <k>1 3 4 6 2 5 7 8</k> Merge (two sorted halves); <k>3 1 4 2 5 6 8 7</k> Quick (5 in place, left&lt;5&lt;right). <b>2024 Feb:</b> 14 12 40 6 8 100 7 109 &rarr; 6 8 7 12 14 40 100 109 = <b>Quick</b> (pivot 12).</p>')
 P2.append(sub('Recognising a sort from code: WHO is compared, and swap or shift'))
@@ -255,6 +281,12 @@ P2.append(code(S['insertion'])); P2.append(code(S['bubble'])); P2.append(code(S[
 P2.append(code(S['merge']))
 
 P2.append(code(S['quick']))
+P2.append(sub('QuickSelect / MultiSelect: ranks without sorting'))
+P2.append('<p>After partition the pivot sits at index p &rArr; it IS the (p&minus;lo+1)-th smallest of A[lo..hi]. Free information &mdash; only the recursion differs from QuickSort.</p>')
+P2.append(code(S['qselect'], max_col=54))
+P2.append('<p>One call only &rArr; levels shrink n, n/2, n/4, &hellip; &rArr; geometric &le; 2n &rArr; <b>expected O(n)</b>, worst O(n&sup2;).</p>')
+P2.append(code(S['mselect'], max_col=54))
+P2.append('<p>e.g. A = [3,4,1,2,6,7,8,5], ranks 3..6 &rArr; {3,4,5,6} in any order. Both sides are recursed only while the range straddles the pivot &rArr; <b>expected O(n + r log r)</b> where r = b &minus; a + 1: O(n) for a short range, degenerates to QuickSort&#39;s n log n when r = n.</p>')
 P2.append(code('''
 partition, pivot=22:  22 35 10 42 7 51 18  -> swap 35,18: 22 18 10 42 7 51 35
  -> swap 42,7: 22 18 10 7 42 51 35 -> hands cross, swap pivot with A[high]

@@ -4,6 +4,29 @@ One dated entry per mistake that cost a rebuild or a wrong deliverable, with
 the fix that was adopted. Newest first. When a fix becomes a rule, it lives in
 SKILL.md or the references; this file keeps the history.
 
+## 2026-09-14 — Cheatsheet mode: sizing a sheet that overflows by half a column
+
+- **`--measure` under-reported side 1.** It lays every fragment out in one
+  container without the `.pb` class, so side-specific rules such as
+  `.page:not(.pb) { font-size }` were applied to side-1 fragments too, and
+  it adds column-break waste only as a flat guess. Side 1 read 3.11 columns
+  while it really needed 220 mm of a 203 mm box.
+- **Exact fit check that worked:** render the real two-side HTML at the
+  printed content width, set each `.page` to `overflow: visible`, and
+  binary-search the height at which no element's client rect lies right of
+  the page box (anything that does not fit spills into a fourth column to
+  the right). That height includes break waste, and one Chrome run compares
+  a dozen variants in seconds.
+- **What bought space, in order:** code-box padding (~45 boxes) 5 mm per
+  side; table column widths where one long cell wrapped to six lines; body
+  line-height 1.02 to 1.0; then fonts. Reordering equal-weight code boxes
+  and narrowing the column gap gained nothing (breaks are discrete). Moving a
+  heading-led block (the section heading + its first paragraph) across the
+  side boundary fixed the last few millimetres without deleting anything.
+- **Leave margin for print.** A variant with 0.5 mm spare was rejected in
+  favour of one with 1.5 / 3.4 mm; screen layout and print layout can
+  differ by a line.
+
 ## 2026-09-11 — Cheatsheet mode: CS2040C Quiz 1 (two A4 sides, ~5 pt)
 
 - **Chrome print silently shrank the whole document.** Content overflowed the
