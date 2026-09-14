@@ -96,7 +96,7 @@ def profit_svg():
     left = ['', 7, 1, 1, 1, 1]
     diff = ['', '&minus;6', 4, 2, 5, 3]
     x0, w, hgt, buy, sell = 60, 36, 13, 1, 4
-    s = ['<svg viewBox="0 0 280 58" width="30mm" xmlns="http://www.w3.org/2000/svg">']
+    s = ['<svg viewBox="0 0 280 58" width="26mm" xmlns="http://www.w3.org/2000/svg">']
     s.append('<defs><marker id="ahp" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#c00000"/></marker></defs>')
     s.append(f'<path d="M {x0+buy*w+w/2} 12 Q {x0+(buy+sell)/2*w+w/2} -3 {x0+sell*w+w/2} 11" fill="none" stroke="#c00000" stroke-width="0.9" marker-end="url(#ahp)"/>')
     for r, (label, vals, y) in enumerate([('p[i]', p, 13), ('min of left', left, 29), ('p[i] &minus; min', diff, 45)]):
@@ -187,6 +187,7 @@ P1.append('''<p>Binary search finds a <b>BOUNDARY</b>, not just a key. Pattern: 
 <tr><td>fixed point A[i] == i (sorted, distinct)</td><td>A[mid] vs mid</td><td colspan="2">A[mid] &lt; mid &rArr; lo = mid+1; &gt; &rArr; hi = mid&minus;1</td></tr>
 <tr><td>&lfloor;&radic;n&rfloor;</td><td>mid &le; n/mid</td><td>ans = mid; lo = mid+1</td><td>hi = mid&minus;1</td></tr>
 <tr><td>min of rotated sorted array</td><td>A[mid] &gt; A[hi]</td><td>lo = mid+1 (min on right)</td><td>ans = mid; hi = mid&minus;1</td></tr></table>
+<p><r>Initialise ans = -1, not 0</r>: 0 is a valid index, so it cannot mean "not found".</p>
 <p>Linked list: <r>cannot binary search</r> &mdash; finding mid costs an O(n) walk (no O(1) random access), not just "hard".</p>''')
 P1.append(code(S['badge']))
 P1.append(code(S['peak']))
