@@ -2,14 +2,17 @@
 
 这份指南写给**没用过 Claude Code、也没跑过这套流程**的人。照着一节一节做就行。
 
-这个工具能做两件事：
+这个工具有三种模式：
 
 | 你给它什么 | 它给你什么 | 对应模式 |
 |-----------|-----------|---------|
 | 课件 PDF / 上课录像 | 5–7 页 A4 的复习笔记 PDF（定义 → 类比 → 规则/坑） | 笔记模式（默认） |
 | 会议录像（mp4 等） | 一份会议纪要 `minutes.md`（TL;DR、决定、行动项、带时间戳） | 会议模式 |
+| 课件 / 笔记 + 历年考卷 | 双面 A4 的考试 cheatsheet PDF（三栏、约 5pt，完整代码、T/F 一行一条、复杂度分步推导） | Cheatsheet 模式 |
 
-整个流程分三层：**Claude Code**（跑 AI 的命令行工具）→ **这个 skill**（告诉 AI 怎么做笔记）→ **本地依赖**（ffmpeg、whisper 等，负责把视频变成文字和截图）。视频转文字**完全在你自己电脑上跑**，录像不会上传到任何地方；只有转出来的文字和截图会发给你选的模型。
+不用记命令：说出你要什么，它会自动选模式；想指定或中途换，说一句"切换到会议模式"就行，见第 3 步的[切换模式](#切换模式)。
+
+整个流程分三层：**Claude Code**（跑 AI 的命令行工具）→ **这个 skill**（告诉 AI 怎么做笔记）→ **本地依赖**（ffmpeg、whisper 等，负责把视频变成文字和截图；cheatsheet 模式用 Chrome 排版）。视频转文字**完全在你自己电脑上跑**，录像不会上传到任何地方；只有转出来的文字和截图会发给你选的模型。
 
 ---
 
@@ -75,7 +78,7 @@ macOS/Linux 在 `~/.claude/settings.json`，Windows 在 `C:\Users\你的用户�
 
 模型名各家改得很勤，**以它们自己的文档为准**。用方式 C 时注意两点：
 
-- **做课件笔记需要模型能看图**（截帧、contact sheet、PDF 里的图）。选一个支持图片输入的模型，不然录像里的幻灯片它读不了。纯会议纪要只用到文字，什么模型都行。
+- **做课件笔记和 cheatsheet 需要模型能看图**（截帧、contact sheet、PDF 里的图、扫描版的历年卷子）。选一个支持图片输入的模型，不然录像里的幻灯片和没有文字层的卷子它读不了。纯会议纪要只用到文字，什么模型都行。
 - 用了 `ANTHROPIC_AUTH_TOKEN` 就不要再设 `ANTHROPIC_API_KEY`，两个一起设会打架。
 
 改完配置重新运行 `claude`，输入 `/status` 能看到当前用的是哪个接口和模型。
@@ -167,6 +170,34 @@ whisper-cli --help
 
 两个都能出东西就好了。
 
+### 2c. 做 cheatsheet（Cheatsheet 模式必装）
+
+Cheatsheet 用 Chrome 的无头打印排版，不需要 weasyprint。要装的只有两样：
+
+```bash
+# macOS
+brew install --cask google-chrome        # 已经装了 Chrome 就跳过
+brew install poppler
+
+# Windows PowerShell
+winget install Google.Chrome
+winget install oschwartz10612.Poppler
+
+# Linux
+sudo apt install chromium poppler-utils
+```
+
+Chrome 装在非默认位置的话，设置环境变量 `CHROME` 指向它的可执行文件。代码字体用 Consolas：装了 Microsoft Office 或者在 Windows 上会自动嵌入，没有就换成别的等宽字体，不影响使用。cheatsheet 里有代码时，它会用 `g++` 或 `clang++` 编译测试一遍（可选；macOS 装 Xcode Command Line Tools 就有）。
+
+自检（在任意空文件夹里跑，会生成一份两页的示例 PDF；Windows 把 `~/.claude` 换成 `$env:USERPROFILE\.claude`）：
+
+```bash
+python ~/.claude/skills/lecture-notes-maker/assets/build_cheatsheet.py \
+  ~/.claude/skills/lecture-notes-maker/assets/cheatsheet_template.py --out test_sheet.pdf
+```
+
+看到 `wrote test_sheet.pdf: 2 page(s), expected 2` 就好了。
+
 ---
 
 ## 第 3 步：用起来
@@ -213,6 +244,38 @@ claude
 
 要 PDF 的话再说一句"导出成 PDF"。会议里如果共享了屏幕（有 PPT 或文档），告诉它"会议里有共享屏幕，截图也要看"，它就不会加 `--transcript-only`。
 
+### 课件 + 历年考卷 → Cheatsheet
+
+```bash
+cd ~/Desktop/CS2040C     # 里面有 Notes/（考试范围）和 Quiz 1/（历年卷子，带答案的最好）
+claude
+```
+
+> 我要做 Cheatsheet：考试范围是 Notes 文件夹，历年卷子在 Quiz 1 文件夹，要双面 A4。
+
+它会进入 Cheatsheet 模式：
+
+1. 读完范围内的笔记和**每一份**历年卷子，按题型统计分值，版面按分值分配。
+2. 写 `content.py`（文字、表格、图）和 `snippets.py`（代码），代码都会编译测试。
+3. 用 `assets/build_cheatsheet.py --measure --check` 生成 PDF，逐栏截图检查，删减到正好两面、没有被截掉的行。
+4. 交给你 PDF 和一个 `cheatsheet_src/` 文件夹，之后改内容可以直接重新生成。
+
+之后直接说要改什么就行，比如"把 reverse() 加回去""代码字号调到 5pt""T/F 的 F 标红"。**打印时选 A4 横向、双面、实际大小（100%）**，不要选"适应页面"，否则整页会被缩小。
+
+### 切换模式
+
+三种模式不用手动开关，说出你要的东西它就会选对。想明确指定，或者做完一种再换另一种，直接说：
+
+```
+切换到笔记模式
+切换到会议模式
+切换到 cheatsheet 模式
+```
+
+英文也行：`switch to notes mode` / `switch to meeting mode` / `switch to cheatsheet mode`。
+
+切换后，已经读过的课件、历年卷子、会议文字稿会接着用，不用重新给。但每种模式的成品是分开做的：笔记 PDF 不会被"压缩"成 cheatsheet，它会按 cheatsheet 的规则从原材料重新做。你说得不清楚是要笔记还是 cheatsheet 时，它会先问一句。
+
 ### 只想要文字稿，不要 AI 总结
 
 这一步不需要 AI，脚本可以单独跑：
@@ -233,6 +296,7 @@ python ~/.claude/skills/lecture-notes-maker/assets/extract_video.py meeting.mp4 
 - **Cursor / 其他能读文件、能跑命令的 agent**：把整个仓库放进项目，对它说"先读 SKILL.md，按照里面的流程用 lecture.mp4 做笔记"。
 - **只有网页版 ChatGPT / Claude / Kimi 的情况**：自己先跑上面"只想要文字稿"那一步，然后把 `index.md` 和 `references/meeting-summary.md`（会议纪要的模板和规则）一起粘进对话框，说"按这个模板总结"。
   做课件笔记的话就把 `SKILL.md` 里的 Step 2–4 和课件一起给它；只是没有 build 脚本，最后的 PDF 得自己想办法。
+  做 cheatsheet 的话把 `references/cheatsheet-rules.md` 和材料一起给它；排版脚本要本地 Chrome，网页版只能拿到内容，PDF 得自己排。
 
 ---
 
@@ -254,6 +318,12 @@ python ~/.claude/skills/lecture-notes-maker/assets/extract_video.py meeting.mp4 
 
 **一小时的录像跑了 10 分钟就断了** — 让 Claude 用 `nohup … &` 在后台跑（SKILL.md 里有写），它默认会这么做；如果没有，提醒一句。
 
+**Cheatsheet 报 `Chrome/Chromium not found`** — 没装 Chrome，或者装在非默认位置。装上，或者设置环境变量 `CHROME` 指向它。
+
+**Cheatsheet 打印出来字比预期小、四边留白很大** — 打印对话框选了"适应页面"。改成"实际大小 / 100%"。
+
+**Cheatsheet 生成时提示 `code line(s) longer than N chars will be clipped`** — 有代码行太长，打印时右边会被截掉。让 Claude 把这些行缩短或换行再生成。
+
 ---
 
 ## 一句话版本
@@ -262,5 +332,7 @@ python ~/.claude/skills/lecture-notes-maker/assets/extract_video.py meeting.mp4 
 装 Claude Code → 登录（订阅 / API key / 第三方接口）
 → git clone 到 ~/.claude/skills/
 → pip install weasyprint pillow pypdfium2；brew install ffmpeg whisper-cpp poppler；下模型
-→ cd 到放材料的文件夹，运行 claude，说"给我做笔记"或"总结这个会议"
+→ 做 cheatsheet 另外要装 Chrome
+→ cd 到放材料的文件夹，运行 claude，说"给我做笔记""总结这个会议"或"我要做 Cheatsheet"
+→ 随时换模式：说"切换到笔记模式 / 会议模式 / cheatsheet 模式"
 ```

@@ -3,17 +3,23 @@
 This guide is for someone who has **never used Claude Code and has never run
 this pipeline**. Work through it section by section.
 
-The tool does two things:
+The tool has three modes:
 
 | You give it | You get | Mode |
 |-------------|---------|------|
 | Lecture slides PDF / lecture recording | A 5–7 page A4 revision-notes PDF (definition → analogy → rule/trap) | Notes mode (default) |
 | A meeting recording (mp4 etc.) | Meeting minutes `minutes.md` (TL;DR, decisions, action items, all with timestamps) | Meeting mode |
+| Course notes or slides + past exam papers | A two-sided A4 exam cheatsheet PDF (3 columns, ~5pt, complete code, one-line T/F, step-by-step complexity) | Cheatsheet mode |
+
+No commands to memorise: ask for what you want and it picks the mode. To
+name a mode or switch midway, say "switch to meeting mode"; see
+[Switching modes](#switching-modes) in Step 3.
 
 There are three layers: **Claude Code** (the command-line tool that runs the
 AI) → **this skill** (tells the AI how to write the notes) → **local
 dependencies** (ffmpeg, whisper, etc., which turn the video into text and
-screenshots). Speech-to-text runs **entirely on your own machine**; the
+screenshots; cheatsheet mode uses Chrome to lay out the PDF). Speech-to-text
+runs **entirely on your own machine**; the
 recording is never uploaded anywhere. Only the extracted text and frames go
 to the model you chose.
 
@@ -92,10 +98,11 @@ model names:
 Model names change often, so **trust the provider's own docs**. Two things
 to keep in mind with option C:
 
-- **Notes from slides need a model that can see images** (frames, contact
-  sheets, figures inside the PDF). Pick a model with image input, otherwise
-  the slides in a recording cannot be read. Meeting minutes only use text,
-  so any model works.
+- **Notes and cheatsheets from slides need a model that can see images**
+  (frames, contact sheets, figures inside the PDF, scanned past papers).
+  Pick a model with image input, otherwise the slides in a recording and
+  scanned papers cannot be read. Meeting minutes only use text, so any model
+  works.
 - If you set `ANTHROPIC_AUTH_TOKEN`, do not also set `ANTHROPIC_API_KEY`;
   the two conflict.
 
@@ -201,6 +208,41 @@ whisper-cli --help
 
 Both printing something means you are set.
 
+### 2c. Building a cheatsheet (required for cheatsheet mode)
+
+Cheatsheet mode lays out the PDF with headless Chrome, not WeasyPrint. You
+need two things:
+
+```bash
+# macOS
+brew install --cask google-chrome        # skip if Chrome is already installed
+brew install poppler
+
+# Windows PowerShell
+winget install Google.Chrome
+winget install oschwartz10612.Poppler
+
+# Linux
+sudo apt install chromium poppler-utils
+```
+
+If Chrome lives in a non-standard place, set the `CHROME` environment
+variable to its executable. Code is set in Consolas, embedded automatically
+when Microsoft Office is installed or on Windows; without it the sheet falls
+back to another monospace font. If the sheet contains code, Claude compiles
+it with `g++` or `clang++` to test it (optional; on macOS they come with the
+Xcode Command Line Tools).
+
+Self-check (run it in any empty folder; it builds a two-page sample PDF; on
+Windows replace `~/.claude` with `$env:USERPROFILE\.claude`):
+
+```bash
+python ~/.claude/skills/lecture-notes-maker/assets/build_cheatsheet.py \
+  ~/.claude/skills/lecture-notes-maker/assets/cheatsheet_template.py --out test_sheet.pdf
+```
+
+`wrote test_sheet.pdf: 2 page(s), expected 2` means you are set.
+
 ---
 
 ## Step 3: use it
@@ -259,6 +301,51 @@ Ask "export it as a PDF" if you want one. If the meeting had a screen share
 (slides or a document), tell it "there was a screen share, look at the
 frames too" and it will drop `--transcript-only`.
 
+### Notes + past papers → cheatsheet
+
+```bash
+cd ~/Desktop/CS2040C     # contains Notes/ (exam scope) and Quiz 1/ (past papers, ideally with answers)
+claude
+```
+
+> Make me a cheatsheet. The exam scope is the Notes folder, the past papers are in Quiz 1, double-sided A4.
+
+It switches to cheatsheet mode:
+
+1. Reads the scope notes and **every** past paper and counts the marks per
+   question type; space on the sheet follows those marks.
+2. Writes `content.py` (text, tables, figures) and `snippets.py` (code), and
+   compiles every code snippet.
+3. Builds with `assets/build_cheatsheet.py --measure --check`, inspects every
+   column, and cuts until the sheet is exactly two sides with no clipped
+   lines.
+4. Hands you the PDF plus a `cheatsheet_src/` folder, so later edits can be
+   rebuilt.
+
+After that, just say what to change: "add reverse() back", "code at 5pt",
+"F in red". **Print on A4 landscape, double-sided, at actual size (100%)**;
+"fit to page" shrinks the whole sheet.
+
+### Switching modes
+
+The modes need no manual switch: ask for what you want and it picks the
+right one. To name a mode, or to move to another one after finishing, say:
+
+```
+switch to notes mode
+switch to meeting mode
+switch to cheatsheet mode
+```
+
+Chinese works too: `切换到笔记模式` / `切换到会议模式` / `切换到 cheatsheet 模式`.
+
+After a switch, the slides, past papers or meeting transcript it already
+read are reused, so you do not hand them over again. Each mode still builds
+its own output from the source: a notes PDF is never squeezed into a
+cheatsheet; the cheatsheet is rebuilt from the material under cheatsheet
+rules. If it cannot tell whether you want notes or a cheatsheet, it asks
+once.
+
 ### Just the transcript, no AI summary
 
 This step needs no AI; the script runs on its own:
@@ -288,7 +375,9 @@ scripts. It is not tied to Claude Code:
   `references/meeting-summary.md` (the minutes template and rules) into the
   chat and say "summarise following this template". For slide notes, give
   it Steps 2–4 of `SKILL.md` along with the slides; you just will not have
-  the build script, so the final PDF is on you.
+  the build script, so the final PDF is on you. For a cheatsheet, give it
+  `references/cheatsheet-rules.md` with the material; the layout script
+  needs a local Chrome, so a web chat gets you the content but not the PDF.
 
 ---
 
@@ -324,6 +413,17 @@ the meeting-minutes feature.
 the background with `nohup … &` (SKILL.md tells it to). It does this by
 default; if not, remind it.
 
+**Cheatsheet: `Chrome/Chromium not found`**: Chrome is not installed, or it
+is in a non-standard place. Install it, or set the `CHROME` environment
+variable to its path.
+
+**Cheatsheet prints smaller than expected, with wide margins**: the print
+dialog was set to "fit to page". Choose "actual size / 100%".
+
+**Cheatsheet build warns `code line(s) longer than N chars will be clipped`**:
+some code lines are too long and would be cut off at the right edge. Ask
+Claude to shorten or wrap them and rebuild.
+
 ---
 
 ## One-line version
@@ -332,5 +432,7 @@ default; if not, remind it.
 install Claude Code → log in (subscription / API key / third-party endpoint)
 → git clone into ~/.claude/skills/
 → pip install weasyprint pillow pypdfium2; brew install ffmpeg whisper-cpp poppler; download the model
-→ cd into the folder with your material, run claude, ask for notes or a meeting summary
+→ cheatsheet mode also needs Chrome
+→ cd into the folder with your material, run claude, ask for notes, a meeting summary, or a cheatsheet
+→ switch any time: "switch to notes / meeting / cheatsheet mode"
 ```

@@ -1,6 +1,6 @@
 ---
 name: lecture-notes-maker
-description: Turn lecture slides, course PDFs, or lecture recordings (video) into a short, print-ready revision-notes PDF — one lecture in roughly 5–7 A4 pages, each key point written as definition → everyday analogy → rule/trap, worked examples as step-by-step dialogues, ending with a self-check. Use when the user asks for study notes, revision notes, 重点笔记, or a "notes PDF" from uploaded course material. Also turns a meeting recording into minutes (TL;DR, decisions, action items with timestamps) through the same video pipeline — use for 会议纪要, 会议总结, or "summarise this meeting video". Cheatsheet mode: when the user says "我要做 Cheatsheet", "cheatsheet 模式", "小抄", "cheat sheet", or asks for a one/two-page exam reference sheet, build a maximum-density double-sided A4 cheatsheet PDF instead (3 columns, ~5pt, complete compilable code, one-fact-per-line T/F banks, step-by-step complexity derivations, weighted by the past papers). Not for exhaustive transcriptions of the slides.
+description: Three modes. Notes mode (default) turns lecture slides, course PDFs or lecture recordings into a short revision-notes PDF, about 5–7 A4 pages per lecture, each key point as definition → analogy → rule/trap, worked examples as step-by-step dialogues, ending with a self-check; use for 重点笔记, 复习笔记, 笔记模式, study notes, revision notes, a notes PDF. Meeting mode turns a meeting recording into minutes (TL;DR, decisions, timestamped action items); use for 会议纪要, 会议总结, 会议模式, meeting minutes. Cheatsheet mode builds a maximum-density two-sided A4 exam cheatsheet PDF from notes plus past papers (3 columns, ~5pt, compilable code, one-fact-per-line T/F, step-by-step complexity); use for 我要做 Cheatsheet, cheatsheet 模式, 小抄, cheat sheet, a one or two-page exam reference sheet. The user can switch at any time by naming a mode, e.g. 切换到笔记模式 / 切换到会议模式 / 切换到 cheatsheet 模式, or switch to notes / meeting / cheatsheet mode. Not for exhaustive slide-by-slide transcriptions.
 ---
 
 # Lecture Notes Maker
@@ -9,6 +9,10 @@ Produces an A4 revision-notes PDF from source course material. The reader should
 be able to grasp the whole lecture's key points in about **20 minutes**. This is
 **not** a transcription of the slides: the deliverable is the third of the
 material that the exam and the labs actually turn on, written so it sticks.
+
+That is the default **notes** mode. The same skill also runs **Meeting
+mode** and **Cheatsheet mode**; how each is chosen and how the user switches
+between them is under **Scope → Modes and switching** near the end.
 
 ## Non-negotiable rules
 
@@ -342,18 +346,40 @@ locally; it is git-ignored because of its size.)
 
 ## Scope
 
-This skill has three modes: **notes** (default) — short revision notes from
-course material; **Meeting mode** — minutes from a meeting recording;
-**Cheatsheet mode** — a maximum-density two-sided A4 exam sheet built from the
-notes plus the past papers. If the user wants an exhaustive, slide-by-slide
-study document, that is a different artifact — say so and ask which they
-want. If it is unclear whether they want notes or a cheatsheet, ask: the two
-are built by different tools and cannot be converted into each other.
+This skill has three modes under one set of non-negotiable rules. The mode
+decides the deliverable, the workflow section to follow, and the build tool.
+
+### Modes and switching
+
+| Mode | Deliverable | Workflow | Build tool | Triggers |
+|------|-------------|----------|------------|----------|
+| **Notes** (default) | 5–7 page A4 revision-notes PDF | Steps 1–7 above | `assets/build.py` + `notes.css` | 重点笔记, 复习笔记, 笔记模式, study / revision notes, notes mode |
+| **Meeting** | `minutes.md`, PDF on request | Meeting mode below | `assets/build.py` + `minutes.css` | 会议纪要, 会议总结, 会议模式, meeting minutes, meeting mode |
+| **Cheatsheet** | two-sided A4 exam sheet PDF | Cheatsheet mode below | `assets/build_cheatsheet.py` | 我要做 Cheatsheet, cheatsheet 模式, 小抄, cheat sheet, cheatsheet mode |
+
+- **Choosing.** Pick the mode from what the user asks for. An explicit mode
+  name always wins over what the material looks like: course slides plus
+  "cheatsheet 模式" get a cheatsheet, not notes.
+- **Switching.** The user can switch at any time with "切换到笔记模式 /
+  切换到会议模式 / 切换到 cheatsheet 模式", "switch to notes / meeting /
+  cheatsheet mode", or a plain "换成 cheatsheet". Confirm the new mode in one
+  line, keep the source material already read (slides, past papers,
+  transcript) instead of asking for it again, and from then on follow only
+  the new mode's rules and tools.
+- **No conversion.** Each mode builds its own file from the source. A notes
+  PDF is never trimmed into a cheatsheet and minutes are never padded into
+  notes; rebuild from the source under the new mode's rules. Earlier outputs
+  stay where they are.
+- **Unclear.** If it is unclear whether the user wants notes or a cheatsheet
+  ("make something from these slides for the quiz"), ask once. If they want
+  an exhaustive, slide-by-slide study document, that is a different
+  artifact; say so and ask which they want.
 
 ## Meeting mode — recording → minutes
 
 Use this mode when the recording is a meeting (project sync, standup, client
-call, interview), or the user asks for a 会议纪要 / summary of a meeting video.
+call, interview), the user asks for a 会议纪要 / summary of a meeting video,
+or the user names the mode (会议模式, meeting mode, 切换到会议模式).
 Nobody revises for a meeting, so the three layers, analogies, self-check, and
 the 5–7 page PDF do **not** apply. The non-negotiable rules still do: never
 summarise from memory, verify against the transcript, never invent.
@@ -402,7 +428,8 @@ summarise from memory, verify against the transcript, never invent.
 ## Cheatsheet mode — notes + past papers → two-sided A4 exam sheet
 
 Use this mode when the user says **"我要做 Cheatsheet"**, "cheatsheet 模式",
-"小抄", "cheat sheet", or asks for the one/two-page sheet they carry into a
+"小抄", "cheat sheet", "cheatsheet mode", "切换到 cheatsheet 模式", or asks for the
+one/two-page sheet they carry into a
 closed-book quiz. The reader has 30 seconds per question: the sheet is a
 lookup table, not a textbook. The three-layer structure, analogies,
 self-check and the 5–7 page PDF do **not** apply. The non-negotiable rules
