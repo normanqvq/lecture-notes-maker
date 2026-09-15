@@ -6,7 +6,7 @@ parts = ['#include <iostream>\n#include <queue>\n#include <algorithm>\n#include 
 cls = clean(S['class']).replace('BankAcct b;', 'void ctorTest() { BankAcct b;').replace('p = new BankAcct(50);   // constructor runs -> destructor only on: delete p;', 'p = new BankAcct(50); delete p; }')
 parts.append('namespace A {\n' + clean(S['list']) + '\n' + clean(S['stackq']) + '\n' + cls + '\n}\n')
 parts.append('namespace B {\n' + clean(S['list']) + '\n' + clean(S['inherit']).replace('Stack *s = new BeeBooStack();','void t(){ Stack *s = new BeeBooStack();').replace('BeeBooStack b; b.empty();','BeeBooStack b; b.empty(); delete s; }').replace('Animal *a = new Dog(); a->talk();', 'void t2() { Animal *a = new Dog();  a->talk(); delete a; }') + '\n}\n')
-parts.append('namespace C {\n' + '\n'.join(clean(S[k]) for k in ['bsearch','badge','peak','selection','insertion','merge','quick','qselect','mselect','profit']) + '\n}\n')
+parts.append('namespace C {\n' + '\n'.join(clean(S[k]) for k in ['bsearch','badge','peak','peak_iter','selection','insertion','merge','quick','qselect','mselect','profit']) + '\n}\n')
 parts.append('#include <string>\nnamespace F {\n' + clean(S['overload']) + '\n}\n')
 gdefs = '\n'.join(l for l in clean(S['opover']).split('\n') if not (l.startswith('food1') or l.startswith('cout <<')))
 parts.append('namespace G {\nclass Food { std::string _name; int _cal; public: Food(std::string n, int c) : _name(n), _cal(c) {} Food operator+(const Food& f2); bool operator>(const Food& f2); int cal() const { return _cal; } friend std::ostream& operator<<(std::ostream& os, const Food& f); };\n' + gdefs + '\n}\n')
@@ -44,6 +44,7 @@ int main(){
     int m = rand()%20+2; int miss = rand()%m+1; int arr[40], k=0; for(int x=1;x<=m;x++) if(x!=miss) arr[k++]=x; if(C::missingBadge(arr,m)!=miss){cout<<"BADGE FAIL "<<m<<" "<<miss<<endl; return 1;}
     // peak
     int p = C::peak1D(base,0,n-1); if((p>0 && base[p-1]>base[p])||(p<n-1&&base[p+1]>base[p])){cout<<"PEAK FAIL"<<endl; return 1;}
+    int q = C::peak1D(base,n); if((q>0 && base[q-1]>base[q])||(q<n-1&&base[q+1]>base[q])){cout<<"PEAK ITER FAIL"<<endl; return 1;}
   }
   for(int trial=0; trial<4000; trial++){ int n = rand()%30+1; int base[40], s[40], b[40];
     for(int i=0;i<n;i++) base[i]=rand()%10; copy(base,base+n,s); sort(s,s+n);

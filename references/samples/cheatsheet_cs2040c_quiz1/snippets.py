@@ -172,11 +172,25 @@ int missingBadge(int A[], int n) { // A sorted, has n-1 of 1..n (2025 Feb).
 '''
 
 S['peak'] = r'''
-int peak1D(int A[], int lo, int hi) { // index of ANY local max. O(log n)
+int peak1D(int A[], int lo, int hi) {
     int mid = (lo + hi) / 2;
-    if (mid > lo && A[mid-1] > A[mid]) return peak1D(A, lo, mid-1); // bigger
-    if (mid < hi && A[mid+1] > A[mid]) return peak1D(A, mid+1, hi); //  side
-    return mid;                               // >= both neighbours: peak
+    if (mid > lo && A[mid-1] > A[mid])
+        return peak1D(A, lo, mid-1);
+    if (mid < hi && A[mid+1] > A[mid])
+        return peak1D(A, mid+1, hi);
+    return mid;
+}
+'''
+
+S['peak_iter'] = r'''
+int peak1D(int A[], int n) {
+    int lo = 0, hi = n - 1;
+    while (lo < hi) {
+        int mid = (lo + hi) / 2;
+        if (A[mid] < A[mid+1]) lo = mid + 1;
+        else hi = mid;
+    }
+    return lo;
 }
 '''
 

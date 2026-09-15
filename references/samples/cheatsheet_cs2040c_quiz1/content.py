@@ -10,7 +10,7 @@ from cheatsheet import code, sec, sub, fig, tree_svg
 from snippets import S
 
 TITLE = "CS2040C Quiz 1 Cheatsheet"
-CSS_EXTRA = 'body { line-height: 1.02; } th, td { padding: 0.15pt 1.3pt; } pre.code { line-height: 1.02; margin: 1pt 0; } p { margin-bottom: 0.9pt; } ul { margin-bottom: 0.9pt; } h1 { margin: 1.3pt 0 0.5pt; } h2 { margin: 1pt 0 0.3pt; } table { margin: 0.8pt 0 1.1pt; } .fig { margin: 0.5pt 0; } pre.code { padding: 0.6pt 2.4pt; margin: 0.6pt 0; } pre.code.mid, pre.code.last { padding-top: 1pt; } h1 { margin: 1pt 0 0.4pt; } h2 { margin: 0.7pt 0 0.2pt; } p, ul { margin-bottom: 0.6pt; } table { margin: 0.6pt 0 0.8pt; } body { line-height: 1.0; } .hdr { padding: 0.5pt 3pt; margin-bottom: 1pt; } .fig { margin: 0; } .page.pb { font-size: 5.0pt; } .page.pb table { font-size: 4.6pt; } .page.pb .tiny { font-size: 4.7pt; } .page.pb .fig .cap { font-size: 4.8pt; } .page.pb pre.code { font-size: 4.7pt; } .page.pb td.m, .page.pb th.m { font-size: 4.6pt; } .page:not(.pb) { font-size: 5.0pt; } .page:not(.pb) table { font-size: 4.6pt; } .page:not(.pb) .tiny { font-size: 4.7pt; } .page:not(.pb) .fig .cap { font-size: 4.8pt; } .page:not(.pb) pre.code { font-size: 4.7pt; } .page:not(.pb) td.m, .page:not(.pb) th.m { font-size: 4.6pt; } .page.pb th, .page.pb td { padding: 0.05pt 1.3pt; }'
+CSS_EXTRA = 'body { line-height: 1.02; } th, td { padding: 0.15pt 1.3pt; } pre.code { line-height: 1.02; margin: 1pt 0; } p { margin-bottom: 0.9pt; } ul { margin-bottom: 0.9pt; } h1 { margin: 1.3pt 0 0.5pt; } h2 { margin: 1pt 0 0.3pt; } table { margin: 0.8pt 0 1.1pt; } .fig { margin: 0.5pt 0; } pre.code { padding: 0.6pt 2.4pt; margin: 0.6pt 0; } pre.code.mid, pre.code.last { padding-top: 1pt; } h1 { margin: 1pt 0 0.4pt; } h2 { margin: 0.7pt 0 0.2pt; } p, ul { margin-bottom: 0.6pt; } table { margin: 0.6pt 0 0.8pt; } body { line-height: 1.0; } .hdr { padding: 0.5pt 3pt; margin-bottom: 1pt; } .fig { margin: 0; } .page.pb { font-size: 5.0pt; } .page.pb table { font-size: 4.6pt; } .page.pb .tiny { font-size: 4.7pt; } .page.pb .fig .cap { font-size: 4.8pt; } .page.pb pre.code { font-size: 4.7pt; } .page.pb td.m, .page.pb th.m { font-size: 4.6pt; } .page:not(.pb) { font-size: 5.0pt; } .page:not(.pb) table { font-size: 4.6pt; } .page:not(.pb) .tiny { font-size: 4.7pt; } .page:not(.pb) .fig .cap { font-size: 4.8pt; } .page:not(.pb) pre.code { font-size: 4.7pt; } .page:not(.pb) td.m, .page:not(.pb) th.m { font-size: 4.6pt; } .page.pb th, .page.pb td { padding: 0.05pt 1.3pt; } .page.pb pre.code { font-size: 4.6pt; } .page.pb td.m, .page.pb th.m { font-size: 4.5pt; }'
 LAYOUT = {"margin": "3.5mm 4mm", "page_height": "203mm", "column_gap": "2.2mm", "code_line_limit": 90}
 
 # ---------------- SVG figures ----------------
@@ -190,7 +190,9 @@ P1.append('''<p>Binary search finds a <b>BOUNDARY</b>, not just a key. Pattern: 
 <p><r>Initialise ans = -1, not 0</r>: 0 is a valid index, so it cannot mean "not found".</p>
 <p>Linked list: <r>cannot binary search</r> &mdash; finding mid costs an O(n) walk (no O(1) random access), not just "hard".</p>''')
 P1.append(code(S['badge']))
-P1.append(code(S['peak']))
+P1.append(sub('peak1D &mdash; recursive | iterative'))
+P1.append('<div class="two" style="break-inside: avoid">' + code(S['peak']) + code(S['peak_iter']) + '</div>')
+P1.append('<p><b>Tail recursion</b> (recursive call is the last line, only one) &rArr; rewritable as a while loop, O(1) stack. Otherwise keep the recursion.</p>')
 P1.append('''<ul>
 <li><b>Peak finding</b> (local max; ends = &minus;&infin;): recurse into the <b>bigger</b> side, it must contain a peak (values can&#39;t rise forever); the smaller side may have none. Finding <i>all</i> peaks: &Omega;(n).</li>
 <li><b>2D peak</b> (m cols &times; n rows): column global max + 1D peak = O(mn), correct but slow; column <i>local</i> max = wrong; <b>lazy evaluation</b> (column max computed only when visited) = <b>O(n log m)</b>.</li>
@@ -220,7 +222,6 @@ P1.append('''<table><tr><th class="m">code</th><th>Steps</th></tr>
 
 
 
-P1.append('<p><b>Recurrence not in the &sect;5 table &mdash; T(n)=T(n/10)+T(9n/10)+cn</b> (quicksort 1:9; not covered by k calls f(n/k)) &rArr; <r>O(n log n)</r>: <y>unequal split, but sizes still add up to n &rArr; n per level</y>; depth = longest path log&#8321;&#8320;&#8725;&#8329; n.</p>')
 
 # ---------------- PAGE 2 ----------------
 P2 = []
@@ -256,6 +257,7 @@ f(10); f(n-10);</td><td>1+1</td><td>n/10</td><td>1, 1, 1</td><td><b>O(n)</b> (1 
 <tr><td class="m">f(n&minus;k)+f(n&minus;m)</td><td>2</td><td>n</td><td>&le; doubles</td><td>exponential, write <b>O(2ⁿ)</b></td></tr>
 <tr><td class="m">f(n&minus;1)+f(n&minus;2) (Fibonacci)</td><td>2</td><td>n</td><td>&le; doubles</td><td>exactly O(1.618ⁿ); in the quiz write <b>O(2ⁿ)</b></td></tr></table>
 <p><b>Rules of thumb:</b> subtract a constant + 1 call = O(n); subtract a constant + &ge;2 calls = exponential; divide by a constant + k calls = n log n. <r>No base case &rArr; None of the above.</r> A call of fixed size, f(10) inside f(n) &rArr; O(1).</p>''')
+P2.append('<p><b>Recurrence not in the &sect;5 table &mdash; T(n)=T(n/10)+T(9n/10)+cn</b> (quicksort 1:9; not covered by k calls f(n/k)) &rArr; <r>O(n log n)</r>: <y>unequal split, but sizes still add up to n &rArr; n per level</y>; depth = longest path log&#8321;&#8320;&#8725;&#8329; n.</p>')
 P2.append(code('''
 //! Special: return INSIDE the loop -> body runs once, the loop vanishes
 for (i=0; i<n; i++) return f(n-1);      // T(n)=T(n-1)+1 => O(n)
