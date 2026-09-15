@@ -274,7 +274,7 @@ def render_pdf(html_path, pdf_path):
 
 def pdf_pages(pdf_path):
     if shutil.which("pdfinfo"):
-        out = subprocess.run(["pdfinfo", pdf_path], capture_output=True, text=True).stdout
+        out = subprocess.run(["pdfinfo", pdf_path], capture_output=True, text=True, encoding="utf-8", errors="replace").stdout
         m = re.search(r"Pages:\s+(\d+)", out)
         return int(m.group(1)) if m else -1
     return -1
@@ -303,8 +303,8 @@ def measure(pages, title, css_extra="", layout=None, col_width_mm=94.3):
     js = ('<script>var o=[];document.querySelectorAll(".it").forEach(function(e){o.push(e.dataset.p+":"+e.dataset.i+":"+e.offsetHeight)});'
           'document.body.innerHTML="<pre id=m>"+o.join("|")+"</pre>";</script>')
     doc = f'<!doctype html><html><head><meta charset="utf-8"><style>{css}</style></head><body><div class="page">{items}</div>{js}</body></html>'
-    tmp = os.path.abspath("_measure.html"); open(tmp, "w").write(doc)
-    out = subprocess.run([find_chrome(), "--headless=new", "--disable-gpu", "--dump-dom", tmp], capture_output=True, text=True).stdout
+    tmp = os.path.abspath("_measure.html"); open(tmp, "w", encoding="utf-8").write(doc)
+    out = subprocess.run([find_chrome(), "--headless=new", "--disable-gpu", "--dump-dom", tmp], capture_output=True, text=True, encoding="utf-8", errors="replace").stdout
     os.remove(tmp)
     m = re.search(r'<pre id="m">(.*?)</pre>', out, re.S)
     res = []

@@ -20,6 +20,7 @@ def load(path):
     return mod
 
 def main():
+    sys.stdout.reconfigure(errors="replace")   # Windows GBK console cannot print nbsp etc. in --measure previews
     ap = argparse.ArgumentParser()
     ap.add_argument("content"); ap.add_argument("--out", default="cheatsheet.pdf")
     ap.add_argument("--check", action="store_true"); ap.add_argument("--measure", action="store_true")
@@ -32,7 +33,7 @@ def main():
 
     html_doc = cs.build_html(pages, title, css_extra, layout)
     html_path = os.path.splitext(a.out)[0] + ".html"
-    open(html_path, "w").write(html_doc)
+    open(html_path, "w", encoding="utf-8").write(html_doc)
     cs.render_pdf(html_path, a.out)
     n = cs.pdf_pages(a.out)
     print(f"wrote {a.out}: {n} page(s), expected {len(pages)}")

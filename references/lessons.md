@@ -4,6 +4,27 @@ One dated entry per mistake that cost a rebuild or a wrong deliverable, with
 the fix that was adopted. Newest first. When a fix becomes a rule, it lives in
 SKILL.md or the references; this file keeps the history.
 
+## 2026-09-16 — Cheatsheet mode on Windows: first build crashed
+
+- **`build_cheatsheet.py` died with `UnicodeDecodeError` in a reader thread,
+  then `TypeError` in `pdf_pages`.** Windows Python decodes subprocess output
+  with the ANSI code page unless `PYTHONUTF8=1`; with it set (needed so the
+  HTML was written as UTF-8), `pdfinfo` output in the GBK code page is not
+  valid UTF-8, the reader thread died and `stdout` came back `None`.
+  Fix: `subprocess.run(..., encoding="utf-8", errors="replace")` for
+  `pdfinfo` and Chrome `--dump-dom`, and `encoding="utf-8"` on every HTML
+  `open(..., "w")` in the cheatsheet builder, so Chinese content no longer
+  depends on the system code page.
+- **`--measure` then crashed printing its previews** (`UnicodeEncodeError:
+  'gbk' codec can't encode ' '`): the Windows console is GBK and the
+  fragment text carries `&nbsp;`. Fix: `sys.stdout.reconfigure(errors=
+  "replace")` at the top of `build_cheatsheet.py`.
+- **A formula sheet with little content is not a quiz sheet.** A CG1111A
+  studio formula sheet filled only 1.6 columns at 5.5 pt; the fonts were
+  raised instead of adding content, but the user still found one page too
+  crowded and asked for sections laid out separately. Short reference sheets
+  get two columns, bigger type and room between sections.
+
 ## 2026-09-14 — Cheatsheet mode: sizing a sheet that overflows by half a column
 
 - **`--measure` under-reported side 1.** It lays every fragment out in one
